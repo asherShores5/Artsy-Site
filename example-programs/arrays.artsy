@@ -1,0 +1,45 @@
+string message[50];
+string staticMessage;
+int numArr[5];
+int random;
+
+numArr[0] = 1;
+
+function int displayMessage(){
+	message[0] = "I"; 																		/*1. allow array to accept word */
+	message[1] = " ";																/*1.5 semantic check (array) string not int */ 
+	message[2] = "c";
+	message[3] = "a";
+	message[4] = "n";
+	message[5] = " ";
+	message[6] = "p";
+	message[7] = "r";
+	message[8] = "i";
+	message[9] = "n";
+	message[10] = "t";
+	message[11] = "!";
+	/*message[100] = "Error"; 	*/														/*2. semantic check if not correct number */
+	
+	return numArr[0];
+}
+
+// Create strings
+random = displayMessage();
+staticMessage = "static message lol haha :)";
+
+numArr[0] = 1;
+numArr[1] = numArr[0];
+numArr[2] = 3; 																
+numArr[3] = 4; 	
+numArr[4] = 5; 	
+// numArr[5] = 10; Semantic Error
+
+random = numArr[0] + numArr[2];
+
+print numArr;
+addline;
+print message;
+addline;
+print staticMessage;
+addline;
+print random;

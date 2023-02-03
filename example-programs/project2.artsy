@@ -1,0 +1,184 @@
+string message[50];
+
+function int displayMessage(){
+	message[0] = "I"; 																		
+	message[1] = " ";																
+	message[3] = "a";
+	message[4] = "n";
+	message[5] = " ";
+	message[6] = "p";
+	message[7] = "r";
+	message[8] = "i";
+	message[9] = "n";
+	message[10] = "t";
+	message[11] = ":";
+	int a;
+	a = 1;
+	if(a == 1) {
+		int b;
+		b = 2;
+	}
+	/* message[100] = "Error"; 	*/														
+	
+	return 0;
+}
+
+
+
+int anywhere; 										
+anywhere = 5;										
+write anywhere; 									
+write "done";																						
+write 5;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*1. semantic check for loop comparsion*/
+/*2. semantic check for if comparsion*/
+/*3. Add AST nodes in the parser for if statements and loops and Add symbol table support for if statements and loops (adding scopes declarations) */
+/*4. check that all ast and symbol are up to date*/ 
+/*5. make sure all        root -> nodeType: =           are filled */ 
+
+
+
+boolean t;
+boolean f;
+boolean n;
+boolean k;
+ 
+
+int a;
+int b;
+int x;
+int y;
+int z;
+string c;
+string d;
+
+// string majortest;
+// majortest = "hello";
+
+int majortest;
+majortest = 1;
+
+
+
+
+x = 0;
+a = 5;
+b = 3;
+y = x + a;
+t = TRUE; 								
+f = FALSE;								 
+n = (a > b);                             
+k = (a < b); 							 
+c = "c c c";
+d = "d d d";
+
+
+
+while (majortest < 4){ 														/*1 should be error*/				
+	int abc;
+	if (majortest < 1){														/*2 should be error*/
+		int h;
+		z = 5;
+		write z;
+		x = x + 1;
+		/*int ifone;*/  													/*3*/
+	}
+	elif (majortest == 1 || x < 0){        		
+		z = 6;
+		write z;
+		x = x + 1;
+		/*int iftwo; */														/*3*/
+		int abcde;
+	}
+	elif (x == majortest && x > 1){				 
+		z = 7;
+		write z;
+		x = x + 1;
+	}
+	else{
+		z = 8;
+		write z;
+		x = x + 1;
+		if (n == TRUE){				
+			write c; 
+			if (k == FALSE){			
+				write d; 
+				int abcdefg;
+			}
+		}
+	}
+}
+
+
+z = 9;
+write z; 
+
+
+
+
+/*4. check that all ast and symbol are up to date*/ 
+/*5. make sure all        root -> nodeType: =           are filled */ 
+
+
+
+
+
+int check1;
+int check2;
+check1 = 1;
+check2 = 2;
+
+
+while (check1 == 1){
+	if (check2 == 2){
+		int check3;
+		check3 = 5;
+		write check3;
+		check2 = 3;
+	}
+	elif (check2 == 3){
+		int check4;
+		check4 = 4;
+		write check4;
+		check2 = 4;
+	}
+	else{
+		int check6;
+		check6 = 6;
+		write check6;
+		check2 = 6;
+
+	}
+}

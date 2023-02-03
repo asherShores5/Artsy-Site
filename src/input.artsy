@@ -1,0 +1,24 @@
+// Simple implementation of void function
+string launchMessage;
+
+// Print two messages using a void function
+action testMessage() {
+    string test;
+    test = "Test Void Function: ";
+    print test;
+    addline;
+    print launchMessage;
+    addline;
+}
+
+// Create launchMessage
+launchMessage = "Launching in 3, 2, 1, lift off!";
+print launchMessage;
+addline;
+
+// Test void function
+testMessage();
+
+// Confirm exit
+launchMessage = "Ending Program";
+print launchMessage;

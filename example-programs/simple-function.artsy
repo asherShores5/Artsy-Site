@@ -1,0 +1,14 @@
+// Simple function program
+declare x as int;
+declare y as int;
+
+action int test(int a, int b) {
+    report a / b;
+}
+
+let y = (52 - 10 * 3) * 2;
+let x = test(y, 3);
+
+print y;
+addline;
+print x;

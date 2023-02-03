@@ -1,0 +1,72 @@
+// Complex Function Program in Artsy
+declare aNumber as int;
+declare secondNumber as float;
+declare someLetter as string; // unsupported type
+declare justAverage as float;
+declare test as float;
+
+action float average(float a, float b, float c){
+	float avg;
+	let avg equal (a plus b plus c) div -3.3;
+	report avg;
+}
+
+action int unreachable(int x, int y){
+   /*
+	This action (or function) does nothing and should
+	Be removed from IR code in the optimization step
+   */
+
+   int result;
+   let result equal x times y plus x times y;
+
+   report result;
+}
+
+action int displayMessage(){
+	report -2 times 3;
+}
+
+action float ambitiousFunction (float a, float b, float c){
+
+   /* great optimization opportunity */
+
+   float result;
+ 
+   let result equal (average(a, b, c) plus average(a, b, c)) div 2.0;
+
+   report result;
+}
+
+action float divideHalf(float a) {
+   float result;
+   let result equal a div 2.0;
+   report result;
+}
+
+let justAverage equal average(12.5, -331.7, 25.8);
+let aNumber equal displayMessage();
+print justAverage;
+addline;
+
+let justAverage equal justAverage times (justAverage plus 3.0);
+let justAverage equal average(justAverage, 0.0, 1.1);
+let aNumber equal displayMessage();
+print justAverage;
+addline;
+
+let aNumber equal displayMessage();
+print aNumber;
+addline;
+let aNumber equal aNumber div (aNumber plus aNumber times aNumber);
+print aNumber;
+addline;
+
+let justAverage equal ambitiousFunction(13.43, 20.3, 5.537);
+let aNumber equal displayMessage();
+print justAverage;
+addline;
+
+let test equal divideHalf(3.0);
+print test;
+addline;

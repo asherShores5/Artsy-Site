@@ -78,27 +78,90 @@
     <script>
       // Initialize ace editor
       var editor = ace.edit("editor");
+
       editor.setTheme("ace/theme/monokai");
       editor.session.setMode("ace/mode/javascript");
-      editor.setValue("console.log('Hello, World!')", -1); // include hello world program by default
+      // editor.setValue("console.log('Hello, World!')", -1);
+      editor.setValue("// Artsy Program\ndeclare x as float;\nlet x = 10.0;\nprint x;", -1) // include hello world program by default
+
+      var output = document.getElementById("output");
+      output.innerHTML = ""; // clear output box before running new code
 
       // Function to run code and display output in output box
       function runCode() {
-        var code = editor.getValue();
-        var output = document.getElementById("output");
-        output.innerHTML = ""; // clear output box before running new code
+          var code = editor.getValue();
+          output.innerHTML = ""; // clear output box before running new code
 
-        // Use eval() function to run code and save to file
-        try {
-            var result = eval(code);
-            if(result){
-                output.innerHTML = result;
+          // Try running the Artsy makefile command using spawn
+          try {
+              // Save the input as an Artsy file
+              const fs = require('fs');
+              // var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+              // saveAs(blob, "src/input.artsy");
+
+              fs.writeFile('src/input.artsy', code, function (err) {
+                if (err) throw err;
+                console.log("File written.");
+              });
+
+              // Use a make file command to run the compiler
+              const { spawn } = require('child_process');
+              const make = spawn('make', ['-C', '../src', 'artsy']);
+
+              make.stdout.on('data', (data) => {
+                console.log(`stdout: ${data}`);
+              });
+
+              make.stderr.on('data', (data) => {
+                console.error(`stderr: ${data}`);
+              });
+
+              make.on('close', (code) => {
+                console.log(`child process exited with code ${code}`);
+              });
+              
+          } catch (err) {
+              output.innerHTML = "Error: " + err;
+          }
+
+          // Display Artsy within the output terminal
+          var memory;
+          let artsyOutput = "";
+          fetch('../src/WASMcode.wasm')
+          .then(response => response.arrayBuffer())
+          .then(bytes => WebAssembly.instantiate(bytes, 
+          {
+          env: {
+              jsprint: function jsprint(byteOffset) {
+                  var s = '';
+                  var a = new Uint8Array(memory.buffer);
+                  for (var i = byteOffset; a[i]; i++) {
+                  s += String.fromCharCode(a[i]);
+                  }
+                  var p = document.createElement('p');
+                  var t = document.createTextNode(s);
+                  p.appendChild(t);
+                  document.body.appendChild(p);
+              },
+
+              newline: function newline() {
+                  output.innerHTML += "<br />";
+              },
+
+              writeconsoleInt: function writeconsole(wVar) {
+                  output.innerHTML += wVar;
+              },
+
+              writeconsoleFloat: function writeconsole(wVar) {
+                  output.innerHTML += wVar;
+              },
+
+              writeconsoleString: function writeconsole(wVar) {
+                  output.innerHTML += String.fromCharCode(wVar);
+              }
             }
-            var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-            saveAs(blob, "src/output.txt");
-        } catch (err) {
-            output.innerHTML = "Error: " + err;
-        }
+          }
+          )).catch(output.innerHTML += console.error);
       }
 
       // Add event listener to run button
