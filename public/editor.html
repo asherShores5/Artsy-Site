@@ -121,7 +121,7 @@
               });
               
           } catch (err) {
-              output.innerHTML = "Error: " + err;
+              // output.innerHTML = "Error: " + err;
           }
 
           // Display Artsy within the output terminal
@@ -161,7 +161,11 @@
               }
             }
           }
-          )).catch(output.innerHTML += console.error);
+          )).then(results => {
+          instance = results.instance;
+          memory = instance.exports.pagememory;
+          instance.exports.main();
+          }).catch(console.error);
       }
 
       // Add event listener to run button

@@ -1,4 +1,81 @@
 #### IR Code ####
-type float x
-x = 10.0
-output x
+type string launchMessage array 100
+entry void testMessage
+type string test array 100
+test[0] = "T"
+test[1] = "e"
+test[2] = "s"
+test[3] = "t"
+test[4] = " "
+test[5] = "V"
+test[6] = "o"
+test[7] = "i"
+test[8] = "d"
+test[9] = " "
+test[10] = "F"
+test[11] = "u"
+test[12] = "n"
+test[13] = "c"
+test[14] = "t"
+test[15] = "i"
+test[16] = "o"
+test[17] = "n"
+test[18] = ":"
+test[19] = " "
+endstring test 20
+output test
+addline
+output launchMessage
+addline
+exit
+launchMessage[0] = "L"
+launchMessage[1] = "a"
+launchMessage[2] = "u"
+launchMessage[3] = "n"
+launchMessage[4] = "c"
+launchMessage[5] = "h"
+launchMessage[6] = "i"
+launchMessage[7] = "n"
+launchMessage[8] = "g"
+launchMessage[9] = " "
+launchMessage[10] = "i"
+launchMessage[11] = "n"
+launchMessage[12] = " "
+launchMessage[13] = "3"
+launchMessage[14] = ","
+launchMessage[15] = " "
+launchMessage[16] = "2"
+launchMessage[17] = ","
+launchMessage[18] = " "
+launchMessage[19] = "1"
+launchMessage[20] = ","
+launchMessage[21] = " "
+launchMessage[22] = "l"
+launchMessage[23] = "i"
+launchMessage[24] = "f"
+launchMessage[25] = "t"
+launchMessage[26] = " "
+launchMessage[27] = "o"
+launchMessage[28] = "f"
+launchMessage[29] = "f"
+launchMessage[30] = "!"
+endstring launchMessage 31
+output launchMessage
+addline
+call testMessage args
+launchMessage[0] = "E"
+launchMessage[1] = "n"
+launchMessage[2] = "d"
+launchMessage[3] = "i"
+launchMessage[4] = "n"
+launchMessage[5] = "g"
+launchMessage[6] = " "
+launchMessage[7] = "P"
+launchMessage[8] = "r"
+launchMessage[9] = "o"
+launchMessage[10] = "g"
+launchMessage[11] = "r"
+launchMessage[12] = "a"
+launchMessage[13] = "m"
+endstring launchMessage 14
+output launchMessage
