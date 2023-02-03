@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Explore Artsy</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+        .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+        .fa-anchor,.fa-coffee {font-size:250px}
+    </style>
+    <style>
+      /* Add styles for the wireframe components */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .header h1 {
+        margin: 0;
+      }
+
+      .header input {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid gray;
+      }
+
+      .content {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .left-sidebar {
+        width: 20%;
+        padding: 20px;
+        background-color: lightgray;
+      }
+
+      .right-sidebar {
+        width: 20%;
+        padding: 20px;
+        background-color: lightgray;
+      }
+
+      .main-content {
+        width: 60%;
+        padding: 20px;
+      }
+
+      .card {
+        background-color: white;
+        box-shadow: 2px 2px 10px gray;
+        margin-bottom: 20px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .card h2 {
+        margin: 0;
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 16px;
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="w3-top">
+        <div class="w3-bar w3-green w3-card w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-green" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+            <a href="index.html" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Home</a>
+            <a href="editor.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Create</a>
+            <a href="tutorial.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Tutorial</a>
+            <a href="explore.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white">Explore</a>
+            <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
+        </div>
+    
+        <!-- Navbar on small screens -->
+        <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+            <a href="index.html" class="w3-bar-item w3-button w3-padding-large">Home</a>
+            <a href="editor.html" class="w3-bar-item w3-button w3-padding-large">Create</a>
+            <a href="tutorial.html" class="w3-bar-item w3-button w3-padding-large">Tutorial</a>
+            <a href="explore.html" class="w3-bar-item w3-button w3-padding-large">Explore</a>
+            <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
+        </div>
+    <div class="container">
+        <h1>Explore Page</h1>
+        <input type="text" placeholder="Search...">
+        <div>
+    <div class="content">
+      <div class="left-sidebar">
+        <!-- Add categories here -->
+        <h2>Categories</h2>
+        <ul>
+          <li>Category 1</li>
+          <li>Category 2</li>
+          <li>Category 3</li>
+        </ul>
+      </div>
+      <div class="main-content">
+        <!-- Add content feed here -->
+        <h2>Content Feed</h2>
+        <div class="card">
+          <h2>Project 1</h2>
+          <p>By User 1</p>
+        </div>
+        <div class="card">
+          <h2>Project 2</h2>
+          <p>By User 2</p>
+        </div>
+        <div class="card">
+          <h2>Project 3</h2>
+          <p>By User 3</p>
+        </div>
+      </div>
+      <div class="right-sidebar">
+        <!-- Add user profiles here -->
+        <h2>User Profiles</h2>
+        <div class="card">
+          <h2>User 1</h2>
+        </div>
+        <div class="card">
+          <h2>User 2</h2>
+        </div>
+        <div class="card">
+          <h2>User 3</h2>
+        </div>
+      </div
+    </div>
+</body>
+</html>
