@@ -1,0 +1,31 @@
+.video-container{
+    margin-left: auto;
+    margin-right: auto;
+    width: 8em;
+}
+
+.videobox{
+    padding: 5%;
+    margin: 5%;
+    background-color: #28A428;
+    opacity: 0.81;
+    display: flex;
+    text-align: justify;
+    font-size: 4.3vw;
+
+}
+
+
+.videobox:hover{
+-webkit-transform: scale(0.8);
+-ms-transform: scale(0.8);
+transform: scale(0.91);
+transition: 1s ease;
+}
+
+.videobox{
+    transition: 1s ease;
+}
+    
+
+
