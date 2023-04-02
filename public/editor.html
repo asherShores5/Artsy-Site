@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Artsy Project</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -16,9 +16,14 @@
   </style>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blob-util@4.0.0/dist/blob-util.min.js"></script>
-    
-    
+    <button id="saveText">Save Text</button>
   <title>Welcome to Code Editor</title>
+
+  <script> 
+    var code = editor.getValue();
+
+  </script>
+
   <style>
     /* CSS styles for page */
     body {
@@ -187,10 +192,37 @@
         cursor: pointer; 
       } 
     </style> 
+
+    <button onclick="saveTextAsFile()">Create and Write File</button>
+    <form id="save-form">
+      <textarea id="file-contents"></textarea>
+      <input type="hidden" id="file-name" value="existing-file.txt">
+      <button type="submit">Save</button>
+    </form>
+    
+    <script>
+    const form = document.getElementById("save-form");
+    const fileContents = document.getElementById("file-contents");
+    const fileName = document.getElementById("file-name");
+    
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+    
+      const request = new XMLHttpRequest();
+      request.open("POST", "/save-file");
+      request.setRequestHeader("Content-Type", "application/json");
+    
+      request.onload = () => {
+        if (request.status === 200) {
+          alert("File saved successfully.");
+        } else {
+          alert("Error saving file.");
+        }
+      };
     
     <a href="index.html" class="center-button"> 
-      Return to Home Page 
+      Return to Index 
     </a> 
     
   </body>
-  </html>
+</html>
