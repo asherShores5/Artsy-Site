@@ -10,7 +10,7 @@
   $code = $_POST["code"];
 
   // Open the file for writing (this will create a new file if it doesn't exist)
-  $file = fopen("path/to/your/file.js", "w");
+  $file = fopen("../src/input.artsy", "w");
 
   // Write the code to the file
   fwrite($file, $code);
