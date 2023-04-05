@@ -1,0 +1,72 @@
+# Complex Action (Function) Program in Artsy
+declare aNumber as int;
+declare secondNumber as float;
+declare someLetter as string; # unsupported type
+declare justAverage as float;
+declare test as float;
+
+action float average(float a, float b, float c){
+	declare avg as float;
+	let avg = (a + b + c) / -3.3;
+	report avg;
+}
+
+action int unreachable(int x, int y){
+   /#
+	This action (or function) does nothing and should
+	Be removed from IR code in the optimization step
+   #/
+
+   declare result as int;
+   let result = x * y + x * y;
+
+   report result;
+}
+
+action int displayMessage(){
+	report -2 * 3;
+}
+
+action float ambitiousAction (float a, float b, float c){
+
+   /# great optimization opportunity #/
+
+   declare result as float;
+ 
+   let result = (average(a, b, c) + average(a, b, c)) / 2.0;
+
+   report result;
+}
+
+action float divideHalf(float a) {
+   declare result as float;
+   let result = a / 2.0;
+   report result;
+}
+
+let justAverage = average(12.5, -331.7, 25.8);
+let aNumber = displayMessage();
+print justAverage;
+addline;
+
+let justAverage = justAverage * (justAverage + 3.0);
+let justAverage = average(justAverage, 0.0, 1.1);
+let aNumber = displayMessage();
+print justAverage;
+addline;
+
+let aNumber = displayMessage();
+print aNumber;
+addline;
+let aNumber = aNumber / (aNumber + aNumber * aNumber);
+print aNumber;
+addline;
+
+let justAverage = ambitiousAction(13.43, 20.3, 5.537);
+let aNumber = displayMessage();
+print justAverage;
+addline;
+
+let test = divideHalf(3.0);
+print test;
+addline;

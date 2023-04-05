@@ -1,0 +1,10 @@
+# Artsy Program
+declare x as int;
+let x = 50;
+print "Start the loop!";
+
+while (x < 100) {
+    print x;
+    addline;
+    x = x + 1;
+}

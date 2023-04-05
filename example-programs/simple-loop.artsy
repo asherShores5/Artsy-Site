@@ -1,0 +1,38 @@
+# Declare variables
+declare x as int;
+declare y as int;
+
+# Assign values
+let x = 1;
+let y = 30;
+
+/#
+While Test!!!
+
+Prints all numbers of x from -1 to 40 onto a new line
+#/
+
+# x < y and x < 30 or y > 30 or y < 10 and x < 100
+while (x < y) {
+	print "Line #"; # Print start statement
+	declare z as int;
+	let z = 1;
+	print x; # Print expression
+	print ":";
+
+	# Nested While Loop Test
+	while (z < 3) {
+		declare b as int;
+		let b = 1;
+		print "\t";
+		print z + b;
+		print ", ";
+		let z = z + 1;
+	}
+
+	print y + z * x * z / 2 + 3; # Print expression
+	addline;
+	let x = x + 1; # Increase iterator variable
+}
+
+print x + x;

@@ -1,9 +1,9 @@
-// Simple function program
+# Simple action program
 declare x as int;
 declare y as int;
 
 action int test(int a, int b) {
-    report a / b;
+    report a / b * a / b;
 }
 
 let y = (52 - 10 * 3) * 2;

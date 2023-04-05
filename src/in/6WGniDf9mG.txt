@@ -1,0 +1,11 @@
+# Artsy Program
+print "Hello Arts!@!@y";
+
+declare x as int;
+x = 0;
+
+while (x < 10) {
+    print x;
+    addline;
+    let x = x + 1;
+}

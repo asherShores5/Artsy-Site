@@ -1,0 +1,28 @@
+# Print Program
+print "Test program\nthis";
+addline;
+
+declare x as int;
+let x = 10 + 20 + 30;
+declare y as int;
+let y = 30;
+print x;
+addline;
+
+print "Look!!!\tThis is tabbed!";
+addline;
+
+# Complex print statements
+declare testArr as float[3];
+let testArr[0] = 3.3;
+let testArr[1] = -129.2;
+
+declare z as int;
+let z = 290230;
+print -923.2 * 23.3343;
+addline;
+print testArr[0] + testArr[1] + testArr[1];
+addline;
+print x * y * z;
+
+

@@ -1,0 +1,82 @@
+
+/# 1. accept comments            #/
+/# 2. actions= action int hi(int x, int y){x = 2; y = 3; report x;}
+/# 3. order of operation #/
+/# 4. multiply float and int #/ 
+/# 6. adding to an array of strings. (no char, and like python) #/ 
+/# 7. everytime displayMessage, it should show message#/ 
+/# 8. addln is line breaks#/ 
+
+
+declare aNumber as int;
+declare secondNumber as float;
+declare someLetter as string;  /# unused variable #/
+declare message as string[50];
+declare justAverage as float;
+
+action float average(float a, float b, float c){
+	declare avg as float;
+	let avg = (a + b + c)/3.0;
+	report avg;
+}
+
+action float unreachableaction(float x, float y){
+   	/# 
+	This action does nothing and should
+	Be removed from IR code in the optimization step
+   	#/
+
+   declare result as float;
+   let result = x*y + x*y;
+
+   report result;
+}
+
+action int displayMessage(){
+	let message[0] = "I";
+	let message[1] = " ";
+	let message[2] = "c";
+	let message[3] = "a";
+	let message[4] = "n";
+	let message[5] = " ";
+	let message[6] = "p";
+	let message[7] = "r";
+	let message[8] = "i";
+	let message[9] = "n";
+	let message[10] = "t";
+	let message[11] = ":";
+
+    print message;
+	addline;
+	
+	report 0;
+}
+
+action float ambitiousAction(float a, float b, float c){
+
+   /# great optimization opportunity #/
+   declare result as float;
+ 
+   let result = (average(a, b, c) + average(a, b, c))/2.0;
+
+   report result;
+}
+
+let justAverage = average(12.5, 13.7, 25.8);
+let aNumber = displayMessage();
+print justAverage;
+addline;
+
+let justAverage = justAverage * (justAverage + 2.0);
+let justAverage = average(justAverage, 0.0, 0.0);
+let aNumber = displayMessage();
+addline;
+
+let aNumber = displayMessage();
+let aNumber = aNumber / (aNumber + aNumber * aNumber);
+print aNumber;
+addline;
+
+let justAverage = ambitiousAction(1.0, 2.0, 3.0);
+let aNumber = displayMessage();
+print justAverage;

@@ -23,7 +23,8 @@ LINEBREAK	(\n\r)|(\r\n)|[\n\r]
 ws          {delim}+
 CHAR		'([^'\n]|\\n|\\\\)'
 STRING		\"([^\\\"]|\\.)*\"
-COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
+SINGLE_LINE_COMMENT	\#.*
+MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 
 %%
 
@@ -44,38 +45,10 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	return FALSE;
 }
 
-"#/"    				{
-						// Comment recognition
-							int c;
-							while((c = input()) != 0) {
-								if(c == '/') {
-									if((c = input()) == '#')
-										break;
-									else
-										unput(c);
-								}
-							}
-						}				
 "int"	{
 			// Recognize integers as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
-
-"integer"	{
-			// Recognize integers as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
-
-"char"	{
-			// Recognize chars as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
+			printf("%s : INT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -83,7 +56,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 "string" {
 			// Recognize chars as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
+			printf("%s : STRING\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -97,46 +70,14 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 			return TYPE;
 		}
 
-
-"double"	{
+"flag"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : DOUBLE\n", yytext);
+			printf("%s : FLAG\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
 
-"boolean"	{
-			// Recognize strings as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : BOOLEAN\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
-
-"num"	{
-			// Recognize integers as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
-
-"number"	{
-			// Recognize integers as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : TYPE\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
-
-"bool"	{
-			// Recognize strings as a TYPE, return as a token
-			words++; chars += strlen(yytext);
-			printf("%s : BOOLEAN\n", yytext);
-			yylval.string = strdup(yytext); 
-			return TYPE;
-		}
 
 "let"	{
 			// Recognize strings as a TYPE, return as a token
@@ -165,41 +106,17 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 "print"	{
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			printf("%s : PRINT\n", yytext);
 			yylval.string = strdup(yytext); 
-			return WRITE;
+			return PRINT;
 		}
 
 "addline"	{
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			printf("%s : ADDLINE\n", yytext);
 			yylval.string = strdup(yytext); 
-			return WRITELN;
-		}
-
-"write"	{
-			// The write operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return WRITE;
-		}
-
-"writeln"	{
-			// The write operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return WRITELN;
-		}
-
-"read"	{
-			// The read operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return READ;
+			return ADDLINE;
 		}
 
 "report"	{
@@ -207,31 +124,15 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 			words++; chars += strlen(yytext);
 			printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
-			return RETURN;
-		}
-
-"return" {
-			// The return operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return RETURN;
+			return REPORT;
 		}
 
 "action"	{
-			// The function operation is special, return as a FUNCTION token
+			// The function operation is special, return as a ACTION token
 			words++; chars += strlen(yytext);
-			printf("%s : FUNCTION\n", yytext);
+			printf("%s : ACTION\n", yytext);
 			yylval.string = strdup(yytext); 
-			return FUNCTION;
-		}
-		
-"function"	{
-			// The function operation is special, return as a FUNCTION token
-			words++; chars += strlen(yytext);
-			printf("%s : FUNCTION\n", yytext);
-			yylval.string = strdup(yytext); 
-			return FUNCTION;
+			return ACTION;
 		}
 
 "while"	{
@@ -244,26 +145,11 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 
 "finish"	{
 			// The write operation is special, return as a KEYWORD token
+			// TO-DO: Implement in parser
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			printf("%s : FINISH\n", yytext);
 			yylval.string = strdup(yytext); 
-			return BREAK;
-		}
-
-"break"	{
-			// The write operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return BREAK;
-		}
-
-"for"	{
-			// The write operation is special, return as a KEYWORD token
-			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
-			yylval.string = strdup(yytext); 
-			return FOR;
+			return FINISH;
 		}
 
 "if"	{
@@ -315,23 +201,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 		  return EQ;
 		}
 
-"equal"		{
-		  // Assignment recognition token
-		  chars++;
-		  printf("%s : EQ\n", yytext);
-		  yylval.string = strdup(yytext); 
-		  return EQ;
-		}
-
 "+"		{
-	// Addition operator recognition, return as "PLUS" token
-	chars++;
-	printf("%s : PLUS\n", yytext);
-	yylval.string = strdup(yytext); 
-	return PLUS;
-}
-
-"plus"		{
 	// Addition operator recognition, return as "PLUS" token
 	chars++;
 	printf("%s : PLUS\n", yytext);
@@ -347,23 +217,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	return MINUS;
 }
 
-"minus"		{
-	// Minus operator recognition, return as "MINUS" token
-	chars++;
-	printf("%s : MINUS\n", yytext);
-	yylval.string = strdup(yytext); 
-	return MINUS;
-}
-
 "*"		{
-	// Multiplication operator recognition, return as "PLUS" token
-	chars++;
-	printf("%s : MULTIPLY\n", yytext);
-	yylval.string = strdup(yytext); 
-	return MULTIPLY;
-}
-
-"times"		{
 	// Multiplication operator recognition, return as "PLUS" token
 	chars++;
 	printf("%s : MULTIPLY\n", yytext);
@@ -379,14 +233,6 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	return DIVIDE;
 }
 
-"div"		{
-	// Division operator recognition, return as "DIVIDE" token
-	chars++;
-	printf("%s : DIVIDE\n", yytext);
-	yylval.string = strdup(yytext); 
-	return DIVIDE;
-}
-
 "^" 	{
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
@@ -395,23 +241,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	return EXPONENT;
 }
 
-"power" 	{
-	// EXPONENT operator recognition, return as "EXP" token
-	chars++;
-	printf("%s : EXPONENT\n", yytext);
-	yylval.string = strdup(yytext); 
-	return EXPONENT;
-}
-
 "%" 	{
-	// EXPONENT operator recognition, return as "EXP" token
-	chars++;
-	printf("%s : MODULO\n", yytext);
-	yylval.string = strdup(yytext); 
-	return MODULO;
-}
-
-"mod" 	{
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
 	printf("%s : MODULO\n", yytext);
@@ -434,7 +264,6 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	yylval.string = strdup(yytext); 
 	return RIGHTBRACKET;
 }
-
 
 
 "("		{
@@ -474,7 +303,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : LESSTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
 
 ">"		{
@@ -482,7 +311,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : GREATERTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
 
 "=="		{
@@ -490,7 +319,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : DOUBLEEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
 
 "!="		{
@@ -498,7 +327,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : NOTEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
 	
 ">="		{
@@ -506,7 +335,7 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : GREATERTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
 
 
@@ -515,48 +344,12 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 	chars++;
 	printf("%s : LESSTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
-	return COMPARSIONOPERATOR;
+	return COMPARISONOPERATOR;
 }
-
-
-"!"		{
-	// Bracket recognition, will be used later as a token for scopes
-	chars++;
-	printf("%s : NOT\n", yytext);
-	yylval.string = strdup(yytext); 
-	return LOGICALOPERATOR;
-}
-
-"not"		{
-	// Bracket recognition, will be used later as a token for scopes
-	chars++;
-	printf("%s : NOT\n", yytext);
-	yylval.string = strdup(yytext); 
-	return LOGICALOPERATOR;
-}
-
-
-"&&"		{
-	// Bracket recognition, will be used later as a token for scopes
-	chars++;
-	printf("%s : AND\n", yytext);
-	yylval.string = strdup(yytext); 
-	return LOGICALOPERATOR;
-}
-
 "and"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
 	printf("%s : AND\n", yytext);
-	yylval.string = strdup(yytext); 
-	return LOGICALOPERATOR;
-}
-
-
-"||"		{
-	// Bracket recognition, will be used later as a token for scopes
-	chars++;
-	printf("%s : OR\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LOGICALOPERATOR;
 }
@@ -600,21 +393,14 @@ COMMENT 	"/*"([^*]|\*+[^*/])*\*+"/"
 			  return NUMBER;
 			}
 
-{CHAR}		{
-			  words++; chars += strlen(yytext);
-			  printf("%s : CHAR\n",yytext);
-			  yylval.string = strdup(yytext); 
-			  return CHAR;
-			}
-
 {STRING}	{
   			  words++; chars += strlen(yytext);
 			  printf("%s : STRING\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return STRING;
 			}
-\/\/.*		{ /* Ignored (comment) */ }
-{COMMENT}	{ /* Ignored (comment) */}
+{SINGLE_LINE_COMMENT}		{ /* Ignored (comment) */ }
+{MULTI_LINE_COMMENT}	{ /* Ignored (comment) */}
 
 {LINEBREAK}	{lines++; chars=0;}
 [ \t]	{chars++;}

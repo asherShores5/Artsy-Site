@@ -1,0 +1,4 @@
+# Artsy Program
+declare x as float;
+let x = 101.0;
+print x;

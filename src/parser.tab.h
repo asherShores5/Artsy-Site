@@ -60,40 +60,37 @@ extern int yydebug;
     FLOAT = 261,                   /* FLOAT  */
     STRING = 262,                  /* STRING  */
     LOGICALOPERATOR = 263,         /* LOGICALOPERATOR  */
-    COMPARSIONOPERATOR = 264,      /* COMPARSIONOPERATOR  */
-    CHAR = 265,                    /* CHAR  */
-    COMMA = 266,                   /* COMMA  */
-    SEMICOLON = 267,               /* SEMICOLON  */
-    EQ = 268,                      /* EQ  */
-    LEFTBRACKET = 269,             /* LEFTBRACKET  */
-    RIGHTBRACKET = 270,            /* RIGHTBRACKET  */
-    LEFTPAREN = 271,               /* LEFTPAREN  */
-    RIGHTPAREN = 272,              /* RIGHTPAREN  */
-    LEFTSQUARE = 273,              /* LEFTSQUARE  */
-    RIGHTSQUARE = 274,             /* RIGHTSQUARE  */
-    NUMBER = 275,                  /* NUMBER  */
-    LET = 276,                     /* LET  */
-    DECLARE = 277,                 /* DECLARE  */
-    AS = 278,                      /* AS  */
-    WRITE = 279,                   /* WRITE  */
-    WRITELN = 280,                 /* WRITELN  */
-    READ = 281,                    /* READ  */
-    RETURN = 282,                  /* RETURN  */
-    IF = 283,                      /* IF  */
-    ELIF = 284,                    /* ELIF  */
-    ELSE = 285,                    /* ELSE  */
-    WHILE = 286,                   /* WHILE  */
-    BREAK = 287,                   /* BREAK  */
-    FOR = 288,                     /* FOR  */
-    TRUE = 289,                    /* TRUE  */
-    FALSE = 290,                   /* FALSE  */
-    FUNCTION = 291,                /* FUNCTION  */
-    PLUS = 292,                    /* PLUS  */
-    MINUS = 293,                   /* MINUS  */
-    MULTIPLY = 294,                /* MULTIPLY  */
-    DIVIDE = 295,                  /* DIVIDE  */
-    MODULO = 296,                  /* MODULO  */
-    EXPONENT = 297                 /* EXPONENT  */
+    COMPARISONOPERATOR = 264,      /* COMPARISONOPERATOR  */
+    COMMA = 265,                   /* COMMA  */
+    SEMICOLON = 266,               /* SEMICOLON  */
+    EQ = 267,                      /* EQ  */
+    LEFTBRACKET = 268,             /* LEFTBRACKET  */
+    RIGHTBRACKET = 269,            /* RIGHTBRACKET  */
+    LEFTPAREN = 270,               /* LEFTPAREN  */
+    RIGHTPAREN = 271,              /* RIGHTPAREN  */
+    LEFTSQUARE = 272,              /* LEFTSQUARE  */
+    RIGHTSQUARE = 273,             /* RIGHTSQUARE  */
+    NUMBER = 274,                  /* NUMBER  */
+    LET = 275,                     /* LET  */
+    DECLARE = 276,                 /* DECLARE  */
+    AS = 277,                      /* AS  */
+    PRINT = 278,                   /* PRINT  */
+    ADDLINE = 279,                 /* ADDLINE  */
+    REPORT = 280,                  /* REPORT  */
+    IF = 281,                      /* IF  */
+    ELIF = 282,                    /* ELIF  */
+    ELSE = 283,                    /* ELSE  */
+    WHILE = 284,                   /* WHILE  */
+    FINISH = 285,                  /* FINISH  */
+    TRUE = 286,                    /* TRUE  */
+    FALSE = 287,                   /* FALSE  */
+    ACTION = 288,                  /* ACTION  */
+    PLUS = 289,                    /* PLUS  */
+    MINUS = 290,                   /* MINUS  */
+    MULTIPLY = 291,                /* MULTIPLY  */
+    DIVIDE = 292,                  /* DIVIDE  */
+    MODULO = 293,                  /* MODULO  */
+    EXPONENT = 294                 /* EXPONENT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -102,7 +99,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 26 "parser.y"
 
 	char* number;
 	char* decimal; 
@@ -110,7 +107,7 @@ union YYSTYPE
 	char* string;
 	struct AST* ast;
 
-#line 114 "parser.tab.h"
+#line 111 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

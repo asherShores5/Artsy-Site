@@ -13,23 +13,12 @@
       body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
       .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
       .fa-anchor,.fa-coffee {font-size:200px}
-  </style>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blob-util@4.0.0/dist/blob-util.min.js"></script>
-    <button id="saveText">Save Text</button>
-  <title>Welcome to Code Editor</title>
-
-  <script> 
-    var code = editor.getValue();
-
-  </script>
-
-  <style>
-    /* CSS styles for page */
-    body {
-      background-color: #f2f2f2;
-      font-family: Arial, sans-serif;
-    }
+      
+      /* CSS styles for page */
+      body {
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+      }
       .container {
         width: 80%;
         margin: 0 auto;
@@ -50,6 +39,7 @@
         overflow-y: scroll;
       }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     <div class="w3-top">
@@ -83,94 +73,71 @@
     <script>
       // Initialize ace editor
       var editor = ace.edit("editor");
-
       editor.setTheme("ace/theme/monokai");
       editor.session.setMode("ace/mode/javascript");
-      // editor.setValue("console.log('Hello, World!')", -1);
-      editor.setValue("// Artsy Program\ndeclare x as float;\nlet x = 10.0;\nprint x;", -1) // include hello world program by default
-
+      editor.setValue("# Artsy Program\nprint \"Hello Artsy\";", -1) // include hello world program by default
       var output = document.getElementById("output");
-      output.innerHTML = ""; // clear output box before running new code
 
       // Function to run code and display output in output box
-      function runCode() {
-          var code = editor.getValue();
-          output.innerHTML = ""; // clear output box before running new code
+      function displayCode(response) {
+        // Display Artsy within the output terminal
+        var memory;
+        let artsyOutput = "";
+        let wasmFile = "../src/in/" + response + ".wasm";
+        fetch(wasmFile)
+        .then(response => response.arrayBuffer())
+        .then(bytes => WebAssembly.instantiate(bytes, 
+        {
+        env: {
+            print_int: function printInt(wVar) {
+                output.innerHTML += wVar;
+            },
 
-          // Try running the Artsy makefile command using spawn
-          try {
-              // Save the input as an Artsy file
-              const fs = require('fs');
-              // var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-              // saveAs(blob, "src/input.artsy");
+            print_float: function printFloat(wVar) {
+                output.innerHTML += wVar;
+            },
 
-              fs.writeFile('src/input.artsy', code, function (err) {
-                if (err) throw err;
-                console.log("File written.");
-              });
+            print_string: function printString(wVar) {
+                output.innerHTML += String.fromCharCode(wVar);
+            },
 
-              // Use a make file command to run the compiler
-              const { spawn } = require('child_process');
-              const make = spawn('make', ['-C', '../src', 'artsy']);
-
-              make.stdout.on('data', (data) => {
-                console.log(`stdout: ${data}`);
-              });
-
-              make.stderr.on('data', (data) => {
-                console.error(`stderr: ${data}`);
-              });
-
-              make.on('close', (code) => {
-                console.log(`child process exited with code ${code}`);
-              });
-              
-          } catch (err) {
-              // output.innerHTML = "Error: " + err;
-          }
-
-          // Display Artsy within the output terminal
-          var memory;
-          let artsyOutput = "";
-          fetch('../src/WASMcode.wasm')
-          .then(response => response.arrayBuffer())
-          .then(bytes => WebAssembly.instantiate(bytes, 
-          {
-          env: {
-              jsprint: function jsprint(byteOffset) {
-                  var s = '';
-                  var a = new Uint8Array(memory.buffer);
-                  for (var i = byteOffset; a[i]; i++) {
-                  s += String.fromCharCode(a[i]);
-                  }
-                  var p = document.createElement('p');
-                  var t = document.createTextNode(s);
-                  p.appendChild(t);
-                  document.body.appendChild(p);
-              },
-
-              newline: function newline() {
-                  output.innerHTML += "<br />";
-              },
-
-              writeconsoleInt: function writeconsole(wVar) {
-                  output.innerHTML += wVar;
-              },
-
-              writeconsoleFloat: function writeconsole(wVar) {
-                  output.innerHTML += wVar;
-              },
-
-              writeconsoleString: function writeconsole(wVar) {
-                  output.innerHTML += String.fromCharCode(wVar);
-              }
+            newline: function newline() {
+                output.innerHTML += "<br />";
             }
           }
-          )).then(results => {
-          instance = results.instance;
-          memory = instance.exports.pagememory;
-          instance.exports.main();
-          }).catch(console.error);
+        }
+        )).then(results => {
+        instance = results.instance;
+        memory = instance.exports.pagememory;
+        }).catch(console.error);
+        console.log("Artsy output is displayed!");
+      }
+
+      function runCode() {
+        output.innerHTML = "";
+        var codeInput = editor.getValue();
+        console.log("Executing code: \n\n" + codeInput);
+
+        // Convert the data into JSON
+        var data = {
+          code: codeInput
+        };
+        var jsonData = JSON.stringify(data);
+
+        // Send an AJAX request to processArtsy.php and execute compiler
+        $.ajax({
+          url: "processArtsy.php",
+          type: "POST",
+          data: jsonData,
+          contentType: 'application/json',
+          success: function(response) {
+            console.log("Artsy successfully compiled!");
+            displayCode(response);
+          },
+          error: function(xhr, status, error) {
+            console.log("Error: " + error);
+          }
+        });
       }
 
       // Add event listener to run button
@@ -192,36 +159,5 @@
         cursor: pointer; 
       } 
     </style> 
-
-    <button onclick="saveTextAsFile()">Create and Write File</button>
-    <form id="save-form">
-      <textarea id="file-contents"></textarea>
-      <input type="hidden" id="file-name" value="existing-file.txt">
-      <button type="submit">Save</button>
-    </form>
-    
-    <script>
-    const form = document.getElementById("save-form");
-    const fileContents = document.getElementById("file-contents");
-    const fileName = document.getElementById("file-name");
-    
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-    
-      const request = new XMLHttpRequest();
-      request.open("POST", "/save-file");
-      request.setRequestHeader("Content-Type", "application/json");
-    
-      request.onload = () => {
-        if (request.status === 200) {
-          alert("File saved successfully.");
-        } else {
-          alert("Error saving file.");
-        }
-      };
-    
-    <a href="index.html" class="center-button"> 
-      Return to Index 
-    </a> 
   </body>
 </html>

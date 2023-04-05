@@ -1,0 +1,4 @@
+# Artsy Hello World Program
+declare memo as string;
+let memo = "Welcome to Artsy! Glad you made it!";
+print memo;

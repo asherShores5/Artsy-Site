@@ -1,0 +1,3 @@
+# Artsy Program
+print "Hello Artsy\n";
+print "Hello again";

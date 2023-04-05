@@ -1,0 +1,4 @@
+# Escape Character Test Program
+declare memo as string;
+let memo = "\"Hi\"!";
+print memo;

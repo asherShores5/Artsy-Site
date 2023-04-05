@@ -1,22 +1,18 @@
 #ifndef WEBGEN_H 
 #define WEBGEN_H
 
+// File Functions
 void initAssemblyFile();
+FILE * getFileType(char * fileType);
 
-void generateModule();
-
-char * getWATType(char * phrase);
-
-int getMoveAmount(char * phrase);
-
+// WAT CODE PRINT MODULES
+void generateStartModule();
 void generateText();
-
 void generateLocalOperations();
-
 void generateMain();
-
 void completeFile();
 
+// Driver Function
 void generateWATcode();
 
 #endif

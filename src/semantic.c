@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h> 
 #include "semantic.h"
+#include "helper.c"
 #include "symbolTable.h"
 #include "AST.h"
 
@@ -14,8 +15,7 @@ int found(char itemName[50], char scopeStack[50][50], int stackPointer);
 // Checks to see if a variable has been declared globally first
 void CheckGlobal(char* variableName, char* currentScope) {
     int nonGlobal = strcmp(currentScope, "global");
-    char ** scopeStack = { "global" };
-    if (nonGlobal != 0 && found(variableName, scopeStack, 0) == 1) {
+    if (nonGlobal != 0 && found(variableName, "global", 0) == 1) {
         printf("SEMANTIC ERROR: Variable %s has already been declared globally.\n", variableName);
         exit(1);
     }
@@ -44,7 +44,7 @@ char* CheckPrimaryType(char * variableName, char scopeStack[50][50], int stackPo
     return getItemType(variableName, scopeStack, stackPointer);
 }
 
-void checkID(char* identifier, char* scopeStack[50], int stackPointer) {
+void checkID(char* identifier, char scopeStack[50][50], int stackPointer) {
     if (found(identifier, scopeStack, stackPointer) == 0) {
         printf("SEMANTIC ERROR: Variable %s does not exist.\n", identifier);
         exit(1);
@@ -54,20 +54,20 @@ void checkID(char* identifier, char* scopeStack[50], int stackPointer) {
 void CheckComparisonType(struct AST * leftExprTreeNode, struct AST * rightExprTreeNode, char scopeStack[50][50], int stackPointer) {
     char* leftType;
     char* rightType;
-    if(found(leftExprTreeNode, scopeStack, stackPointer)) {
-        leftType = getItemType(leftExprTreeNode, scopeStack, stackPointer);
+    if(found(leftExprTreeNode->nodeType, scopeStack, stackPointer)) {
+        leftType = getItemType(leftExprTreeNode->nodeType, scopeStack, stackPointer);
     } else {
-        leftType = leftExprTreeNode -> nodeType;
+        leftType = leftExprTreeNode->nodeType;
     }
 
-    if(found(rightExprTreeNode, scopeStack, stackPointer)) {
-        rightType = getItemType(rightExprTreeNode, scopeStack, stackPointer);
+    if(found(rightExprTreeNode->nodeType, scopeStack, stackPointer)) {
+        rightType = getItemType(rightExprTreeNode->nodeType, scopeStack, stackPointer);
     } else {
-        rightType = rightExprTreeNode -> nodeType;
+        rightType = rightExprTreeNode->nodeType;
     }
 
     if(strcmp(leftType, rightType) != 0) {
-        printf("SEMANTIC ERROR: the type of leftExprTreeNode: %s does not match the type of the rightExprTreeNode: %s. \n", leftExprTreeNode, rightExprTreeNode);
+        printf("SEMANTIC ERROR: the type of leftExprTreeNode: %s does not match the type of the rightExprTreeNode: %s. \n", leftExprTreeNode->nodeType, rightExprTreeNode->nodeType);
         printf("\nleftType: %s\n", leftType);
         printf("\nrightType: %s\n", rightType);
         exit(1);
@@ -104,131 +104,14 @@ void CheckParamLength(char funcName[50], struct AST * funcCallParamList) {
 
 void CheckIndexOutOfBound(char * identifier, char * integer, char scopeStack[50][50], int stackPointer) {
     struct Entry * itemObj = getItem(identifier, scopeStack, stackPointer);
-    if(itemObj == NULL) {
+    if (itemObj == NULL) {
         printf("\nSEMANTIC ERROR: The total number of call parameters for \"%s\" (%s) does not match function declaration (%d).\n", identifier, integer, scopeStack[stackPointer]);
         exit(1);
     }
-    if(itemObj -> arrayLength < atoi(integer) || atoi(integer) < 0) {
-        printf("\nSEMANTIC ERROR: Index out of bound\n");
+    if (itemObj->arrayLength < atoi(integer) || atoi(integer) < 0) {
+        printf("\nSEMANTIC ERROR: Index out of bound for array %s with size %d\n", identifier, itemObj->arrayLength);
         exit(1);
     }
-}
-
-// Helper function to check if a string is alphanumeric
-int isAlpha(char * phrase) {
-    // Get length of string
-    int len;
-    for (len = 0; phrase[len] != '\0'; ++len);
-
-    // Loop through each character
-    // If there is an alphabetical character, return true
-    for (int i = 0; i < len; i++) {
-        if (isalpha(phrase[i])) {
-            return 1;
-        }
-    }
-    // If nothing is caught, return false
-    return 0;
-}
-
-// Helper function to determine if the string is an integer
-int isInt(char * phrase) {
-    // Get length of string
-    int len;
-    for (len = 0; phrase[len] != '\0'; ++len);
-
-    // Loop through each character
-    // If there is a non-numerical character, return false
-    for (int i = 0; i < len; i++) {
-        if (i == 0 && phrase[i] == '-') {
-            // Ignore case for negative floats
-        }
-        else if (!isdigit(phrase[i])) {
-            return 0;
-        }
-    }
-
-    // If nothing is caught, return true
-    return 1;
-}
-
-// Helper function to determine if the string is a float
-int isFloat(char * phrase) {
-    // Get length of string
-    int len;
-    for (len = 0; phrase[len] != '\0'; ++len);
-
-    // Set a var for float condition (must require one and only one "." symbol)
-    int condition = 0;
-
-    // Loop through each character
-    for (int i = 0; i < len; i++) {
-        if (i == 0 && phrase[i] == '-') {
-            // Ignore case for negative floats
-        }
-        else if (!isdigit(phrase[i]) && phrase[i] != '.') {
-            // If there is a non-numerical character, return false
-            return 0;
-        } else if (phrase[i] == '.' && condition == 0) {
-            // Set float condition to true, requirement for string to be a float
-            condition = 1;
-        } else if (phrase[i] == '.' && condition == 1) {
-            // Return false if string has two "." symbols
-            return 0;
-        }
-    }
-
-    // If condition is true and nothing is caught, return true
-    if (condition == 1) {
-        return 1;
-    }
-    // Else return false
-    return 0;
-}
-
-// Helper function to determine the type of a token
-// within a given assignment or operation statement
-char * getPrimaryType(char * phrase) {
-    // If the phrase is a type of string or char
-    if (phrase[0] == '\"' || phrase[0] == '\'') {
-        // If it has three characters, it must be a char
-        // Commented out for now until we implement chars
-        // if (strlen(phrase) == 3) {
-        //     return "char";
-        // }
-        // Otherwise, return as a string
-        return "string";
-    }
-    // Check if the phrase is an float
-    else if (isFloat(phrase)) {
-        return "float";
-    }
-    // Check if the phrase is an int
-    else if (isInt(phrase)) {
-        return "int";
-    } else if (strncmp(phrase, "+", 1) == 0
-        || strncmp(phrase, "-", 1) == 0
-        || strncmp(phrase, "*", 1) == 0
-        || strncmp(phrase, "/", 1) == 0
-        || strncmp(phrase, ">", 1) == 0
-        || strncmp(phrase, ">=", 1) == 0
-        || strncmp(phrase, "<", 1) == 0
-        || strncmp(phrase, "<=", 1) == 0
-        || strncmp(phrase, "==", 1) == 0
-        || strncmp(phrase, "!=", 1) == 0) {
-            return "op";
-    }
-    // If all cases fail, the type must be a variable
-    else {
-        return "var";
-    }
-}
-
-int isNotVar(char phrase[50]) {
-    if (phrase[0] == '\"' || phrase[0] == '\'' || isFloat(phrase) || isInt(phrase)) {
-        return 1;
-    }
-    return 0;
 }
 
 void checkIntDivisionError(int numerator, int denominator) {
@@ -245,7 +128,74 @@ void checkFloatDivisionError(float numerator, float denominator) {
     }
 }
 
+void checkEscapeChars(char * phrase) {
+    int len = strlen(phrase);
 
+    // Detect escape characters by looping through each char
+    for (int i = 0; i < len; i++) {
+        // Detect if the escape character is referenced
+        if (phrase[i] == '\\') {
+            // If the next character is the null character, throw a semantic error
+            // Incomplete escape character
+            if (phrase[i+1] == '\0') {
+                printf("\nSemantic Error: Incomplete escape character reference.\n");
+                exit(1);
+            }
 
+            // Throw a semantic error if the next char does not make this a valid escape char combination
+            if (phrase[i+1] != '\"' && phrase[i+1] != '\'' && phrase[i+1] != '\\' && phrase[i+1] != 'n' && phrase[i+1] != 't') {
+                printf("\nSemantic Error: Invalid escape character combination (\\%c).\n", phrase[i+1]);
+                exit(1);
+            }
 
+            // Skip over index for loop
+            i++;
+        }
+    }
+}
+
+int countEscapeChars(char * phrase) {
+    int len = strlen(phrase);
+    int numEscapeChars = 0;
+
+    // Count the escape characters by looping through each char
+    for (int i = 0; i < len; i++) {
+        // Detect if the escape character is referenced
+        if (phrase[i] == '\\') {
+            // If the next character is the null character, throw a semantic error
+            // Incomplete escape character
+            if (phrase[i+1] == '\0') {
+                printf("\nSemantic Error: Incomplete escape character reference.\n");
+                exit(1);
+            }
+
+            // Throw a semantic error if the next char does not make this a valid escape char combination
+            if (phrase[i+1] != '\"' && phrase[i+1] != '\'' && phrase[i+1] != '\\' && phrase[i+1] != 'n' && phrase[i+1] != 't') {
+                printf("\nSemantic Error: Invalid escape character combination (\\%c).\n", phrase[i+1]);
+                exit(1);
+            }
+
+            // If no semantic error occurs, add to the count
+            numEscapeChars++;
+
+            // Skip over index for loop
+            i++;
+        }
+    }
+
+    // Return final total
+    return numEscapeChars;
+}
+
+// Helper function to find which scope a variable is part of, if nested within multiple scopes
+char * findVarScope(char * varName, char ** scopeList, int scopeListLength) {
+    for (int i = 0; i < scopeListLength; i++) {
+        if (found(varName, scopeList[i], 1)) {
+            return getItemScope(varName, scopeList[i], 1);
+        }
+    }
+    // Else, it's not in this list; throw a semantic error
+    printf("\nSemantic Error: Variable %s is not nested in any scope.\n", varName);
+    exit(1);
+}
 

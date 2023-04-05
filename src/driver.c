@@ -3,8 +3,8 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <time.h>
-#include "ircode.h"
 #include "parser.h"
+#include "ircode.h"
 #include "webgen.h"
 
 // Starts the whole program
@@ -22,8 +22,9 @@ int main(int argc, char**argv) {
 
     // Run the parser
     // If it returns an error, exit the program with a warning number
-    if(parser_main(fd) != 0){
-      return 1;
+    if (parser_main(fd) != 0) {
+      printf("Parser Failed, Exiting Program.\n\n");
+      exit(1);
     }
 
     // Call the ircode generator
@@ -41,7 +42,10 @@ int main(int argc, char**argv) {
     // on testProg.html using the LiveServer extension or on artsy-project.com
     generateWATcode();
 
-    // Stop the time clock 
+    // Print compilation confirmation message
+    printf("\nArtsy Compilation complete! Displaying to website...\n");
+
+    // Stop the time clock
     end = clock();
 
     // Calculate and print out the total time

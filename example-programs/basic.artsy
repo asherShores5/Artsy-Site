@@ -1,4 +1,16 @@
-// Artsy Program
-declare x as float;
-let x equal 10.0;
-print x;
+# A Basic Artsy Program - By Andrew Esch
+
+/#
+Purpose of the program:
+1. Demonstrate Multiple Types of Print Statements
+2. Demonstrate Escape Character Functionality
+3. Utilize all types of Artsy primitive types
+4. Showcase expressions in print statements
+#/
+
+print "The answer is:\t";
+print 1823 - 100;
+addline;
+print "Or a similar float value is:\t\'";
+print 1182.3 * 1.5;
+print "\'";

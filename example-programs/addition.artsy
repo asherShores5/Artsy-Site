@@ -1,20 +1,19 @@
-// Variable declarations
+# Variable declarations
 declare x as int;
 declare y as int;
 declare z as int;
 declare k as int;
 declare newVar as int;
 
-// Operations
+# Operations
 let x = 10;
 let y = 21;
 let k = 20;
 let newVar = 23;
 let z = x + y + newVar + 3 + 4 + x;
-let x = z + y +
- newVar;
+let x = z + y + newVar;
 
-// Output lines
+# Output lines
 print x;
 addline;
 print z;

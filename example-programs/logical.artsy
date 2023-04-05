@@ -1,0 +1,87 @@
+# Declare variables
+declare n as flag;
+declare a as int;
+declare b as int;
+declare x as int;
+declare z as int;
+
+# Assign values
+let x = 0;
+let z = 1 + x;
+let a = 5;
+let b = 3;
+# let n = (a > b);
+
+# Loop test using a void action
+action testLoop() {
+	# While and If-Elif-Else test
+	# x < 4 and a != 0 and b == 3
+	while (x < 4) {
+		if (x > 3) {
+			print "Logic condition 1!";
+			addline;
+			let z = 5;
+			print z;
+			addline;
+			let x = x + 1;
+		}
+		# x == 1 or x < 0 and a != 0
+		elif (x == 1) {
+			print "Logic condition 2!";
+			addline;
+			let z = 6;
+			print z;
+			addline;
+			let x = x + 1;
+		}
+
+		# x == 2 and x > 1
+		elif (x == 2) {
+			print "Logic condition 3!";
+			addline;
+			let z = 7;
+			print z;
+			addline;
+			let x = x + 1;
+		}
+		else {
+			print "Logic condition 4!";
+			addline;
+			let z = 8;
+			print z;
+			addline;
+			let x = x + 1;
+			if (a > b) {
+				let a = a - 10;
+				print 1;
+				addline;
+			} elif (a == b) {
+				print -1;
+				addline;
+			} else {
+				print 0;
+				addline;
+			}
+		}
+	}
+}
+
+print "test!";
+addline;
+
+if (a < 3) {
+	declare xy as int;
+	let xy = 19;
+	print xy;
+	addline;
+	print "Logic condition 0A!";
+	addline;
+} elif (b > 4) {
+	print "Logic condition 0B!";
+	addline;
+} else {
+	print "Logic condition 0C!";
+	addline;
+}
+
+testLoop();

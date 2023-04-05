@@ -1,42 +1,42 @@
-string message[50];
-string staticMessage;
-int numArr[5];
-int random;
+declare message as string[50];
+declare staticMessage as string;
+declare numArr as int[5];
+declare random as int;
 
-numArr[0] = 1;
+let numArr[0] = 1;
 
-function int displayMessage(){
-	message[0] = "I"; 																		/*1. allow array to accept word */
-	message[1] = " ";																/*1.5 semantic check (array) string not int */ 
-	message[2] = "c";
-	message[3] = "a";
-	message[4] = "n";
-	message[5] = " ";
-	message[6] = "p";
-	message[7] = "r";
-	message[8] = "i";
-	message[9] = "n";
-	message[10] = "t";
-	message[11] = "!";
-	/*message[100] = "Error"; 	*/														/*2. semantic check if not correct number */
+action int displayMessage() {
+	let message[0] = "I"; 																		/#1. allow array to accept word #/
+	let message[1] = " ";																/#1.5 semantic check (array) string not int #/ 
+	let message[2] = "c";
+	let message[3] = "a";
+	let message[4] = "n";
+	let message[5] = " ";
+	let message[6] = "p";
+	let message[7] = "r";
+	let message[8] = "i";
+	let message[9] = "n";
+	let message[10] = "t";
+	let message[11] = "!";
+	/# let message[100] = "Error"; #/														/#2. semantic check if not correct number #/
 	
-	return numArr[0];
+	report numArr[0];
 }
 
-// Create strings
-random = displayMessage();
-staticMessage = "static message lol haha :)";
+# Create strings
+let random = displayMessage();
+let staticMessage = "static message lol haha :)";
 
-numArr[0] = 1;
-numArr[1] = numArr[0];
-numArr[2] = 3; 																
-numArr[3] = 4; 	
-numArr[4] = 5; 	
-// numArr[5] = 10; Semantic Error
+let numArr[0] = 1;
+let numArr[1] = numArr[0];
+let numArr[2] = 3; 																
+let numArr[3] = 4; 	
+let numArr[4] = 5;
+# let numArr[5] = 10; Semantic Error
 
-random = numArr[0] + numArr[2];
+let random = numArr[0] + numArr[4] + numArr[2];
 
-print numArr;
+print numArr[0] + numArr[3];
 addline;
 print message;
 addline;

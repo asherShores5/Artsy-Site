@@ -1,0 +1,2 @@
+# Artsy Program
+print "Hello Arts!@!@y";
