@@ -92,9 +92,24 @@
       var output = document.getElementById("output");
       output.innerHTML = ""; // clear output box before running new code
 
+        function saveToFile() {
+          var code = editor.getValue();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "save.php", true);
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+              console.log(xhr.responseText);
+            }
+          };
+          xhr.send("code=" + encodeURIComponent(code));
+        }
+
       // Function to run code and display output in output box
       function runCode() {
           var code = editor.getValue();
+          saveToFile(code, "input.txt");
+          //console.log(code); WEBSECURITY ISSUE HERE
           output.innerHTML = ""; // clear output box before running new code
 
           // Try running the Artsy makefile command using spawn
@@ -193,12 +208,12 @@
       } 
     </style> 
 
-    <button onclick="saveTextAsFile()">Create and Write File</button>
+    <!-- <button onclick="saveTextAsFile()">Create and Write File</button>
     <form id="save-form">
       <textarea id="file-contents"></textarea>
       <input type="hidden" id="file-name" value="existing-file.txt">
       <button type="submit">Save</button>
-    </form>
+    </form> -->
     
     <script>
     const form = document.getElementById("save-form");
