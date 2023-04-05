@@ -87,8 +87,8 @@
       var output = document.getElementById("output");
       output.innerHTML = ""; // clear output box before running new code
 
-        function saveToFile() {
-          var code = editor.getValue();
+        function saveToFile(code) {
+          var myCode = code
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "editor.php", true);
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -97,13 +97,13 @@
               console.log(xhr.responseText);
             }
           };
-          xhr.send("code=" + encodeURIComponent(code));
+          xhr.send("code=" + encodeURIComponent(myCode));
         }
 
       // Function to run code and display output in output box
       function runCode() {
           var code = editor.getValue();
-          saveToFile(code, "../src/input.artsy");
+          saveToFile(code);
           //console.log(code); WEBSECURITY ISSUE HERE
           output.innerHTML = ""; // clear output box before running new code
 
@@ -203,36 +203,5 @@
       } 
     </style> 
 
-    <!-- <button onclick="saveTextAsFile()">Create and Write File</button>
-    <form id="save-form">
-      <textarea id="file-contents"></textarea>
-      <input type="hidden" id="file-name" value="existing-file.txt">
-      <button type="submit">Save</button>
-    </form> -->
-    
-    <script>
-    const form = document.getElementById("save-form");
-    const fileContents = document.getElementById("file-contents");
-    const fileName = document.getElementById("file-name");
-    
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-    
-      const request = new XMLHttpRequest();
-      request.open("POST", "/save-file");
-      request.setRequestHeader("Content-Type", "application/json");
-    
-      request.onload = () => {
-        if (request.status === 200) {
-          alert("File saved successfully.");
-        } else {
-          alert("Error saving file.");
-        }
-      };
-    
-    <a href="index.html" class="center-button"> 
-      Return to Index 
-    </a> 
-    
-  </body>
+</body>
 </html>
