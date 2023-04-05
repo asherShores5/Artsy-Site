@@ -97,6 +97,7 @@
               console.log(xhr.responseText);
             }
           };
+          console.log("About to send request"); //DEBUG
           xhr.send("code=" + encodeURIComponent(myCode));
         }
 
