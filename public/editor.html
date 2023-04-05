@@ -15,14 +15,9 @@
       .fa-anchor,.fa-coffee {font-size:200px}
   </style>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blob-util@4.0.0/dist/blob-util.min.js"></script>
+    <script src="https://unpkg.com/blob-util/dist/blob-util.min.js"></script>
     <button id="saveText">Save Text</button>
   <title>Welcome to Code Editor</title>
-
-  <script> 
-    var code = editor.getValue();
-
-  </script>
 
   <style>
     /* CSS styles for page */
@@ -95,7 +90,7 @@
         function saveToFile() {
           var code = editor.getValue();
           var xhr = new XMLHttpRequest();
-          xhr.open("POST", "save.php", true);
+          xhr.open("POST", "editor.php", true);
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
           xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
