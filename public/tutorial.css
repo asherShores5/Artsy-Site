@@ -1,7 +1,11 @@
+
+
 .video-container{
     margin-left: auto;
     margin-right: auto;
-    width: 8em;
+    width: 8em; 
+    overflow: scroll;   
+    
 }
 
 .videobox{
@@ -12,6 +16,7 @@
     display: flex;
     text-align: justify;
     font-size: 4.3vw;
+    resize: both;
 
 }
 
@@ -27,5 +32,3 @@ transition: 1s ease;
     transition: 1s ease;
 }
     
-
-
