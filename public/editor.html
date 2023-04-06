@@ -84,6 +84,7 @@
         // Display Artsy within the output terminal
         var memory;
         let artsyOutput = "";
+        //let wasmFile = "../src/in/" + response + ".wasm";
         let wasmFile = "../src/in/" + response;
         fetch(wasmFile)
         .then(response => response.arrayBuffer())
