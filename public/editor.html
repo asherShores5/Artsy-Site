@@ -75,6 +75,7 @@
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/monokai");
       editor.session.setMode("ace/mode/javascript");
+      editor.getSession().setUseWorker(false);
       editor.setValue("# Artsy Program\nprint \"Hello Artsy\";", -1) // include hello world program by default
       var output = document.getElementById("output");
 
