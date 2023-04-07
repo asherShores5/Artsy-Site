@@ -1,12 +1,15 @@
 <?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Decode the POST request
   $data = json_decode(file_get_contents("php://input"), true);
 
   // Validate that data isn't empty
   if ($data === null) {
-    http_response_code(400);
-    echo 'Invalid input';
+    $error = 'Invalid code input.';
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
 
@@ -16,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Validate the input
   if (!$code) {
     // Return an error message if the input is invalid
-    http_response_code(400);
-    echo 'Invalid input';
+    $error = 'Invalid code input.';
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
   
@@ -27,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // $dir_in = '../src/in/';
 
   if (!is_writable($temp_dir)) {
-    http_response_code(500);
-    echo 'Cannot write to directory /src';
+    $error = 'Cannot write to directory /tmp';
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
 
@@ -44,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $file = $temp_dir . '/' . $randomString . '.txt';
   echo 'Temp folder file: ' . $file . '\n';
   if (!file_put_contents($file, $code)) {
-    http_response_code(500);
-    echo 'Error saving file';
+    $error = "Cannot put code into file";
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
   
@@ -55,16 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Check if the command actually executed
   if ($output === null) {
-    http_response_code(500);
-    echo 'Error running make';
+    $error = 'Error running make';
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
 
   // Check if the wasm file was created
   $wasmFile = $file . '.wasm';
   if (!file_exists($wasmFile)) {
-    http_response_code(500);
-    echo 'Make command failed to create the file: ' . $wasmFile;
+    $error = 'Make command failed to create the file: ' . $wasmFile;
+    echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
 
