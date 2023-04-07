@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Artsy Project</title>
+  <title>Artsy Code Editor</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +16,7 @@
       
       /* CSS styles for page */
       body {
-        background-color: #f2f2f2;
+        background-color: #E6E6E3;
         font-family: Arial, sans-serif;
       }
       .container {
@@ -28,6 +28,42 @@
       #editor {
         width: 100%;
         height: 400px;
+      }
+
+      /* Styles for code buttons */
+      #code-buttons {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      #code-buttons button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #fff;
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-right: 20px;
+      }
+
+      #code-buttons button:hover {
+        background-color: #3e8e41;
+      }
+
+      #code-buttons button:active {
+        background-color: #1f4421;
+      }
+
+      #code-buttons div {
+        font-size: 16px;
+        margin-right: 0;
       }
 
       /* Styles for output box */
@@ -61,30 +97,49 @@
       </div>
 
     <div class="container">
-      <h1>Welcome to Code Editor</h1>
-      <p>Enter your code below and click "Run" to see the output.</p>
+      <h1>Welcome to Artsy Code Editor</h1>
+      <p>Enter your code below. Click "Run" to see the output, or "Save" to save your progress.</p>
       <div>
         <div id="editor"></div>
-        <button id="run-button">Run</button>
+        <div id="code-buttons">
+          <button id="save-button">Save</button>
+          <button id="run-button">Run</button>
+          <div id="save-text"></div>
+        </div>
       </div>
       <div id="output"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.7/ace.js"></script>
     <script>
-      // Initialize ace editor
-      var editor = ace.edit("editor");
-      editor.setTheme("ace/theme/monokai");
-      editor.session.setMode("ace/mode/python");
-      editor.getSession().setUseWorker(false);
-      editor.setValue("# Artsy Program\nprint \"Hello Artsy\";", -1) // include hello world program by default
-      var output = document.getElementById("output");
+      // Function to start up code interface
+      function startEditor() {
+        // Send an AJAX request to processArtsy.php and execute compiler
+        $.ajax({
+          url: "start_editor.php",
+          type: "GET",
+          contentType: 'application/json',
+          success: function(response) {
+            if (response === "not_found") {
+              console.log("Session not found. Starting a new session...");
+              editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1);
+              saveCode();
+            } else {
+              console.log("Session acquired!");
+              editor.setValue(response);
+            }
+          },
+          error: function(xhr, status, error) {
+            console.log("Error: " + error);
+            editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1); // include hello world program by default
+          }
+        });
+      }
 
       // Function to run code and display output in output box
       function displayCode(response) {
         // Display Artsy within the output terminal
         var memory;
         let artsyOutput = "";
-        console.log(response);
         fetch(response)
         .then(response => response.arrayBuffer())
         .then(bytes => WebAssembly.instantiate(bytes, 
@@ -108,16 +163,28 @@
           }
         }
         )).then(results => {
-        instance = results.instance;
-        memory = instance.exports.pagememory;
+          instance = results.instance;
+          memory = instance.exports.pagememory;
+          console.log("Artsy output is displayed!");
         }).catch(console.error);
-        console.log("Artsy output is displayed!");
       }
 
-      function runCode() {
-        output.innerHTML = "";
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function setSaveText(response, style) {
+        // Set save text as response
+        save_text.innerHTML = response;
+        save_text.style = style;
+
+        // Clear output after 4 seconds
+        await sleep(4000);
+        save_text.innerHTML = "";
+      }
+
+      async function saveCode(useMessage) {
         var codeInput = editor.getValue();
-        console.log("Executing code: \n\n" + codeInput);
 
         // Convert the data into JSON
         var data = {
@@ -127,12 +194,33 @@
 
         // Send an AJAX request to processArtsy.php and execute compiler
         $.ajax({
-          url: "processArtsy.php",
+          url: "save_code.php",
           type: "POST",
           data: jsonData,
           contentType: 'application/json',
           success: function(response) {
-            console.log("Artsy successfully compiled!");
+            if (useMessage === true) {
+              setSaveText("Your progress was saved!", "color:darkgreen");
+            }
+          },
+          error: function(xhr, status, error) {
+            if (useMessage === true) {
+              setSaveText("Error: Your code was not saved.", "color:red");
+            }
+          }
+        });
+      }
+
+      async function runCode() {
+        // Reset output of terminal
+        output.innerHTML = "";
+
+        // Send an AJAX request to process_code.php and execute compiler
+        $.ajax({
+          url: "process_code.php",
+          type: "POST",
+          contentType: 'application/json',
+          success: function(response) {
             displayCode(response);
           },
           error: function(xhr, status, error) {
@@ -141,9 +229,32 @@
         });
       }
 
-      // Add event listener to run button
-      var runButton = document.getElementById("run-button");
-      runButton.addEventListener("click", runCode);
+      // Initialize ace editor
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/python");
+      editor.getSession().setUseWorker(false);
+      var output = document.getElementById("output");
+      var save_text = document.getElementById("save-text");
+
+      // Start code editor
+      startEditor();
+
+      // Register change event handler
+      editor.getSession().on('change', function() {
+        saveCode(); // call the saveCode function whenever the editor content changes
+      });
+
+      // Register save button clicks
+      $('#save-button').click(function() {
+        saveCode(true);
+      });
+
+      // Register run button clicks
+      $('#run-button').click(function() {
+        runCode();
+      });
+
     </script>
     <style> 
       .center-button { 

@@ -8,7 +8,7 @@
 #include "webgen.h"
 
 // Starts the whole program
-int main(int argc, char**argv) {
+int main(int argc, char ** argv) {
   // Track the total compilation time
   double total_time;
   clock_t start, end;
