@@ -84,9 +84,7 @@
         // Display Artsy within the output terminal
         var memory;
         let artsyOutput = "";
-        let wasmFile = "../src/in/" + response + ".wasm";
-        //let wasmFile = "../src/in/" + response;
-        fetch(wasmFile)
+        fetch(response)
         .then(response => response.arrayBuffer())
         .then(bytes => WebAssembly.instantiate(bytes, 
         {

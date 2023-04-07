@@ -22,16 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
   
   // Check if the user has permissions to write to each directory
+  $temp_dir = sys_get_temp_dir();
   $dir = '../src/';
   $dir_in = '../src/in/';
 
-  if (!is_writable($dir)) {
+  if (!is_writable($temp_dir)) {
     http_response_code(500);
     echo 'Cannot write to directory /src';
-    exit;
-  } else if (!is_writable($dir_in)) {
-    http_response_code(500);
-    echo 'Cannot write to directory /src/in';
     exit;
   }
 
@@ -44,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Save the code to a file
-  $file = $dir . '/in/' . $randomString . '.txt';
+  $file = $temp_dir . $randomString . '.txt';
   if (!file_put_contents($file, $code)) {
     http_response_code(500);
     echo 'Error saving file';
@@ -52,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
   
   // Execute the set of commands
-  $outputText = 'make -C ' . $dir . ' artsy ./in/' . $randomString . '.txt';
+  $outputText = 'make -C ' . $dir . ' artsy ' . $file;
   $output = exec($outputText);
 
   // Check if the command actually executed
@@ -62,12 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Check if the wasm file was created
-  if (!file_exists($dir_in . $randomString . '.txt.wasm')) {
-    echo 'Make command failed to create the file: ' . $randomString . '.txt.wasm';
+  $wasmFile = $file . '.wasm';
+  if (!file_exists($wasmFile)) {
+    echo 'Make command failed to create the file: ' . $wasmFile;
     exit;
   }
 
-  echo $randomString . '.txt';
+  echo $wasmFile;
   exit;
 }
 ?>
