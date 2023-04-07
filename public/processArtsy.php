@@ -58,14 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   fclose($file_handle);
 
   // Check if the text file actually exists
-  if (!file_exists($file)) {
-    $error = 'Input file was not created' . $file;
+  if (!file_exists($filename)) {
+    $error = 'Input file was not created' . $filename;
     echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
   
   // Execute the set of commands
-  $outputText = 'make -C ' . $dir . ' artsy ' . $file;
+  $outputText = 'make -C ' . $dir . ' artsy ' . $filename;
   $output = exec($outputText);
 
   // Check if the command actually executed
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Check if the wasm file was created
-  $wasmFile = $file . '.wasm';
+  $wasmFile = $filename . '.wasm';
   if (!file_exists($wasmFile)) {
     $error = 'Make command failed to create the file: ' . $wasmFile;
     echo json_encode(array("success" => false, "message" => $error));
