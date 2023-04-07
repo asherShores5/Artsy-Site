@@ -1,2 +1,0 @@
-# Artsy Program
-print "Hello Artsy;
