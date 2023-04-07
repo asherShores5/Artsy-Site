@@ -42,12 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   for ($i = 0; $i < $length; $i++) {
       $randomString .= $characters[rand(0, strlen($characters) - 1)];
   }
-
+//$temp_dir == /tmp
   // Save the code to a file
   $filename = $temp_dir . '/' . $randomString . '.txt';
   $mode = "w";
 
-  $filename = $temp_dir . "helloWorld.txt";
+  $filename = $temp_dir . "/helloWorld.txt";
 
   $file_handle = fopen($filename, $mode);
 
