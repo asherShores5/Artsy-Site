@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   // Check if the user has permissions to write to each directory
   $temp_dir = sys_get_temp_dir();
-  $dir = '../src/';
-  $dir_in = '../src/in/';
+  // $dir = '../src/';
+  // $dir_in = '../src/in/';
 
   if (!is_writable($temp_dir)) {
     http_response_code(500);
@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Save the code to a file
   $file = $temp_dir . '/' . $randomString . '.txt';
+  echo 'Temp folder file: ' . $file . '\n';
   if (!file_put_contents($file, $code)) {
     http_response_code(500);
     echo 'Error saving file';
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Check if the command actually executed
   if ($output === null) {
+    http_response_code(500);
     echo 'Error running make';
     exit;
   }
@@ -61,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Check if the wasm file was created
   $wasmFile = $file . '.wasm';
   if (!file_exists($wasmFile)) {
+    http_response_code(500);
     echo 'Make command failed to create the file: ' . $wasmFile;
     exit;
   }
