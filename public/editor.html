@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Artsy Project</title>
-  <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -74,7 +74,7 @@
       // Initialize ace editor
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/monokai");
-      editor.session.setMode("ace/mode/javascript");
+      editor.session.setMode("ace/mode/python");
       editor.getSession().setUseWorker(false);
       editor.setValue("# Artsy Program\nprint \"Hello Artsy\";", -1) // include hello world program by default
       var output = document.getElementById("output");
