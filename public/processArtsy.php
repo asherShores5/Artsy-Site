@@ -46,6 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Save the code to a file
   $filename = $temp_dir . '/' . $randomString . '.txt';
   $mode = "w";
+
+  $filename = $temp_dir . "helloWorld.txt";
+
   $file_handle = fopen($filename, $mode);
 
   if (!fwrite($file_handle, $code)) {
