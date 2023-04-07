@@ -44,13 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Save the code to a file
-  $file = $temp_dir . '/' . $randomString . '.txt';
-  echo 'Temp folder file: ' . $file . '\n';
-  if (!file_put_contents($file, $code)) {
+  $filename = $temp_dir . '/' . $randomString . '.txt';
+  $mode = "w";
+  $file_handle = fopen($filename, $mode);
+
+  if (!fwrite($file_handle, $code)) {
     $error = "Cannot put code into file";
     echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
+
+  // Close the file
+  fclose($file_handle);
 
   // Check if the text file actually exists
   if (!file_exists($file)) {
