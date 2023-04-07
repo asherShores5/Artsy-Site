@@ -51,6 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(array("success" => false, "message" => $error));
     exit;
   }
+
+  // Check if the text file actually exists
+  if (!file_exists($file)) {
+    $error = 'Input file was not created' . $file;
+    echo json_encode(array("success" => false, "message" => $error));
+    exit;
+  }
   
   // Execute the set of commands
   $outputText = 'make -C ' . $dir . ' artsy ' . $file;
