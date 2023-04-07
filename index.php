@@ -1,5 +1,5 @@
 <?php
-    header('Location: index.html');
+    header('Location: public/index.html');
     phpinfo();
     exit;
 ?>

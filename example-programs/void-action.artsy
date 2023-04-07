@@ -4,9 +4,10 @@ declare launchMessage as string;
 # Print two messages using a void action
 action testMessage() {
     declare test as string;
-    let test = "Test Void Function: ";
+    let test = "Quickly end this";
     print test;
     addline;
+    report;
     print launchMessage;
     addline;
     print "YAY!";

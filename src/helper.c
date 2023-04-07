@@ -118,18 +118,6 @@ int isVar(char * phrase) {
     return 1;
 }
 
-// Helper function that checks each char and determines if the whole string is a digit or not
-int isNumeric(char * var) {
-    for(int i = 0; var[i]; i++) {
-        // If any char in the string is not a digit, return false
-        if(!isdigit((int)var[i])) {
-            return 0;
-        }
-    }
-    // Else, return true, it is a digit
-    return 1;
-}
-
 // Helper function that determines the escape character type; used alongside another function to parse if this is a escapeChar or not.
 char * escapeCharType(char c) {
     if (c == '\"') {
@@ -151,6 +139,18 @@ char * escapeCharType(char c) {
         return "SPACE";  
     }
     return "NONE";
+}
+
+// Helper function that checks each char and determines if the whole string is a digit or not
+int isNumeric(char * var) {
+    for(int i = 0; var[i]; i++) {
+        // If any char in the string is not a digit, return false
+        if(!isdigit((int)var[i])) {
+            return 0;
+        }
+    }
+    // Else, return true, it is a digit
+    return 1;
 }
 
 // Helper function that maps IRcode to the corresponding WebAssembly type
@@ -243,4 +243,8 @@ char * convertToASCII(char * phrase) {
 
     // Return ASCII value
     return asciiVal;
+}
+
+char * convertLogicalIR(char * phrase) {
+    
 }

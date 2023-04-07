@@ -43,9 +43,9 @@ int inMain = 1;
 int inParams = 0;
 int inLogic = 0;
 
-// Variable to track total ifs
-int totalIfs = 0;
-
+// Variable to track finish indexes
+int * finishIndexes;
+int stackNumber = 0;
 
 // File functions
 
@@ -83,6 +83,7 @@ FILE * getHelperFileType(char * fileType) {
     }
     return 0;
 }
+
 
 // String hash table functions
 
@@ -232,6 +233,17 @@ void checkParamContext() {
         inParams = 0;
         generateResultWAT(WATcode, returnType);
     }
+}
+
+// Helper function to get finish index
+int getFinishIndex() {
+    int newIndex = 0;
+    for (int i = 0; i < stackNumber + 1; i++) {
+        printf("Stack num #%d: %d\n", i, finishIndexes[i]);
+        newIndex += finishIndexes[i];
+    }
+    printf("New index: %d\n", newIndex);
+    return newIndex;
 }
 
 // WAT CODE PRINT MODULES
@@ -455,6 +467,7 @@ void generateResultWAT(FILE * printFile, char * returnType) {
     }
 }
 
+// Function module for handling action returns with a return type
 void generateReturnWAT(char * varName, char * scopeType) {
     // Create starting return statement in WAT
     fprintf(LOCALcode, "\t\t(return");
@@ -465,6 +478,18 @@ void generateReturnWAT(char * varName, char * scopeType) {
     // Generate the return ending statement in WAT
     fprintf(LOCALcode, ")\n");    
 }
+
+// Function module for handling action returns without a return type
+void generateVoidReturnWAT() {
+    // Create void return statement in WAT
+    fprintf(LOCALcode, "\t\t(return)\n");
+}
+
+void generateFinishWAT(FILE * printFile) {
+    // Create finish statement in wat
+    fprintf(printFile, "\t\t(br %d)\n", getFinishIndex());
+}
+
 
 void generateActionEndWAT(char * actionScope) {
     fprintf(WATcode, "\t)\n\t(export \"%s\" (func $%s))\n", actionScope, actionScope);
@@ -726,7 +751,7 @@ void generateWhileStartWAT(FILE * printFile) {
 
 // Function module for handling exiting from While Loops
 void generateWhileExitWAT(FILE * printFile) {
-    fprintf(printFile, "\t\t(br 0)\n\t\t))");
+    fprintf(printFile, "\t\t(br 0)\n\t\t))\n");
 }
 
 // Function module for starting if statements
@@ -764,6 +789,10 @@ void generateText() {
 
     // Global return type variable for a given function
     returnType = calloc(100, sizeof(char));
+
+    // Finish indexes array
+    finishIndexes = malloc(MAX_ARRAY_LENGTH * sizeof(int*));
+    for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { prevScopes[i] = 0; }
 
     // Print file variable
     FILE * printFile = MAINcode;
@@ -884,7 +913,7 @@ void generateText() {
             totalWebScopes--;
         }
 
-        // Case for return statements in functions
+        // Case for return statements with a return type in actions
         else if (strncmp(strArr[0], "return", 6) == 0) {
             // Switch param context
             checkParamContext();
@@ -892,8 +921,23 @@ void generateText() {
             // Get variable scopeType
             char * scopeType = getScopeType(strArr[1]);
             
-            // Print function ending code
+            // Print action ending code
             generateReturnWAT(strArr[1], scopeType);
+        }
+
+        // Case for void return statements in actions
+        else if (strncmp(strArr[0], "voidreturn", 10) == 0) {
+            // Switch param context
+            checkParamContext();
+            
+            // Print void action ending code
+            generateVoidReturnWAT();
+        }
+
+        // Case for finish keywords in logical statements
+        else if (strncmp(strArr[0], "finish", 6) == 0) {
+            // Print finish code
+            generateFinishWAT(printFile);
         }
 
         // Case for output statements
@@ -941,6 +985,10 @@ void generateText() {
             strcpy(prevScopes[totalWebScopes], currScope);
             totalWebScopes++;
 
+            // Set finish index
+            stackNumber++;
+            finishIndexes[stackNumber]++;
+
             // Determine if uses a single statement
             if (lenIndex == 3) {
                 generateComparisonWAT(printFile, strArr[1], strArr[2], strArr[3], "while");
@@ -964,6 +1012,10 @@ void generateText() {
             strcpy(currScope, newScope);
             strcpy(prevScopes[totalWebScopes], currScope);
             totalWebScopes++;
+
+            // Set finish index
+            stackNumber++;
+            finishIndexes[stackNumber]++;
 
             // Determine if uses a single statement
             if (lenIndex == 3) {
@@ -989,6 +1041,9 @@ void generateText() {
             strcpy(prevScopes[totalWebScopes], currScope);
             totalWebScopes++;
 
+            // Set finish index
+            finishIndexes[stackNumber]++;
+
             // Determine if uses a single statement
             if (lenIndex == 3) {
                 generateComparisonWAT(printFile, strArr[1], strArr[2], strArr[3], "elif");
@@ -1001,7 +1056,7 @@ void generateText() {
             inLogic = 1;
         }
 
-        // Case for Exit Statements
+        // Case for Else Statements
         else if (strncmp(strArr[0], "else", 4) == 0) {
             generateIfStartWAT(printFile, "else");
 
@@ -1012,6 +1067,9 @@ void generateText() {
             strcpy(currScope, newScope);
             strcpy(prevScopes[totalWebScopes], currScope);
             totalWebScopes++;
+
+            // Set finish index
+            finishIndexes[stackNumber]++;
 
             // Set scope to be in a logical statement
             inLogic = 1;
@@ -1024,6 +1082,10 @@ void generateText() {
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
+
+            // Reduce stack number
+            finishIndexes[stackNumber] = 0;
+            stackNumber--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
             if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
@@ -1048,9 +1110,6 @@ void generateText() {
         // Case for Ending Elif Statements
         else if (strncmp(strArr[0], "endelif", 7) == 0) {
             generateIfExitWAT(printFile, "then");
-            
-            // Increment ifs variable
-            totalIfs++;
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalWebScopes-2]);
@@ -1065,10 +1124,13 @@ void generateText() {
         // Case for Ending Else Statements
         else if (strncmp(strArr[0], "endelse", 7) == 0) {
             // Print all elif endings and reset iterator variable
-            for (int i = 0; i < totalIfs; i++) { generateIfExitWAT(printFile, "elif"); }
-            totalIfs = 0;
-
-            generateIfExitWAT(printFile, "else");
+            for (int i = 0; i < finishIndexes[stackNumber] - 1; i++) {
+                if (i == 0) {
+                    generateIfExitWAT(printFile, "then"); 
+                } else {
+                    generateIfExitWAT(printFile, "elif"); 
+                }
+            }
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalWebScopes-2]);
@@ -1083,6 +1145,10 @@ void generateText() {
         // Case for Ending Flow Statements
         else if (strncmp(strArr[0], "endlogic", 8) == 0) {
             generateIfExitWAT(printFile, "logic");
+
+            // Reduce stack number
+            finishIndexes[stackNumber] = 0;
+            stackNumber--;
         }
 
         // Case for Void Action Calls

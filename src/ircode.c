@@ -602,6 +602,14 @@ void emitReturnOptimized(char * id) {
     fprintf(IRcodeOptimized, "return %s\n", id);
 }
 
+void emitVoidReturn(FILE * printFile) {
+    fprintf(printFile, "voidreturn\n");
+}
+
+void emitFinish(FILE * printFile) {
+    fprintf(printFile, "finish\n");
+}
+
 void emitExit(FILE * printFile) {
     // Set current scope as previous scope
     strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -1011,7 +1019,6 @@ char* ASTTraversal(struct AST* root) {
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
             if (root->RHS != NULL && root->RHS[0] != '\0' && root->RHS[0] != '\n') {
-                printf("YEP! %s\n", root->RHS);
                 strcpy(params[paramIndex], root->right->RHS);
                 paramIndex += 1;
             }
@@ -1035,8 +1042,15 @@ char* ASTTraversal(struct AST* root) {
             return buffer;
         }
         if(strcmp(root->nodeType, "report") == 0) {
+            // Traverse and report the RHS if the action has a return type
             strcpy(rightVar, ASTTraversal(root->right));
             emitReturn(rightVar);
+        }
+        if(strcmp(root->nodeType, "voidreport") == 0) {
+            emitVoidReturn(IRcode);
+        }
+        if(strcmp(root->nodeType, "finish") == 0) {
+            emitFinish(IRcode);
         }
         if(strcmp(root->nodeType, "=") == 0) {
             strcpy(rightVar, ASTTraversal(root->right));
@@ -1097,7 +1111,7 @@ char* ASTTraversal(struct AST* root) {
                     } else if (strncmp(root->left->LHS, "int", 3) == 0 || strncmp(root->left->LHS, "float", 5) == 0) {
                         strcpy(leftVar, root->left->left->RHS);
                     } else if (strncmp(root->left->RHS, "action call param list", 24) == 0) {
-                        strcpy(leftVar, ASTTraversal(root->right));
+                        strcpy(leftVar, ASTTraversal(root->left));
                     } else {
                         sprintf(leftVar, "%s[%s]", root->left->LHS, root->left->RHS);
                     }
@@ -1133,7 +1147,6 @@ char* ASTTraversal(struct AST* root) {
                     || strcmp(root->LHS, "!=") == 0) {
                         return emitBinaryOperation(root->nodeType, ASTTraversal(root->left), rightVar);;
                 }
-
                 return emitBinaryOperation(root->nodeType, leftVar, rightVar);
         }
 
@@ -1428,7 +1441,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             }
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
-            if (root->right != NULL) {
+            if (root->RHS != NULL && root->RHS[0] != '\0' && root->RHS[0] != '\n') {
                 strcpy(params[paramIndex], root->right->RHS);
                 paramIndex += 1;
             }
@@ -1458,6 +1471,7 @@ char* ASTTraversalOptimized(struct AST* root) {
         }
         if(strncmp(root->nodeType, "action call", 14) == 0) {
             ASTTraversalOptimized(root->right);
+            printf("made it\n");
 
             memset(buffer, 0, 50);
             strcpy(buffer, emitFunctionCallOptimized(root->LHS));
@@ -1467,6 +1481,12 @@ char* ASTTraversalOptimized(struct AST* root) {
         if(strcmp(root->nodeType, "report") == 0) {
             strcpy(rightVar, ASTTraversalOptimized(root->right));
             emitReturnOptimized(rightVar);
+        }
+        if(strcmp(root->nodeType, "voidreport") == 0) {
+            emitVoidReturn(IRcodeOptimized);
+        }
+        if(strcmp(root->nodeType, "finish") == 0) {
+            emitFinish(IRcodeOptimized);
         }
         if(strcmp(root->nodeType, "block") == 0) {
             return ASTTraversalOptimized(root->right);
@@ -1534,7 +1554,7 @@ char* ASTTraversalOptimized(struct AST* root) {
                     } else if (strncmp(root->left->LHS, "int", 3) == 0 || strncmp(root->left->LHS, "float", 5) == 0) {
                         strcpy(leftVar, root->left->left->RHS);
                     } else if (strncmp(root->left->RHS, "action call param list", 24) == 0) {
-                        strcpy(leftVar, ASTTraversalOptimized(root->right));
+                        strcpy(leftVar, ASTTraversalOptimized(root->left));
                     } else {
                         sprintf(leftVar, "%s[%s]", root->left->LHS, root->left->RHS);
                     }

@@ -20,6 +20,7 @@ char scopeStack[50][50];
 char currentFunctionScope[50];
 int stackPointer;
 int blockNumber;
+int inLoop;
 
 %}
 
@@ -292,7 +293,14 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 	}
 	| FINISH SEMICOLON {
 		printf("\n RECOGNIZED RULE: FINISH statement\n");
-		$$ = AST_SingleChildNode("finish", 0, 0);
+		$$ = AST_SingleChildNode("finish", "finish", 0);
+
+		// Semantic check
+		// If the finish statement is not within a loop, throw a semantic error
+		if (!inLoop) {
+			printf("SEMANTIC ERROR: The \"finish\" keyword was specified outside of a loop.\n");
+			exit(1);
+		}
 	}
 	| REPORT Expr SEMICOLON {
 		printf("\n RECOGNIZED RULE: REPORT statement\n");
@@ -301,12 +309,23 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 		// Semantic check for void functions
 		// If the function is a void function and states a return, throw a semantic error
 		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) == 0) {
-			printf("SEMANTIC ERROR: Cannot specify a \"return\" command for void actions.\n", $2);
+			printf("SEMANTIC ERROR: Cannot specify \"report\" with a report type for void actions.\n");
 			exit(1);
 		}
 
 		// Check if the return type matches the function type
 		CheckAssignmentType(currentFunctionScope, getExprOp($2), scopeStack, stackPointer);
+	}
+	| REPORT SEMICOLON {
+		printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
+		$$ = AST_SingleChildNode("voidreport", "voidreport", 0); 
+
+		// Semantic check for non-void functions
+		// If the function is a non-void function and states a blank return, throw a semantic error
+		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) != 0) {
+			printf("SEMANTIC ERROR: Cannot specify a \"report\" without a report type for non-void actions.\n");
+			exit(1);
+		}
 	}
 	| Block {$$ = $1;} //To do for next iteration
 	| Loop {$$ = $1;}
@@ -328,6 +347,15 @@ Loop: WhileL {
 	}
 ;
 
+WhileL: WhileHead Block {
+	$$ = AST_DoublyChildNodes("WhileL", $1, $2, $1, $2);
+	stackPointer--;
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, scopeStack[stackPointer]);
+	inLoop = 0;
+}
+;
+
 WhileHead: WHILE LEFTPAREN Expr RIGHTPAREN {
 	$$ = AST_SingleChildNode($3, $3, $3);
 
@@ -335,6 +363,9 @@ WhileHead: WHILE LEFTPAREN Expr RIGHTPAREN {
 	symTabAccess();
 	addLogic("while", "While", scopeStack[stackPointer], stackPointer, blockNumber);
 	showSymTable();
+
+	// Indicate that it's within a loop
+	inLoop = 1;
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -344,17 +375,9 @@ WhileHead: WHILE LEFTPAREN Expr RIGHTPAREN {
 	blockNumber++;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], tempScopeName);
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, tempScopeName);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, tempScopeName);
 };
-
-WhileL: WhileHead Block {
-	$$ = AST_DoublyChildNodes("WhileL", $1, $2, $1, $2);
-	stackPointer--;
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, scopeStack[stackPointer]);
-}
-;
 
 IfHead: IF LEFTPAREN Expr RIGHTPAREN {
 	$$ = AST_SingleChildNode($3, $3, $3);
@@ -371,8 +394,8 @@ IfHead: IF LEFTPAREN Expr RIGHTPAREN {
 	blockNumber++;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], tempScopeName);
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, tempScopeName);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, tempScopeName);
 }
 ;
 
@@ -381,8 +404,8 @@ If: IfHead Block {
 
 	$$ = AST_DoublyChildNodes("If", $1, $2, $1, $2);
 	stackPointer--;
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, scopeStack[stackPointer]);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, scopeStack[stackPointer]);
 }
 ;
 
@@ -401,8 +424,8 @@ ElifHead: ELIF LEFTPAREN Expr RIGHTPAREN {
 	blockNumber++;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], tempScopeName);
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, tempScopeName);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, tempScopeName);
 }
 ;
 
@@ -411,8 +434,8 @@ Elif:  ElifHead Block {
 
 	$$ = AST_DoublyChildNodes("Elif", $1, $2, $1, $2);
 	stackPointer--;
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, scopeStack[stackPointer]);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, scopeStack[stackPointer]);
 }
 ;
 
@@ -429,8 +452,8 @@ ElseHead: ELSE {
 	blockNumber++;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], tempScopeName);
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, tempScopeName);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, tempScopeName);
 }
 ;
 
@@ -439,8 +462,8 @@ Else:  ElseHead Block {
 
 	$$ = AST_SingleChildNode("Else", $2, $2);
 	stackPointer--;
-	memset(currentFunctionScope, 0, 50 * sizeof(char));
-	strcpy(currentFunctionScope, scopeStack[stackPointer]);
+	// memset(currentFunctionScope, 0, 50 * sizeof(char));
+	// strcpy(currentFunctionScope, scopeStack[stackPointer]);
 }
 ;
 
@@ -467,10 +490,16 @@ Primary :	 INTEGER	{$$ = AST_SingleChildNode("int", $1, $1); }
 ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\n", 0);}	
 	| Primary	{ 
 			$$ = AST_SingleChildNode("exprlist end", $1, $1); 
-		}
+	}
 	| Primary COMMA ExprListTail	{
 			$$ = AST_DoublyChildNodes("exprlist exprtail", $1, $3, $1, $3);
-		}
+	}
+	// | Expr	{ 
+	// 		$$ = AST_SingleChildNode("exprlist end", $1, $1); 
+	// 	}
+	// | Expr COMMA ExprListTail	{
+	// 		$$ = AST_DoublyChildNodes("exprlist exprtail", $1, $3, $1, $3);
+	// 	}
 ;
 
 ExprList: {}	
@@ -682,6 +711,7 @@ int parser_main(FILE * inputfile)
 	printf("\n----Starting Lexer and Parser----\n\n");
 	stackPointer = 0;
 	blockNumber = 0;
+	inLoop = 0;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], "global");
 	
