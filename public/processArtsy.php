@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Save the code to a file
-  $file = $temp_dir . $randomString . '.txt';
+  $file = $temp_dir . '/' . $randomString . '.txt';
   if (!file_put_contents($file, $code)) {
     http_response_code(500);
     echo 'Error saving file';
