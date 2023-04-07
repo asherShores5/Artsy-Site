@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   // Check if the user has permissions to write to each directory
   $temp_dir = sys_get_temp_dir();
-  // $dir = '../src/';
+  $dir = '../src/';
   // $dir_in = '../src/in/';
 
   if (!is_writable($temp_dir)) {
