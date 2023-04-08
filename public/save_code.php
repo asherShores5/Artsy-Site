@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($codeInput !== null) {
         // Save the code input to a cookie variable
-        setcookie("codeInput", $codeInput, time() + 3600, "/", "", true, true);
+        setcookie("codeInput", $codeInput, time() + (10 * 365 * 24 * 60 * 60), "/", "", true, true);
 
         // Send a success response
         $response = array(
