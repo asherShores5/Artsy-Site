@@ -544,7 +544,7 @@ char *yytext;
 
 int words = 0;
 int chars = 0;
-int lines = 0;
+int lines = 1;
 
 #line 550 "lex.yy.c"
 #line 551 "lex.yy.c"
@@ -1358,7 +1358,7 @@ YY_RULE_SETUP
 #line 407 "lexer.l"
 {chars++;
 		 // Line break and tab recognition for processing files in Windows
-         printf("%s : Unrecognized symbol at line %d char %d\n", yytext,lines,chars);
+         printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
 		}
 	YY_BREAK
 case 52:

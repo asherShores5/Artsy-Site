@@ -809,7 +809,7 @@ void generateText() {
         // Ensure the line from fgets isn't beyond the max
         // Avoids buffer overflow attacks
         if (strlen(line) == MAX_LINE_LENGTH - 1 && line[MAX_LINE_LENGTH - 2] != '\n') 	  {
-            printf("SEMANTIC ERROR: Line %d is too long.\n", lineNumber);
+            fprintf(errorFile, "Semantic Error: Line %d is too long.\n", lines);
             exit(1);
         }
         printf("%s", line);

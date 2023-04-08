@@ -23,7 +23,7 @@ lex.yy.c: lexer.l parser.tab.h
 	@flex lexer.l
 
 artsy: lex.yy.c parser.tab.c parser.tab.h symbolTable.h symbolTable.c AST.c AST.h semantic.c semantic.h helper.h helper.c ircode.c ircode.h driver.c webgen.c webgen.h
-	# @gcc -w -o driver parser.tab.c lex.yy.c semantic.c ircode.c driver.c AST.c symbolTable.c webgen.c
+	gcc -w -o driver parser.tab.c lex.yy.c semantic.c ircode.c driver.c AST.c symbolTable.c webgen.c
 	@./driver $(FILE_PATH)
 	@rm -f MAINcode.wat LOCALcode.wat VARScode.wat
 	@wat2wasm WATcode.wat -o $(FILE_PATH).wasm

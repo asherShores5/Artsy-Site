@@ -8,7 +8,7 @@
 
 int words = 0;
 int chars = 0;
-int lines = 0;
+int lines = 1;
 
 %}
 
@@ -406,7 +406,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 [ \t]	{chars++;}
 .		{chars++;
 		 // Line break and tab recognition for processing files in Windows
-         printf("%s : Unrecognized symbol at line %d char %d\n", yytext,lines,chars);
+         printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
 		}
 		
 

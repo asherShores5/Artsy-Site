@@ -191,7 +191,7 @@ char * getCallListItemType(struct AST * root, int searchIndex, int currIndex, ch
 	//		- If searchIndex != currIndex, add +1 to currIndex, then traverse to the right
 	//		- Otherwise, return the left hand side case
 	// 3. If an exprlist end is encountered:
-	//		- If searchIndex != currIndex, then throw a semantic error
+	//		- If searchIndex != currIndex, then throw a Semantic Error
 	//		- Otherwise, return the right hand side case
 	// 4. If anything else is encounered, skip and traverse to the right
 
@@ -248,7 +248,7 @@ char * getCallListItemType(struct AST * root, int searchIndex, int currIndex, ch
 		}
 	} else if (strncmp(root->nodeType, "exprlist end", 12) == 0) {
 		if (searchIndex != currIndex) {
-			printf("SEMANTIC ERROR: Search index (%d) does not match the total number of call parameters (%d).\n", searchIndex, currIndex);
+			fprintf(errorFile, "Semantic Error, line %d: Search index (%d) does not match the total number of call parameters (%d).\n", lines, searchIndex, currIndex);
 			exit(1);
 		} else {
 			char * nodeType = root->RHS;

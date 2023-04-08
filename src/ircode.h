@@ -3,6 +3,10 @@
 
 extern struct AST* ast;
 
+// Error log file
+extern FILE* errorFile;
+extern int lines;
+
 // ---- Functions to handle IR code emissions ---- //
 
 void initIRcodeFile();

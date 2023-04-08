@@ -31,7 +31,7 @@ endlogic
 return 0
 exit
 type int test
-T5 = call fibonacci args 30
+T5 = call fibonacci args 3
 test = T5
 output "Fibonacci Result: "
 output test

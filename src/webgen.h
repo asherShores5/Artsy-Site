@@ -1,6 +1,10 @@
 #ifndef WEBGEN_H 
 #define WEBGEN_H
 
+// Error log file
+extern FILE* errorFile;
+extern int lines;
+
 // File Functions
 void initAssemblyFile();
 FILE * getFileType(char * fileType);

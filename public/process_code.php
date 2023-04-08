@@ -78,12 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Check if the wasm file was created
   $wasmFile = $dir_in . $randomString . '.txt.wasm';
   if (!file_exists($wasmFile)) {
-    $error = 'Make command failed to create the file: ' . $wasmFile;
-    $response = array(
-      "status" => "error",
-      "message" => $error, 
-    );
-    echo json_encode($response);
+    // Return back error file name
+    $errorFile = $dir_in . $randomString . '_error.txt';
+    echo $errorFile;
     exit;
   }
 

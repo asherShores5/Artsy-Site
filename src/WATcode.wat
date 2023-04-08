@@ -126,7 +126,7 @@
 		(local $_printstr_2 i32)
 
 		(local.set $T5 (call $fibonacci
- (i32.const 30)))
+ (i32.const 3)))
 		(global.set $test
 		(local.get $T5))
 		(local.set $_printstr_1 (call $create_array (i32.const 20)))

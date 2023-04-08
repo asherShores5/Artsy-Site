@@ -4,6 +4,10 @@
 #include <string.h>
 #include "AST.h"
 
+// Error log file
+extern FILE* errorFile;
+extern int lines;
+
 // Header file for all semantic check functions
 // This is a simplistic implementation, will be expanded on later
 
