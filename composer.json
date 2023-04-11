@@ -1,0 +1,8 @@
+{
+    "require": {
+        "monolog/monolog": "^2.0",
+        "aws/aws-sdk-php": "^3.33",
+        "vlucas/phpdotenv": "^5.5",
+        "guzzlehttp/guzzle": "^6.5"
+    }
+}
