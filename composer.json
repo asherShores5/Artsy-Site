@@ -1,0 +1,9 @@
+{
+    "require": {
+        "php": ">=7.4",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-sqlite3": "*"
+    }
+}
