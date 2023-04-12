@@ -7,6 +7,7 @@ $aws_secret_access_key = getenv('AWS_SECRET_ACCESS_KEY');
 $s3_bucket = getenv('S3_BUCKET');
 
 use Aws\S3\S3Client;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Create an instance of the AWS SDK for PHP
   require 'vendor/autoload.php';
@@ -16,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     'version'      => 'latest',
     'region'       => 'us-west-1',
     'credentials'  => [
-        'key'    => getenv('AWS_ACCESS_KEY_ID'),
-        'secret' => getenv('AWS_SECRET_ACCESS_KEY'),
+        'key'    => $aws_access_key_id,
+        'secret' => $aws_secret_access_key,
     ],
-]);
-  $bucket = 'artsy-project';
+  ]);
+  $bucket = $s3_bucket;
   $key = 'my-file.artsy';
   try {
     $result = $s3->getObject([

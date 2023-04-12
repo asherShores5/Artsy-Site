@@ -125,65 +125,71 @@
           await sleep(4000);
           save_text.innerHTML = "";
         }
-        
-        async function saveCode(useMessage) {
-          $('#save-button').on('click', function() {
-            var s3 = new AWS.S3({
-              accessKeyId: window.AWS_ACCESS_KEY_ID,
-              secretAccessKey: window.AWS_SECRET_ACCESS_KEY
-            });
-            var code = editor.getValue();
-            var filename = 'my-file.artsy';
-            var params = {
-              Bucket: window.S3_BUCKET,
-              Key: filename,
-              Body: code
-            };
-            s3.upload(params, function(err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                $('#save-text').html('File saved to S3');
-              }
-            });
-          });
+
+async function saveCode(useMessage) {
+  $('#save-button').on('click', function() {
+    var s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    });
+    var code = editor.getValue();
+    var filename = 'my-file.artsy';
+    var params = {
+      Bucket: process.env.S3_BUCKET,
+      Key: filename,
+      Body: code
+    };
+    s3.upload(params, function(err, data) {
+      if (err) {
+        console.log(err);
+      } else {
+        $('#save-text').html('File saved to S3');
+      }
+    });
+  });
+}
+
+async function runCode() {
+  // Reset output of terminal
+  output.innerHTML = "";
+  // Display saveCode
+  setSaveText("Processing your code...", "style:black");
+
+  // Create an instance of the S3 service
+  var s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  });
+
+  // Retrieve the saved code from the S3 bucket
+  var params = {
+    Bucket: process.env.S3_BUCKET,
+    Key: 'my-file.artsy'
+  };
+
+  s3.getObject(params, function(err, data) {
+    if (err) {
+      console.log("Error: " + err);
+    } else {
+      // Send the saved code to process_code.php to execute the compiler
+      $.ajax({
+        url: "process_code.php",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          code: data.Body.toString()
+        }),
+        success: function(response) {
+          displayCode(response);
+        },
+        error: function(xhr, status, error) {
+          console.log("Error: " + error);
         }
-        
-        
-        async function runCode() {
-          // Reset output of terminal
-          output.innerHTML = "";
-          // Display saveCode
-          setSaveText("Processing your code...", "style:black");
-          // Create an instance of the S3 service
-          var s3 = new AWS.S3();
-          // Retrieve the saved code from the S3 bucket
-          var params = {
-            Bucket: 'artsy-project',
-            Key: 'my-file.artsy'
-          };
-          s3.getObject(params, function(err, data) {
-            if (err) {
-              console.log("Error: " + err);
-            } else {
-              // Send the saved code to process_code.php to execute the compiler
-              $.ajax({
-                url: "process_code.php",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({
-                  code: data.Body.toString()
-                }),
-                success: function(response) {
-                  displayCode(response);
-                },
-                error: function(xhr, status, error) {
-                  console.log("Error: " + error);
-                }
-              });
-            }
-          });
-        }
+      });
+    }
+  });
+}
+
         // Initialize ace editor
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai");
