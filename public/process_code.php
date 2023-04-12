@@ -2,6 +2,20 @@
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Set the code variable
   $code = $_COOKIE['codeInput'];
+  // $code = "# Simple action program
+  // declare x as int;
+  // declare y as int;
+  
+  // action int test(int a, int b) {
+  //     report a / b * a / b;
+  // }
+  
+  // let y = (52 - 10 * 3) * 2;
+  // let x = test(y, 3);
+  
+  // print y;
+  // addline;
+  // print x;";
 
   // Validate the input
   if (!$code) {
@@ -20,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!is_writable($dir_in)) {
     $response = array(
       "status" => "error",
-      "message" => "Cannot write to directory /src/in",
+      "message" => "Cannot write to directory " . $dir_,
     );
     echo json_encode($response);
     exit;
