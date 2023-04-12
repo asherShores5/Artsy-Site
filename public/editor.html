@@ -126,28 +126,30 @@
           save_text.innerHTML = "";
         }
 
-async function saveCode(useMessage) {
-  $('#save-button').on('click', function() {
-    var s3 = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    });
-    var code = editor.getValue();
-    var filename = 'my-file.artsy';
-    var params = {
-      Bucket: process.env.S3_BUCKET,
-      Key: filename,
-      Body: code
-    };
-    s3.upload(params, function(err, data) {
-      if (err) {
-        console.log(err);
-      } else {
-        $('#save-text').html('File saved to S3');
-      }
-    });
-  });
-}
+        async function saveCode(useMessage) {
+          $('#save-button').on('click', function() {
+            var s3 = new AWS.S3({
+              accessKeyId: '<?php echo getenv("AWS_ACCESS_KEY_ID"); ?>',
+              secretAccessKey: '<?php echo getenv("AWS_SECRET_ACCESS_KEY"); ?>'
+            });
+            var code = editor.getValue();
+            var filename = 'my-file.artsy';
+            var params = {
+              Bucket: '<?php echo getenv("S3_BUCKET"); ?>',
+              Key: filename,
+              Body: code
+            };
+            s3.upload(params, function(err, data) {
+              if (err) {
+                console.log(err);
+              } else {
+                $('#save-text').html('File saved to S3');
+              }
+            });
+          });
+        }
+        
+        
 
 async function runCode() {
   // Reset output of terminal
@@ -157,9 +159,9 @@ async function runCode() {
 
   // Create an instance of the S3 service
   var s3 = new AWS.S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-  });
+    accessKeyId: '<?php echo getenv("AWS_ACCESS_KEY_ID"); ?>',
+    secretAccessKey: '<?php echo getenv("AWS_SECRET_ACCESS_KEY"); ?>'
+            });
 
   // Retrieve the saved code from the S3 bucket
   var params = {
