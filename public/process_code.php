@@ -1,80 +1,61 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Set the code variable
-  $code = $_COOKIE['codeInput'];
-  // $code = "# Simple action program
-  // declare x as int;
-  // declare y as int;
-  
-  // action int test(int a, int b) {
-  //     report a / b * a / b;
-  // }
-  
-  // let y = (52 - 10 * 3) * 2;
-  // let x = test(y, 3);
-  
-  // print y;
-  // addline;
-  // print x;";
+namespace MyNamespace;
 
-  // Validate the input
-  if (!$code) {
+// Load environment variables
+$aws_access_key_id = getenv('AWS_ACCESS_KEY_ID');
+$aws_secret_access_key = getenv('AWS_SECRET_ACCESS_KEY');
+$s3_bucket = getenv('S3_BUCKET');
+
+use Aws\S3\S3Client;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Create an instance of the AWS SDK for PHP
+  require 'vendor/autoload.php';
+
+  // Retrieve the saved code from the S3 bucket
+  $s3 = new S3Client([
+    'version' => 'latest',
+    'region' => 'us-east-1',
+    'credentials' => [
+      'key' => $aws_access_key_id,
+      'secret' => $aws_secret_access_key,
+    ],
+  ]);
+  $bucket = 'artsy-project';
+  $key = 'my-file.artsy';
+  try {
+    $result = $s3->getObject([
+      'Bucket' => $bucket,
+      'Key' => $key,
+    ]);
+    $code = $result['Body'];
+  } catch (Aws\S3\Exception\S3Exception $e) {
     // Send an error response
     $response = array(
         "status" => "error",
-        "message" => "Invalid code input."
+        "message" => "Error retrieving code from S3 bucket.",
     );
     echo json_encode($response);
     exit;
   }
-  
-  // Check if the user has permissions to write to the directory
-  $dir_in = '../src/in/';
 
-  if (!is_writable($dir_in)) {
+  // Check if the code is empty
+  if (empty($code)) {
+    // Send an error response
     $response = array(
-      "status" => "error",
-      "message" => "Cannot write to directory " . $dir_,
+        "status" => "error",
+        "message" => "Invalid code input.",
     );
     echo json_encode($response);
     exit;
   }
 
-  // Generate a random string
-  $length = 10;
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $randomString = '';
-  for ($i = 0; $i < $length; $i++) {
-      $randomString .= $characters[rand(0, strlen($characters) - 1)];
-  }
+  // Save the code to a temporary file
+  $filename = tempnam(sys_get_temp_dir(), 'code_');
+  file_put_contents($filename, $code);
 
-  // Save the code to a file
-  $filename = $dir_in . $randomString . '.txt';
-
-  if (!file_put_contents($filename, $code)) {
-    $response = array(
-      "status" => "error",
-      "message" => "Cannot put code into file", 
-    );
-    echo json_encode($response);
-    exit;
-  }
-
-  // Check if the text file actually exists
-  if (!file_exists($filename)) {
-    $error = 'Input file was not created' . $filename;
-    $response = array(
-      "status" => "error",
-      "message" => $error, 
-    );
-    echo json_encode($response);
-    exit;
-  }
-  
   // Execute the set of commands in a new working directory
-  $dir = '../src/';
+  $dir = dirname($filename);
   chdir($dir);
-  $filename = './in/' . $randomString . '.txt';
   $command = 'make artsy ' . escapeshellarg($filename);
 
   $output = shell_exec(escapeshellcmd($command));
@@ -83,17 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($output === null) {
     $response = array(
       "status" => "error",
-      "message" => "Error running make", 
+      "message" => "Error running make",
     );
     echo json_encode($response);
     exit;
   }
 
   // Check if the wasm file was created
-  $wasmFile = $dir_in . $randomString . '.txt.wasm';
+  $wasmFile = $dir . '/out.wasm';
   if (!file_exists($wasmFile)) {
     // Return back error file name
-    $errorFile = $dir_in . $randomString . '_error.txt';
+    $errorFile = $dir . '/error.txt';
     echo $errorFile;
     exit;
   }
