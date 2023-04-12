@@ -16,17 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Set the code variable
-    $codeInput = $data['code'];
+    $codeInput = str_replace("\n", "\r\n", $data['code']);
 
     if ($codeInput !== null) {
         // Save the code input to a cookie variable
         setcookie("codeInput", $codeInput, time() + (10 * 365 * 24 * 60 * 60), "/", "", true, true);
 
         // Send a success response
-        $response = array(
-            "status" => "success",
-            "message" => "Code successfully saved!"
-        );
+        $response = $codeInput;
     } else {
         // Send an error response
         $response = array(

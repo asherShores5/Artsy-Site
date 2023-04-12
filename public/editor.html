@@ -1,218 +1,235 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Artsy Code Editor</title>
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="editor.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.105.0.min.js"></script>
+<head>
+  <title>Artsy Code Editor</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="editor.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
-
   <body>
-    <!-- Navbar -->
     <div class="w3-top">
       <div class="w3-bar w3-green w3-card w3-left-align w3-large">
-        <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-green" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu">
-          <i class="fa fa-bars"></i>
-        </a>
-        <a href="index.html" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Home</a>
-        <a href="editor.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white">Create</a>
-        <a href="tutorial.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Tutorials</a>
-        <a href="explore.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Explore</a>
-        <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
+          <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-green" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+          <a href="index.html" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Home</a>
+          <a href="editor.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white">Create</a>
+          <a href="tutorial.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Tutorials</a>
+          <a href="explore.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Explore</a>
+          <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
       </div>
-      <!-- Navbar on small screens -->
+        <!-- Navbar on small screens -->
       <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
-        <a href="index.html" class="w3-bar-item w3-button w3-padding-large">Home</a>
-        <a href="editor.html" class="w3-bar-item w3-button w3-padding-large">Create</a>
-        <a href="tutorial.html" class="w3-bar-item w3-button w3-padding-large">Tutorial</a>
-        <a href="explore.html" class="w3-bar-item w3-button w3-padding-large">Explore</a>
-        <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
+          <a href="index.html" class="w3-bar-item w3-button w3-padding-large">Home</a>
+          <a href="editor.html" class="w3-bar-item w3-button w3-padding-large">Create</a>
+          <a href="tutorial.html" class="w3-bar-item w3-button w3-padding-large">Tutorial</a>
+          <a href="explore.html" class="w3-bar-item w3-button w3-padding-large">Explore</a>
+          <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">About Us</a>
       </div>
 
-      <!-- Code buttons container -->
-      <div class="container">
-        <h1>Welcome to Artsy Code Editor</h1>
-        <p>Enter your code below. Click "Run" to see the output, or "Save" to save your progress.</p>
-        <div>
-          <div id="editor"></div>
-          <div id="code-buttons">
-            <button id="save-button">Save</button>
-            <button id="run-button">Run</button>
-            <div id="save-text"></div>
-          </div>
+    <div class="container">
+      <h1>Welcome to Artsy Code Editor</h1>
+      <p>Enter your code below. Click "Run" to see the output, or "Save" to save your progress.</p>
+      <div>
+        <div id="editor"></div>
+        <div id="code-buttons">
+          <button id="save-button">Save</button>
+          <button id="run-button">Run</button>
+          <div id="save-text"></div>
         </div>
-        <div id="output"></div>
       </div>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.7/ace.js"></script>
-      <script>
-        // Function to start up code interface
-        function startEditor() {
-          // Send an AJAX request to processArtsy.php and execute compiler
-          $.ajax({
-            url: "start_editor.php",
-            type: "GET",
-            contentType: 'application/json',
-            success: function(response) {
-              if (response === "not_found") {
-                console.log("Session not found. Starting a new session...");
-                editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1);
-                saveCode();
-              } else {
-                console.log("Session acquired!");
-                editor.setValue(response);
-              }
-            },
-            error: function(xhr, status, error) {
-              console.log("Error: " + error);
-              editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1); // include hello world program by default
+      <pre>
+        <div id="output"></div>
+      </pre>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.7/ace.js"></script>
+    <script>
+      // Function to start up code interface
+      function startEditor() {
+        // Send an AJAX request to processArtsy.php and execute compiler
+        $.ajax({
+          url: "start_editor.php",
+          type: "GET",
+          contentType: 'application/json',
+          success: function(response) {
+            if (response === "not_found") {
+              console.log("Session not found. Starting a new session...");
+              editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1);
+              saveCode();
+            } else {
+              console.log("Session acquired!");
+              editor.setValue(response);
             }
-          });
-        }
-        // Function to run code and display output in output box
-        function displayCode(response) {
-          // Display Artsy within the output terminal
-          var memory;
-          let artsyOutput = "";
-          // Check if the file name ends with a ".wasm" extension
-          if (response.endsWith('.wasm')) {
-            // Display the result to the output terminal
-            fetch(response).then(response => response.arrayBuffer()).then(bytes => WebAssembly.instantiate(bytes, {
-              env: {
-                print_int: function printInt(wVar) {
-                  output.innerHTML += wVar;
-                },
-                print_float: function printFloat(wVar) {
-                  output.innerHTML += wVar;
-                },
-                print_string: function printString(wVar) {
-                  output.innerHTML += String.fromCharCode(wVar);
-                },
-                newline: function newline() {
-                  output.innerHTML += " < br / > ";
-                }
-              }
-            })).then(results => {
-              instance = results.instance;
-              memory = instance.exports.pagememory;
-              console.log("Artsy output is displayed!");
-            }).catch(console.error);
-          } else if (response.endsWith('_error.txt')) {
-            // Display the compiler error to the output terminal
-            fetch(response).then(response => response.text()).then(data => {
-              output.innerHTML = data;
-            }).catch(error => console.error(error));
-          } else {
-            // Display a default error message to the output terminal
-            output.innerHTML = "Error running Artsy compiler. Try again later.";
+          },
+          error: function(xhr, status, error) {
+            console.log("Error: " + error);
+            editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1); // include hello world program by default
           }
-        }
+        });
+      }
 
-        function sleep(ms) {
-          return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        async function setSaveText(response, style) {
-          // Set save text as response
-          save_text.innerHTML = response;
-          save_text.style = style;
-          // Clear output after 4 seconds
-          await sleep(4000);
-          save_text.innerHTML = "";
-        }
+      // Function to run code and display output in output box
+      function displayCode(response) {
+        output.innerHTML = response;
+        // // Display Artsy within the output terminal
+        // var memory;
+        // let artsyOutput = "";
 
-        async function saveCode(useMessage) {
-          $('#save-button').on('click', function() {
-            var s3 = new AWS.S3({
-              accessKeyId: '<?php echo getenv("AWS_ACCESS_KEY_ID"); ?>',
-              secretAccessKey: '<?php echo getenv("AWS_SECRET_ACCESS_KEY"); ?>'
-            });
-            var code = editor.getValue();
-            var filename = 'my-file.artsy';
-            var params = {
-              Bucket: '<?php echo getenv("S3_BUCKET"); ?>',
-              Key: filename,
-              Body: code
-            };
-            s3.upload(params, function(err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                $('#save-text').html('File saved to S3');
-              }
-            });
-          });
-        }
-        
-        
+        // // Check if the file name ends with a ".wasm" extension
+        // if (response.endsWith('.wasm')) {
+        //   // Display the result to the output terminal
+        //   fetch(response)
+        //     .then(response => response.arrayBuffer())
+        //     .then(bytes => WebAssembly.instantiate(bytes, 
+        //     {
+        //     env: {
+        //         print_int: function printInt(wVar) {
+        //             output.innerHTML += wVar;
+        //         },
 
-async function runCode() {
-  // Reset output of terminal
-  output.innerHTML = "";
-  // Display saveCode
-  setSaveText("Processing your code...", "style:black");
+        //         print_float: function printFloat(wVar) {
+        //             output.innerHTML += wVar;
+        //         },
 
-  // Create an instance of the S3 service
-  var s3 = new AWS.S3({
-    accessKeyId: '<?php echo getenv("AWS_ACCESS_KEY_ID"); ?>',
-    secretAccessKey: '<?php echo getenv("AWS_SECRET_ACCESS_KEY"); ?>'
-            });
+        //         print_string: function printString(wVar) {
+        //             output.innerHTML += String.fromCharCode(wVar);
+        //         },
 
-  // Retrieve the saved code from the S3 bucket
-  var params = {
-    Bucket: '<?php echo getenv("S3_BUCKET"); ?>',
-    Key: 'my-file.artsy'
-  };
+        //         newline: function newline() {
+        //             output.innerHTML += "<br />";
+        //         }
+        //       }
+        //     }
+        //     )).then(results => {
+        //       instance = results.instance;
+        //       memory = instance.exports.pagememory;
+        //       console.log("Artsy output is displayed!");
+        //     }).catch(console.error);
 
-  s3.getObject(params, function(err, data) {
-    if (err) {
-      console.log("Error: " + err);
-    } else {
-      // Send the saved code to process_code.php to execute the compiler
-      $.ajax({
-        url: "process_code.php",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-          code: data.Body.toString()
-        }),
-        success: function(response) {
-          displayCode(response);
-        },
-        error: function(xhr, status, error) {
-          console.log("Error: " + error);
-        }
+        // } else if (response.endsWith('_error.txt')) {
+        //   // Display the compiler error to the output terminal
+        //   fetch(response)
+        //     .then(response => response.text())
+        //     .then(data => {
+        //       output.innerHTML = data;
+        //     })
+        //     .catch(error => console.error(error));
+
+        // } else {
+        //   // Display a default error message to the output terminal
+        //   output.innerHTML = "Error running Artsy compiler. Try again later.";
+        // }
+      }
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function setSaveText(response, style) {
+        // Set save text as response
+        save_text.innerHTML = response;
+        save_text.style = style;
+
+        // Clear output after 4 seconds
+        await sleep(4000);
+        save_text.innerHTML = "";
+      }
+
+      async function saveCode(useMessage) {
+        var codeInput = editor.getValue();
+
+        // Convert the data into JSON
+        var data = {
+          code: codeInput
+        };
+        var jsonData = JSON.stringify(data);
+
+        // Send an AJAX request to processArtsy.php and execute compiler
+        $.ajax({
+          url: "save_code.php",
+          type: "POST",
+          data: jsonData,
+          contentType: 'application/json',
+          success: function(response) {
+            console.log(response);
+            if (useMessage === true) {
+              setSaveText("Your progress was saved!", "color:darkgreen");
+            }
+          },
+          error: function(xhr, status, error) {
+            if (useMessage === true) {
+              setSaveText("Error: Your code was not saved.", "color:red");
+            }
+          }
+        });
+      }
+
+      async function runCode() {
+        // Reset output of terminal
+        output.innerHTML = "";
+
+        // Display saveCode
+        setSaveText("Processing your code...", "style:black");
+
+        // Send an AJAX request to process_code.php and execute compiler
+        $.ajax({
+          url: "new_process.php",
+          type: "POST",
+          contentType: 'application/json',
+          success: function(response) {
+            displayCode(response);
+          },
+          error: function(xhr, status, error) {
+            console.log("Error: " + error);
+          }
+        });
+      }
+
+      // Initialize ace editor
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/python");
+      editor.getSession().setUseWorker(false);
+      var output = document.getElementById("output");
+      var save_text = document.getElementById("save-text");
+
+      // Start code editor
+      startEditor();
+
+      // Register change event handler
+      editor.getSession().on('change', function() {
+        saveCode(); // call the saveCode function whenever the editor content changes
       });
-    }
-  });
-}
 
-        // Initialize ace editor
-        var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/monokai");
-        editor.session.setMode("ace/mode/python");
-        editor.getSession().setUseWorker(false);
-        var output = document.getElementById("output");
-        var save_text = document.getElementById("save-text");
-        // Start code editor
-        startEditor();
-        // Register change event handler
-        editor.getSession().on('change', function() {
-          saveCode(); // call the saveCode function whenever the editor content changes
-        });
-        // Register save button clicks
-        $('#save-button').click(function() {
-          saveCode(true);
-        });
-        // Register run button clicks
-        $('#run-button').click(function() {
-          runCode();
-        });
-      </script>
+      // Register save button clicks
+      $('#save-button').click(function() {
+        saveCode(true);
+      });
+
+      // Register run button clicks
+      $('#run-button').click(function() {
+        runCode();
+      });
+
+    </script>
+    <style> 
+      .center-button { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 50px; 
+        width: 200px; 
+        margin: 50px auto; 
+        background-color: blue; 
+        color: white; 
+        border-radius: 25px; 
+        text-align: center; 
+        cursor: pointer; 
+      } 
+    </style> 
   </body>
 </html>

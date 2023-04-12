@@ -831,7 +831,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : TRUE\n", yytext);
+	// printf("%s : TRUE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return TRUE;
 }
@@ -842,7 +842,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : FALSE\n", yytext);
+	// printf("%s : FALSE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return FALSE;
 }
@@ -853,7 +853,7 @@ YY_RULE_SETUP
 {
 			// Recognize integers as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : INT\n", yytext);
+			// printf("%s : INT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -864,7 +864,7 @@ YY_RULE_SETUP
 {
 			// Recognize chars as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : STRING\n", yytext);
+			// printf("%s : STRING\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -875,7 +875,7 @@ YY_RULE_SETUP
 {
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : FLOAT\n", yytext);
+			// printf("%s : FLOAT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -886,7 +886,7 @@ YY_RULE_SETUP
 {
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : FLAG\n", yytext);
+			// printf("%s : FLAG\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -897,7 +897,7 @@ YY_RULE_SETUP
 {
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : LET\n", yytext);
+			// printf("%s : LET\n", yytext);
 			yylval.string = strdup(yytext); 
 			return LET;
 		}
@@ -908,7 +908,7 @@ YY_RULE_SETUP
 {
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : DECLARE\n", yytext);
+			// printf("%s : DECLARE\n", yytext);
 			yylval.string = strdup(yytext); 
 			return DECLARE;
 		}
@@ -919,7 +919,7 @@ YY_RULE_SETUP
 {
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : AS\n", yytext);
+			// printf("%s : AS\n", yytext);
 			yylval.string = strdup(yytext); 
 			return AS;
 		}
@@ -930,7 +930,7 @@ YY_RULE_SETUP
 {
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : PRINT\n", yytext);
+			// printf("%s : PRINT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return PRINT;
 		}
@@ -941,7 +941,7 @@ YY_RULE_SETUP
 {
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : ADDLINE\n", yytext);
+			// printf("%s : ADDLINE\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ADDLINE;
 		}
@@ -952,7 +952,7 @@ YY_RULE_SETUP
 {
 			// The report operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return REPORT;
 		}
@@ -963,7 +963,7 @@ YY_RULE_SETUP
 {
 			// The function operation is special, return as a ACTION token
 			words++; chars += strlen(yytext);
-			printf("%s : ACTION\n", yytext);
+			// printf("%s : ACTION\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ACTION;
 		}
@@ -974,7 +974,7 @@ YY_RULE_SETUP
 {
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return WHILE;
 		}
@@ -986,7 +986,7 @@ YY_RULE_SETUP
 			// The write operation is special, return as a KEYWORD token
 			// TO-DO: Implement in parser
 			words++; chars += strlen(yytext);
-			printf("%s : FINISH\n", yytext);
+			// printf("%s : FINISH\n", yytext);
 			yylval.string = strdup(yytext); 
 			return FINISH;
 		}
@@ -997,7 +997,7 @@ YY_RULE_SETUP
 {
 			// The "IF" operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return IF;
 		}
@@ -1008,7 +1008,7 @@ YY_RULE_SETUP
 {
 			// The "IF" operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ELIF;
 		}
@@ -1019,7 +1019,7 @@ YY_RULE_SETUP
 {
 			// The else operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-		 	printf("%s : KEYWORD\n", yytext);
+		 	// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ELSE;
 		}
@@ -1030,7 +1030,7 @@ YY_RULE_SETUP
 {
 		  // Comma Recognition
 		  chars++;
-		  printf("%s : COMMA\n", yytext);
+		  // printf("%s : COMMA\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return COMMA;
 		}
@@ -1041,7 +1041,7 @@ YY_RULE_SETUP
 {
 		  // End of statement recognition
 		  chars++;
-		  printf("%s : SEMICOLON\n", yytext);
+		  // printf("%s : SEMICOLON\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return SEMICOLON;
 		}
@@ -1052,7 +1052,7 @@ YY_RULE_SETUP
 {
 		  // Assignment recognition token
 		  chars++;
-		  printf("%s : EQ\n", yytext);
+		  // printf("%s : EQ\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return EQ;
 		}
@@ -1063,7 +1063,7 @@ YY_RULE_SETUP
 {
 	// Addition operator recognition, return as "PLUS" token
 	chars++;
-	printf("%s : PLUS\n", yytext);
+	// printf("%s : PLUS\n", yytext);
 	yylval.string = strdup(yytext); 
 	return PLUS;
 }
@@ -1074,7 +1074,7 @@ YY_RULE_SETUP
 {
 	// Minus operator recognition, return as "MINUS" token
 	chars++;
-	printf("%s : MINUS\n", yytext);
+	// printf("%s : MINUS\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MINUS;
 }
@@ -1085,7 +1085,7 @@ YY_RULE_SETUP
 {
 	// Multiplication operator recognition, return as "PLUS" token
 	chars++;
-	printf("%s : MULTIPLY\n", yytext);
+	// printf("%s : MULTIPLY\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MULTIPLY;
 }
@@ -1096,7 +1096,7 @@ YY_RULE_SETUP
 {
 	// Division operator recognition, return as "DIVIDE" token
 	chars++;
-	printf("%s : DIVIDE\n", yytext);
+	// printf("%s : DIVIDE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return DIVIDE;
 }
@@ -1107,7 +1107,7 @@ YY_RULE_SETUP
 {
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
-	printf("%s : EXPONENT\n", yytext);
+	// printf("%s : EXPONENT\n", yytext);
 	yylval.string = strdup(yytext); 
 	return EXPONENT;
 }
@@ -1118,7 +1118,7 @@ YY_RULE_SETUP
 {
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
-	printf("%s : MODULO\n", yytext);
+	// printf("%s : MODULO\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MODULO;
 }
@@ -1129,7 +1129,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTBRACKET\n", yytext);
+	// printf("%s : LEFTBRACKET\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTBRACKET;
 }
@@ -1140,7 +1140,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTBRACKET\n", yytext);
+	// printf("%s : RIGHTBRACKET\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTBRACKET;
 }
@@ -1151,7 +1151,7 @@ YY_RULE_SETUP
 {
 	// Paren recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTPAREN\n", yytext);
+	// printf("%s : LEFTPAREN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTPAREN;
 }
@@ -1162,7 +1162,7 @@ YY_RULE_SETUP
 {
 	// Paren recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTPAREN\n", yytext);
+	// printf("%s : RIGHTPAREN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTPAREN;
 }
@@ -1173,7 +1173,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTSQUARE\n", yytext);
+	// printf("%s : LEFTSQUARE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTSQUARE;
 }
@@ -1184,7 +1184,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTSQUARE\n", yytext);
+	// printf("%s : RIGHTSQUARE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTSQUARE;
 }
@@ -1195,7 +1195,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LESSTHAN\n", yytext);
+	// printf("%s : LESSTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1206,7 +1206,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : GREATERTHAN\n", yytext);
+	// printf("%s : GREATERTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1217,7 +1217,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : DOUBLEEQUAL\n", yytext);
+	// printf("%s : DOUBLEEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1228,7 +1228,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : NOTEQUAL\n", yytext);
+	// printf("%s : NOTEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1239,7 +1239,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : GREATERTHAN OR EQUAL\n", yytext);
+	// printf("%s : GREATERTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1250,7 +1250,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LESSTHAN OR EQUAL\n", yytext);
+	// printf("%s : LESSTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -1261,7 +1261,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : AND\n", yytext);
+	// printf("%s : AND\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LOGICALOPERATOR;
 }
@@ -1272,7 +1272,7 @@ YY_RULE_SETUP
 {
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : OR\n", yytext);
+	// printf("%s : OR\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LOGICALOPERATOR;
 }
@@ -1283,7 +1283,7 @@ YY_RULE_SETUP
 {
 			  // IDs such as "x" or "y" are utilized with a TYPE or KEYWORD, return as an identifier token
 			  words++; chars += strlen(yytext);
-			  printf("%s : IDENTIFIER\n",yytext);
+			  // printf("%s : IDENTIFIER\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return ID;
 			}
@@ -1293,7 +1293,7 @@ YY_RULE_SETUP
 #line 373 "lexer.l"
 {
 			  words++; chars += strlen(yytext);
-			  printf("%s : INTEGER\n",yytext);
+			  // printf("%s : INTEGER\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return INTEGER;
 			}
@@ -1303,7 +1303,7 @@ YY_RULE_SETUP
 #line 380 "lexer.l"
 {
 			  words++; chars += strlen(yytext);
-			  printf("%s : FLOAT\n",yytext);
+			  // printf("%s : FLOAT\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return FLOAT;
 			}
@@ -1314,7 +1314,7 @@ YY_RULE_SETUP
 {
 		      // Any integer needs to be assigned to a digit or number, so return any digit as a number token
 			  words++; chars += strlen(yytext);
-			  printf("%s : NUMBER\n",yytext);
+			  // printf("%s : NUMBER\n",yytext);
 			  yylval.number = strdup(yytext); 
 			  //yylval.number = atoi(yytext); 
 			  return NUMBER;
@@ -1326,7 +1326,7 @@ YY_RULE_SETUP
 #line 396 "lexer.l"
 {
   			  words++; chars += strlen(yytext);
-			  printf("%s : STRING\n",yytext);
+			  // printf("%s : STRING\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return STRING;
 			}
@@ -1357,8 +1357,8 @@ case 51:
 YY_RULE_SETUP
 #line 407 "lexer.l"
 {chars++;
-		 // Line break and tab recognition for processing files in Windows
-         printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
+		// Line break and tab recognition for processing files in Windows
+        // // printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
 		}
 	YY_BREAK
 case 52:

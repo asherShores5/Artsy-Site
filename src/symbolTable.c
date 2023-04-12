@@ -6,11 +6,6 @@
 struct Entry symTabItems[100];
 int symTabIndex;
 
-// Simple action to notify user that the table has been accessed successfully
-void symTabAccess(void){
-	printf("::::> Symbol table accessed.\n");
-}
-
 // Add a single entry struct to the symbol table for the appropriate scope
 void addItem(char itemName[50], char itemKind[8], char itemType[8], int arrayLength, char scope[50], int stackPointer, int blockNumber){
 	// Set entry struct item data for each parameter in the action
@@ -33,8 +28,8 @@ struct Entry* getParamList(char * id, struct AST* paramlist, char scopeStack[50]
 		// Semantic check
 		// If the parameter variable name has already been declared before this, throw a Semantic Error
 		if (found(paramlist->RHS, scopeStack, stackPointer) == 1) {
-			fprintf(errorFile, "Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
-			exit(1);
+			printf("Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
+			exit(0);
 		}
 
 		list->itemID = symTabIndex;
@@ -67,8 +62,8 @@ void addAction(char *type, char *id, struct AST* paramlist, char scopeStack[50][
 		// Semantic check
 		// If the parameter variable name has already been declared before this, throw a Semantic Error
 		if (found(paramlist->RHS, scopeStack, stackPointer) == 1) {
-			fprintf(errorFile, "Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
-			exit(1);
+			printf("Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
+			exit(0);
 		}
 		
 		list->itemID = symTabIndex;
@@ -114,22 +109,22 @@ void addLogic(char * itemName, char * itemKind, char * scopeStack, int stackPoin
 	symTabIndex++;
 }
 
-void showSymTable(){
-	// Show the format of the symboltable using the scope's current entries
-	printf("itemID    itemName    itemKind    itemType    ArrayLength    itemScope    stackPointer    blockNumber\n");
-	printf("-----------------------------------------------------------------------------------------------------\n");
-	for (int i=0; i<symTabIndex; i++){
-		printf("%7d %7s %12s %12s %12d %22s %5d %12d\n", symTabItems[i].itemID, symTabItems[i].itemName, symTabItems[i].itemKind, symTabItems[i].itemType, symTabItems[i].arrayLength, symTabItems[i].scope, symTabItems[i].stackPointer, symTabItems[i].blockNumber);
-		if(symTabItems[i].paramlist) {
-			struct Entry* tempList = symTabItems[i].paramlist;
-			while(tempList) {
-				printf("%5d %15s %7s %7s %6d %15s\n",tempList->itemID, tempList->itemName, tempList->itemKind, tempList->itemType, tempList->arrayLength, tempList->scope);
-				tempList = tempList->paramlist;
-			}
-		}
-	}
-	printf("-----------------------------------------------------------------------------------------------------\n");
-}
+// void showSymTable(){
+// 	// Show the format of the symboltable using the scope's current entries
+// 	printf("itemID    itemName    itemKind    itemType    ArrayLength    itemScope    stackPointer    blockNumber\n");
+// 	printf("-----------------------------------------------------------------------------------------------------\n");
+// 	for (int i=0; i<symTabIndex; i++){
+// 		printf("%7d %7s %12s %12s %12d %22s %5d %12d\n", symTabItems[i].itemID, symTabItems[i].itemName, symTabItems[i].itemKind, symTabItems[i].itemType, symTabItems[i].arrayLength, symTabItems[i].scope, symTabItems[i].stackPointer, symTabItems[i].blockNumber);
+// 		if(symTabItems[i].paramlist) {
+// 			struct Entry* tempList = symTabItems[i].paramlist;
+// 			while(tempList) {
+// 				printf("%5d %15s %7s %7s %6d %15s\n",tempList->itemID, tempList->itemName, tempList->itemKind, tempList->itemType, tempList->arrayLength, tempList->scope);
+// 				tempList = tempList->paramlist;
+// 			}
+// 		}
+// 	}
+// 	printf("-----------------------------------------------------------------------------------------------------\n");
+// }
 
 int found(char itemName[50], char scopeStack[50][50], int stackPointer){
 	// Lookup an identifier in the symbol table
@@ -209,8 +204,8 @@ void updateItemArrayLength(char itemName[50], char scopeStack[50][50], int stack
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 struct Entry* getItem(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -288,8 +283,8 @@ int getItemID(char itemName[50], char scopeStack[50][50], int stackPointer) {
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 char* getItemKind(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -329,8 +324,8 @@ char* getItemKind(char itemName[50], char scopeStack[50][50], int stackPointer) 
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 char* getItemType(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -370,8 +365,8 @@ char* getItemType(char itemName[50], char scopeStack[50][50], int stackPointer) 
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 int getArrayLength(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -411,8 +406,8 @@ int getArrayLength(char itemName[50], char scopeStack[50][50], int stackPointer)
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 char* getItemScope(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -452,8 +447,8 @@ char* getItemScope(char itemName[50], char scopeStack[50][50], int stackPointer)
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 int getItemStackPointer(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -493,8 +488,8 @@ int getItemStackPointer(char itemName[50], char scopeStack[50][50], int stackPoi
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 int getItemBlockNumber(char itemName[50], char scopeStack[50][50], int stackPointer) {
@@ -534,8 +529,8 @@ int getItemBlockNumber(char itemName[50], char scopeStack[50][50], int stackPoin
 		}
 	}
 	// Else, return false
-	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
-	exit(1);
+	printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
+	exit(0);
 }
 
 int compareTypes(char item1[50], char item2[50], char scope[50]) {
@@ -543,8 +538,6 @@ int compareTypes(char item1[50], char item2[50], char scope[50]) {
 	const char* idType1 = item1;
 
 	const char* idType2 = item2;
-
-	printf("%s = %s\n", idType1, idType2);
 
 	// Return true or false to state if these items are the same
 	return strcmp(idType1, idType2);

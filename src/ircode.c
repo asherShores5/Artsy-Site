@@ -9,9 +9,8 @@
 #include "symbolTable.h"
 #include "AST.h"
 
-// Open two files for unoptimized and optimized IRcode
-FILE * IRcode;
-FILE * IRcodeOptimized;
+// Declare a string variable for returning optimized IRcode
+char * IRcodeOptimized;
 
 // Standard program variables
 #define MAX_LINE_LENGTH 10000
@@ -69,18 +68,6 @@ struct Var {
 
 // Generate symbol table for variable usage
 struct Var uvTable[100];
-
-// Function to open unoptimized IRcode
-void initIRcodeFile() {
-    IRcode = fopen("IRcode.ir", "w");
-    fprintf(IRcode, "#### IR Code ####\n");
-}
-
-// Function to open optimized IRcode file
-void initIRcodeFileOptimized() {
-    IRcodeOptimized = fopen("IRcodeOptimized.ir", "w");
-    fprintf(IRcodeOptimized, "#### Optimized IR Code ####\n");
-}
 
 char * updateArrayId(char id[50]) {
     // Split apart the phrase into a set of tokens by the "[" keyword
@@ -163,19 +150,17 @@ char* emitBinaryOperation(char op[2], const char* id1, const char* id2){
             opType = getPrimaryType(token1);
         }
 
-        fprintf(IRcode, "subop %s\n", opType);
         startSubOp = 1;
     }
 
     // Print the unoptimized iRcode using outputIDs, the operator, and the other ids
-    fprintf(IRcode, "%s = %s %s %s\n", outputId, token1, op, token2);
     lastIndex += 1;
 
     // Returns output
     return outputId;
 }
 
-// For optimized IRcode, but unoptimized generation for while loops
+// For optimized IRcode but unoptimized generation for while loops
 char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id2){
     // Assign temporary variables for tracking base array variables
     char * token1 = malloc(strlen(id1)*sizeof(char));
@@ -199,12 +184,11 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
             opType = getPrimaryType(token1);
         }
 
-        fprintf(IRcodeOptimized, "subop %s\n", opType);
+        sprintf(IRcodeOptimized, "subop %s\n", opType);
         startSubOpOptimized = 1;
     }
 
     // Print the unoptimized iRcode using outputIDs, the operator, and the other ids
-    fprintf(IRcode, "%s = %s %s %s\n", outputId, id1, op, id2);
     lastIndex += 1;
 
     // Returns output
@@ -213,7 +197,6 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
 
 // Optimized version of binary operations for IRcodeOptimized.ir
 char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2){
-    // printf("ID1: %s, ID2: %s\n", id1, id2);
     memset(outputId, 0, 50);
 
     // Assign temporary variables for tracking base array variables
@@ -277,12 +260,12 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
             opType = getPrimaryType(token1);
         }
 
-        fprintf(IRcodeOptimized, "subop %s\n", opType);
+        sprintf(IRcodeOptimized, "subop %s\n", opType);
         startSubOpOptimized = 1;
     }
 
     // Output optimized suboperation line
-    fprintf(IRcodeOptimized, "%s = %s %s %s\n", outputId, id1, op, id2);
+    sprintf(IRcodeOptimized, "%s = %s %s %s\n", outputId, id1, op, id2);
     lastIndex += 1;
 
     return outputId;
@@ -307,20 +290,15 @@ void emitAssignment(char * id1, char * id2){
         int loopEscapeChars = 0; // Tracks total escape chars encountered
         for (int i = 1; i < strlen(id2)-1-numEscapeCharacters; i++) {
             if (id2[i+loopEscapeChars] == '\\') {
-                fprintf(IRcode, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+1+loopEscapeChars]));
                 loopEscapeChars++;
             // If the character is a space
             } else if (id2[i+loopEscapeChars] == ' ') {
-                fprintf(IRcode, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+loopEscapeChars]));
             } else {
-                fprintf(IRcode, "%s[%d] = \"%c\"\n", id1, i-1, id2[i+loopEscapeChars]);
             }
         }
 
         // Indicate end of full string with length
-        fprintf(IRcode, "endstring %s %ld\n", id1, strlen(id2)-2-numEscapeCharacters);
     } else {
-        fprintf(IRcode, "%s = %s\n", id1, id2);
     }
 
     // Indicate subop stop
@@ -355,35 +333,24 @@ void emitAssignmentOptimized(char * id1, char * id2){
 
         for (int i = 1; i < strlen(id2)-1-numEscapeCharacters; i++) {
             if (id2[i+loopEscapeChars] == '\\') {
-                fprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+1+loopEscapeChars]));
+                sprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+1+loopEscapeChars]));
                 loopEscapeChars++;
             // If the character is a space
             } else if (id2[i+loopEscapeChars] == ' ') {
-                fprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+loopEscapeChars]));
+                sprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+loopEscapeChars]));
             } else {
-                fprintf(IRcodeOptimized, "%s[%d] = \"%c\"\n", id1, i-1, id2[i+loopEscapeChars]);
+                sprintf(IRcodeOptimized, "%s[%d] = \"%c\"\n", id1, i-1, id2[i+loopEscapeChars]);
             }
         }
         // Indicate end of full string with length
-        fprintf(IRcodeOptimized, "endstring %s %ld\n", id1, strlen(id2)-2-numEscapeCharacters);
+        sprintf(IRcodeOptimized, "endstring %s %ld\n", id1, strlen(id2)-2-numEscapeCharacters);
     } else {
-        fprintf(IRcodeOptimized, "%s = %s\n", id1, id2);
+        sprintf(IRcodeOptimized, "%s = %s\n", id1, id2);
     }
     
     // Indicate subop stop
     startSubOpOptimized = 0;
 
-}
-
-// Unoptimized IRcode operation for variable assignment (for array)
-void emitAssignmentForElement(char * id1, char * elementNum, char * id2) {
-    // Check if the item uses an escape character or space, switch to new format
-    if (strncmp(getPrimaryType(id2), "string", 6) == 0 && id2[1] == '\\' || id2[1] == ' ') {
-        snprintf(id2, 10, "\"%s\"", escapeCharType(id2[1]));
-    }
-
-    // Print the assignment statement using the two basic IDs with an element number
-    fprintf(IRcode, "%s[%s] = %s\n", id1, elementNum, id2);
 }
 
 void emitAssignmentForElementOptimized(char *id1, char * elementNum, char * id2) {
@@ -410,43 +377,41 @@ void emitAssignmentForElementOptimized(char *id1, char * elementNum, char * id2)
     }
 
     // Print the assignment statement using the two basic IDs with an element number
-    fprintf(IRcodeOptimized, "%s[%s] = %s\n", id1, elementNum, id2);
+    sprintf(IRcodeOptimized, "%s[%s] = %s\n", id1, elementNum, id2);
 }
 
-void emitWritePrimary(FILE * printFile, char * value) {
-    fprintf(printFile, "output %s\n", value);
+void emitWritePrimary(char * value) {
+    sprintf(IRcodeOptimized, "output %s\n", value);
 }
 
 // Unoptimized IRcode operation for writing standard ids
 void emitWriteId(char * id) {
     // Update variable in the unused variable table
     updateUnusedVar(updateArrayId(id));
-    fprintf(IRcode, "output %s\n", id);
 }
 
 // Optimized IRCode operation for writing standard ids
 void emitWriteIdOptimized(char * id){
     // Print output keyword with the associated ID
     // Unused variables are already removed prior to this step, so it is redundant to include it here
-    fprintf(IRcodeOptimized, "output %s\n", id);
+    sprintf(IRcodeOptimized, "output %s\n", id);
 }
 
 // Unoptimized IRcode operation for writing array callouts
 void emitWriteArrayId(char * id, char * elementNum) {
     // Update variable in the unused variable table
     updateUnusedVar(updateArrayId(id));
-    fprintf(IRcode, "output %s[%s]\n", id, elementNum);
 }
 
 // Optimized IRcode operation for writing array callouts
 void emitWriteArrayIdOptimized(char * id, char * elementNum) {
     // Print output keyword with the associated ID and element num
     // Unused variables are already removed prior to this step, so it is redundant to include it here
-    fprintf(IRcodeOptimized, "output %s[%s]\n", id, elementNum);
+    sprintf(IRcodeOptimized, "output %s[%s]\n", id, elementNum);
 }
 
-void emitWriteLn(FILE * printFile){
-    fprintf(printFile, "addline\n");
+void emitWriteLn(){
+    sprintf(IRcodeOptimized, "addline\n");
 }
 
 // Outputs the variable and type for variable declaration (unoptimized)
@@ -470,16 +435,6 @@ void emitTypeDeclaration(char * type, char * id){
     if(isParam) {
         varType = "param";
     }
-
-    // Print variable declaration IRcode to file
-    // If the type is a string, print a statement with a default size limit
-    if (strncmp(type, "string", 6) == 0) {
-        char * size = "100";
-        fprintf(IRcode, "%s %s %s array %s\n", varType, type, id, size);
-    } else {
-        // Else, print a standard type declaration statement
-        fprintf(IRcode, "%s %s %s\n", varType, type, id);
-    }
 }
 
 // Emit the type declaration for optimized IRcode file
@@ -496,10 +451,10 @@ void emitTypeDeclarationOptimized(char * type, char * id){
     // If the type is a string, print a statement with a default size limit
     if (strncmp(type, "string", 6) == 0) {
         char * size = "100";
-        fprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
+        sprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
     } else {
         // Else, print a standard type declaration statement
-        fprintf(IRcodeOptimized, "%s %s %s\n", varType, type, id);
+        sprintf(IRcodeOptimized, "%s %s %s\n", varType, type, id);
     }
 
 }
@@ -527,7 +482,6 @@ void emitTypeArrayDeclaration(char * type, char * id, char * size){
         addUnusedVar(id);
     }
 
-    fprintf(IRcode, "%s %s %s array %s\n", varType, type, id, size);
 }
 
 // Outputs the variable and type for variable declaration (unoptimized) (for array)
@@ -544,7 +498,7 @@ void emitTypeArrayDeclarationOptimized(char * type, char * id, char * size){
 
     // Already includes optimizations prior to this step, so doing optimization beforehand is redundant
     // Print variable declaration IRcode to file
-    fprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
+    sprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
 }
 
 void emitEntry(char * id) {
@@ -570,7 +524,6 @@ void emitEntry(char * id) {
     strcpy(prevScopes[totalIRScopes], currScope);
     totalIRScopes++;
 
-    fprintf(IRcode, "entry %s %s\n", type, id);
 }
 
 void emitEntryOptimized(char * id) {    
@@ -582,7 +535,7 @@ void emitEntryOptimized(char * id) {
     strcpy(prevScopes[totalIRScopes], currScope);
     totalIRScopes++;
 
-    fprintf(IRcodeOptimized, "entry %s %s\n", type, id);
+    sprintf(IRcodeOptimized, "entry %s %s\n", type, id);
 }
 
 void emitReturn(char * id) {
@@ -595,71 +548,70 @@ void emitReturn(char * id) {
         updateUnusedVar(updateArrayId(token));
     }
 
-    fprintf(IRcode, "return %s\n", id);
 }
 
 void emitReturnOptimized(char * id) {    
-    fprintf(IRcodeOptimized, "return %s\n", id);
+    sprintf(IRcodeOptimized, "return %s\n", id);
 }
 
-void emitVoidReturn(FILE * printFile) {
-    fprintf(printFile, "voidreturn\n");
+void emitVoidReturn() {
+    sprintf(IRcodeOptimized, "voidreturn\n");
 }
 
-void emitFinish(FILE * printFile) {
-    fprintf(printFile, "finish\n");
+void emitFinish() {
+    sprintf(IRcodeOptimized, "finish\n");
 }
 
-void emitExit(FILE * printFile) {
+void emitExit() {
     // Set current scope as previous scope
     strcpy(currScope, prevScopes[totalIRScopes-2]);
     totalIRScopes--;
 
-    fprintf(printFile, "exit\n");
+    sprintf(IRcodeOptimized, "exit\n");
 }
 
-void emitLogicalExpression(FILE * printFile, char * opType) {
-    fprintf(IRcode, " %s", opType);
+void emitLogicalExpression(char * opType) {
+    sprintf(IRcodeOptimized, " %s", opType);
 }
 
-void emitComparisonExpression(FILE * printFile, char * leftExpr, char * compareType, char * rightExpr) {
-    fprintf(IRcode, " %s %s %s", leftExpr, compareType, rightExpr);
+void emitComparisonExpression(char * leftExpr, char * compareType, char * rightExpr) {
+    sprintf(IRcodeOptimized, " %s %s %s", leftExpr, compareType, rightExpr);
 }
 
-void emitIfConditionStatement(FILE * printFile) {
-    fprintf(printFile, "if");
+void emitIfConditionStatement() {
+    sprintf(IRcodeOptimized, "if");
 }
 
-void emitIfEndStatement(FILE * printFile) {
-    fprintf(printFile, "endif\n");
+void emitIfEndStatement() {
+    sprintf(IRcodeOptimized, "endif\n");
 }
 
-void emitElifConditionStatement(FILE * printFile) {
-    fprintf(printFile, "elif");
+void emitElifConditionStatement() {
+    sprintf(IRcodeOptimized, "elif");
 }
 
-void emitElifEndStatement(FILE * printFile) {
-    fprintf(printFile, "endelif\n");
+void emitElifEndStatement() {
+    sprintf(IRcodeOptimized, "endelif\n");
 }
 
-void emitElseConditionStatement(FILE * printFile) {
-    fprintf(printFile, "else");
+void emitElseConditionStatement() {
+    sprintf(IRcodeOptimized, "else");
 }
 
-void emitElseEndStatement(FILE * printFile) {
-    fprintf(printFile, "endelse\n");
+void emitElseEndStatement() {
+    sprintf(IRcodeOptimized, "endelse\n");
 }
 
-void emitWhileConditionStatement(FILE * printFile) {
-    fprintf(printFile, "while");
+void emitWhileConditionStatement() {
+    sprintf(IRcodeOptimized, "while");
 }
 
-void emitWhileEndStatement(FILE * printFile) {
-    fprintf(printFile, "endwhile\n");
+void emitWhileEndStatement() {
+    sprintf(IRcodeOptimized, "endwhile\n");
 }
 
-void emitLogicEndStatement(FILE * printFile) {
-    fprintf(printFile, "endlogic\n");
+void emitLogicEndStatement() {
+    sprintf(IRcodeOptimized, "endlogic\n");
 }
 
 char * emitFunctionCall(char *id) {
@@ -685,16 +637,8 @@ char * emitFunctionCall(char *id) {
 
         // Do not generate a subop if its a void function call
         if (strncmp(opType, "void", 4) != 0) {
-            fprintf(IRcode, "subop %s\n", opType);
             startSubOp = 1;
         }
-    }
-
-    // Generate function call based on if there is a void keyword
-    if (strncmp(opType, "void", 4) != 0) {
-        fprintf(IRcode, "%s = call %s args", outputId, id);
-    } else {
-        fprintf(IRcode, "call %s args", id);
     }
     
     // Print arguments
@@ -704,9 +648,7 @@ char * emitFunctionCall(char *id) {
             updateUnusedVar(params[i]);
         }
 
-        fprintf(IRcode, " %s", params[i]);
     }
-    fprintf(IRcode, "\n");
     lastIndex += 1;
 
     return outputId;
@@ -730,23 +672,23 @@ char * emitFunctionCallOptimized(char *id) {
 
         // Do not generate a subop if its a void function call
         if (strncmp(opType, "void", 4) != 0) {
-            fprintf(IRcodeOptimized, "subop %s\n", opType);
+            sprintf(IRcodeOptimized, "subop %s\n", opType);
             startSubOpOptimized = 1;
         }
     }
 
     // Generate function call based on if there is a void keyword
     if (strncmp(opType, "void", 4) != 0) {
-        fprintf(IRcodeOptimized, "%s = call %s args", outputId, id);
+        sprintf(IRcodeOptimized, "%s = call %s args", outputId, id);
     } else {
-        fprintf(IRcodeOptimized, "call %s args", id);
+        sprintf(IRcodeOptimized, "call %s args", id);
     }
 
     // Generate arguments
     for(int i = 0; i < paramIndex; i ++) {
-        fprintf(IRcodeOptimized, " %s", params[i]);
+        sprintf(IRcodeOptimized, " %s", params[i]);
     }
-    fprintf(IRcodeOptimized, "\n");
+    sprintf(IRcodeOptimized, "\n");
     lastIndex += 1;
 
     return outputId;
@@ -756,7 +698,7 @@ char * emitFunctionCallOptimized(char *id) {
 // This initializes creating all of the IRcode for unoptimized IRcode
 char* ASTTraversal(struct AST* root) {
     if(root != NULL) {
-        printf("root->nodeType: %s\n", root->nodeType);
+        // printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
@@ -801,19 +743,15 @@ char* ASTTraversal(struct AST* root) {
         }
         if(strcmp(root->nodeType, "Comparison") == 0) {
             if (isLogical == 1 && currLogicalStatements != 0) {
-                emitLogicalExpression(IRcode, logicalTypes[totalLogicalStatements-currLogicalStatements]);
-                emitComparisonExpression(IRcode, ASTTraversal(root->right->left), root->right, ASTTraversal(root->right->right));
                 updateUnusedVar(ASTTraversal(root->right->left));
                 updateUnusedVar(ASTTraversal(root->right->right));
                 currLogicalStatements++;
             } else if (isLogical == 1) {
-                emitComparisonExpression(IRcode, ASTTraversal(root->right->left), root->right, ASTTraversal(root->right->right));
                 updateUnusedVar(ASTTraversal(root->right->left));
                 updateUnusedVar(ASTTraversal(root->right->right));
                 currLogicalStatements++;
             }
             else {
-                emitComparisonExpression(IRcode, ASTTraversal(root->right->right->left), root->right->RHS, ASTTraversal(root->right->right->right));
                 updateUnusedVar(ASTTraversal(root->right->right->left));
                 updateUnusedVar(ASTTraversal(root->right->right->right));
             }
@@ -830,8 +768,6 @@ char* ASTTraversal(struct AST* root) {
         }
 
         if(strcmp(root->nodeType, "WhileL") == 0) {
-            emitWhileConditionStatement(IRcode);
-
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
 
@@ -852,16 +788,11 @@ char* ASTTraversal(struct AST* root) {
             snprintf(newScope, 1000, "while %s %d", currScope, getItemBlockNumber("while", findVarScope("while", prevScopes, totalIRScopes), 1));
             strcpy(prevScopes[totalIRScopes], currScope);
             strcpy(currScope, newScope);
-            printf("newScope: %s\n", currScope);
             totalIRScopes++;
 
-            fprintf(IRcode, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversal(root->right);
-
-            // End the While statement
-            emitWhileEndStatement(IRcode);
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -869,8 +800,6 @@ char* ASTTraversal(struct AST* root) {
         }
 
         if(strcmp(root->nodeType, "If") == 0) {
-            emitIfConditionStatement(IRcode);
-
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
 
@@ -893,13 +822,9 @@ char* ASTTraversal(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcode, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversal(root->right);
-
-            // End if statement
-            emitIfEndStatement(IRcode);
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -907,8 +832,6 @@ char* ASTTraversal(struct AST* root) {
         }
 
         if (strcmp(root->nodeType, "Elif") == 0) {
-            emitElifConditionStatement(IRcode);
-
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
 
@@ -931,13 +854,9 @@ char* ASTTraversal(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcode, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversal(root->right);
-
-            // End elif statement
-            emitElifEndStatement(IRcode);
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -948,17 +867,13 @@ char* ASTTraversal(struct AST* root) {
             // Return an empty string 
             if(strcmp(root->right, "") == 0) {
                 // Generate Logic Ending Statement if there's no else statement
-                emitLogicEndStatement(IRcode);
                 return "";
             }
 
             // If there is an Else statement, traverse right, then print logic ending statement
             ASTTraversal(root->right);
-            emitLogicEndStatement(IRcode);
         }
         if(strcmp(root->nodeType, "Else") == 0) {
-            emitElseConditionStatement(IRcode);
-
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
             snprintf(newScope, 1000, "else %s %d", currScope, getItemBlockNumber("else", findVarScope("else", prevScopes, totalIRScopes), 1));
@@ -966,13 +881,8 @@ char* ASTTraversal(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcode, "\n");
-
             // Traverse to the right to generate block code
             ASTTraversal(root->right);
-
-            // End else statement
-            emitElseEndStatement(IRcode);
 
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -994,7 +904,6 @@ char* ASTTraversal(struct AST* root) {
             || strcmp(root->RHS, "float") == 0
             || strcmp(root->RHS, "string") == 0) {
                 updateUnusedVar(root->right->RHS);
-                emitWritePrimary(IRcode, root->right->RHS);
             } else if (strncmp(getPrimaryType(root->RHS), "var", 3) == 0) {
                 emitWriteId(root->RHS);
             } else {
@@ -1006,7 +915,6 @@ char* ASTTraversal(struct AST* root) {
             }
         }
         if(strcmp(root->nodeType, "addline") == 0) {
-            emitWriteLn(IRcode);
         }
         if(strcmp(root->nodeType, "action context") == 0) {
             emitEntry(root->LHS);
@@ -1015,7 +923,10 @@ char* ASTTraversal(struct AST* root) {
         if(strcmp(root->nodeType, "action") == 0) {
             ASTTraversal(root->left);
             ASTTraversal(root->right);
-            emitExit(IRcode);
+            
+            // Set current scope as previous scope
+            strcpy(currScope, prevScopes[totalIRScopes-2]);
+            totalIRScopes--;
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
             if (root->RHS != NULL && root->RHS[0] != '\0' && root->RHS[0] != '\n') {
@@ -1047,10 +958,8 @@ char* ASTTraversal(struct AST* root) {
             emitReturn(rightVar);
         }
         if(strcmp(root->nodeType, "voidreport") == 0) {
-            emitVoidReturn(IRcode);
         }
         if(strcmp(root->nodeType, "finish") == 0) {
-            emitFinish(IRcode);
         }
         if(strcmp(root->nodeType, "=") == 0) {
             strcpy(rightVar, ASTTraversal(root->right));
@@ -1081,7 +990,6 @@ char* ASTTraversal(struct AST* root) {
                         } else {
                             strcpy(rightVar, root->right->right->RHS);
                         }
-                        emitAssignmentForElement(root->LHS, root->right->LHS, rightVar);
                     }
             } else {
                 emitAssignment(root->LHS, rightVar);
@@ -1174,7 +1082,7 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        printf("root->nodeType: %s\n", root->nodeType);
+        // printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
@@ -1215,15 +1123,15 @@ char* ASTTraversalOptimized(struct AST* root) {
         }
         if(strcmp(root->nodeType, "Comparison") == 0) {
             if (isLogical == 1 && currLogicalStatements != 0) {
-                emitLogicalExpression(IRcodeOptimized, logicalTypes[totalLogicalStatements-currLogicalStatements]);
-                emitComparisonExpression(IRcodeOptimized, ASTTraversalOptimized(root->right->left), root->right, ASTTraversalOptimized(root->right->right));
+                emitLogicalExpression(logicalTypes[totalLogicalStatements-currLogicalStatements]);
+                emitComparisonExpression(ASTTraversalOptimized(root->right->left), root->right, ASTTraversalOptimized(root->right->right));
                 currLogicalStatements++;
             } else if (isLogical == 1) {
-                emitComparisonExpression(IRcodeOptimized, ASTTraversalOptimized(root->right->left), root->right, ASTTraversalOptimized(root->right->right));
+                emitComparisonExpression(ASTTraversalOptimized(root->right->left), root->right, ASTTraversalOptimized(root->right->right));
                 currLogicalStatements++;
             }
             else {
-                emitComparisonExpression(IRcodeOptimized, ASTTraversalOptimized(root->right->right->left), root->right->RHS, ASTTraversalOptimized(root->right->right->right));
+                emitComparisonExpression(ASTTraversalOptimized(root->right->right->left), root->right->RHS, ASTTraversalOptimized(root->right->right->right));
             }
         }
         if(strcmp(root->nodeType, "program") == 0 
@@ -1239,7 +1147,7 @@ char* ASTTraversalOptimized(struct AST* root) {
         if(strcmp(root->nodeType, "WhileL") == 0) {
             // Start While Loop statement
             inWhileLoop = 1;
-            emitWhileConditionStatement(IRcodeOptimized);
+            emitWhileConditionStatement();
 
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
@@ -1263,13 +1171,13 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcodeOptimized, "\n");
+            sprintf(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
 
             // End the While statement
-            emitWhileEndStatement(IRcodeOptimized);
+            emitWhileEndStatement();
             inWhileLoop = 0;
             
             // Set current scope as previous scope
@@ -1279,7 +1187,7 @@ char* ASTTraversalOptimized(struct AST* root) {
 
         if(strcmp(root->nodeType, "If") == 0) {
             // Start If Statement Condition
-            emitIfConditionStatement(IRcodeOptimized);
+            emitIfConditionStatement();
 
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
@@ -1303,13 +1211,13 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcodeOptimized, "\n");
+            sprintf(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
 
             // End the If statement
-            emitIfEndStatement(IRcodeOptimized);
+            emitIfEndStatement();
             
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -1318,7 +1226,7 @@ char* ASTTraversalOptimized(struct AST* root) {
 
         if (strcmp(root->nodeType, "Elif") == 0) {
             // Start Elif Statement Condition
-            emitElifConditionStatement(IRcodeOptimized);
+            emitElifConditionStatement();
 
             // Change logical statement indicator variable to active
             isLogical = !strcmp(root->LHS, "Logical");
@@ -1342,13 +1250,13 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcodeOptimized, "\n");
+            sprintf(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
 
             // End the Elif statement
-            emitElifEndStatement(IRcodeOptimized);
+            emitElifEndStatement();
             
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
@@ -1359,17 +1267,17 @@ char* ASTTraversalOptimized(struct AST* root) {
             // Return an empty string 
             if(strcmp(root->right, "") == 0) {
                 // Generate Logic Ending Statement if there's no else statement
-                emitLogicEndStatement(IRcodeOptimized);
+                emitLogicEndStatement();
                 return "";
             }
 
             // If there is an Else statement, traverse right, then print logic ending statement
             ASTTraversalOptimized(root->right);
-            emitLogicEndStatement(IRcodeOptimized);
+            emitLogicEndStatement();
         }
         if(strcmp(root->nodeType, "Else") == 0) {
             // Start Else Statement Condition
-            emitElseConditionStatement(IRcodeOptimized);
+            emitElseConditionStatement();
             
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
@@ -1378,18 +1286,17 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            fprintf(IRcodeOptimized, "\n");
+            sprintf(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
 
             // End the Elif statement
-            emitElseEndStatement(IRcodeOptimized);
+            emitElseEndStatement();
             
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
             totalIRScopes--;
-            printf("currScope: %s\n", currScope);
         }
         if(strcmp(root->nodeType, "and") == 0
             || strcmp(root->nodeType, "or") == 0) {
@@ -1413,7 +1320,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             } else if (strcmp(root->RHS, "int") == 0
             || strcmp(root->RHS, "float") == 0
             || strcmp(root->RHS, "string") == 0) {
-                emitWritePrimary(IRcodeOptimized, root->right->RHS);
+                emitWritePrimary(root->right->RHS);
             } else if (strncmp(getPrimaryType(root->RHS), "var", 3) == 0) {
                 if (isUsedVar(root->RHS)) {
                     emitWriteIdOptimized(root->RHS);
@@ -1427,7 +1334,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             }
         }
         if(strcmp(root->nodeType, "addline") == 0) {
-            emitWriteLn(IRcodeOptimized);
+            emitWriteLn();
         }
         if(strcmp(root->nodeType, "action context") == 0) {
             emitEntryOptimized(root->LHS);
@@ -1437,7 +1344,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             if(isUsedVar(root->left->LHS)) {
                 ASTTraversalOptimized(root->left);
                 ASTTraversalOptimized(root->right);
-                emitExit(IRcodeOptimized);
+                emitExit();
             }
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
@@ -1471,8 +1378,6 @@ char* ASTTraversalOptimized(struct AST* root) {
         }
         if(strncmp(root->nodeType, "action call", 14) == 0) {
             ASTTraversalOptimized(root->right);
-            printf("made it\n");
-
             memset(buffer, 0, 50);
             strcpy(buffer, emitFunctionCallOptimized(root->LHS));
             paramIndex = 0;
@@ -1483,10 +1388,10 @@ char* ASTTraversalOptimized(struct AST* root) {
             emitReturnOptimized(rightVar);
         }
         if(strcmp(root->nodeType, "voidreport") == 0) {
-            emitVoidReturn(IRcodeOptimized);
+            emitVoidReturn();
         }
         if(strcmp(root->nodeType, "finish") == 0) {
-            emitFinish(IRcodeOptimized);
+            emitFinish();
         }
         if(strcmp(root->nodeType, "block") == 0) {
             return ASTTraversalOptimized(root->right);
@@ -1620,24 +1525,24 @@ void generateIRCode() {
     strcpy(prevScopes[0], "global");
 
     // Start AST Traversal
-    printf("\n\n----Generate IRCode----\n\n");
-    initIRcodeFile();
     ASTTraversal(ast);
-    fclose(IRcode);
 }
 
 // Main function for optimized IRcode generation
-void generateIRCodeOptimized() {
+char * generateIRCodeOptimized() {
     // Reset temp variable number
     lastIndex = 0;
+
+    // Set IRcodeOptimized String memory
+    IRcodeOptimized = malloc(1000000 * sizeof(char));
+    strcpy(IRcodeOptimized,  "#### Optimized IR Code ####\n");
 
     // Set Scope Memory
     strcpy(currScope, "global");
 
     // Start Optimized AST Traversal
-    printf("\n\n----Perform Code Optimizations----\n\n");
-    initIRcodeFileOptimized();
     ASTTraversalOptimized(ast);
-    fclose(IRcodeOptimized);
     fflush(stdout);
+
+    return IRcodeOptimized;
 }

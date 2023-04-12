@@ -1,22 +1,20 @@
 #ifndef WEBGEN_H 
 #define WEBGEN_H
 
-// Error log file
-extern FILE* errorFile;
+// Error logging
 extern int lines;
 
 // File Functions
-void initAssemblyFile();
-FILE * getFileType(char * fileType);
+char * getFileType(char * fileType);
 
 // WAT CODE PRINT MODULES
 void generateStartModule();
-void generateText();
+void generateText(char * IRcode);
 void generateLocalOperations();
 void generateMain();
 void completeFile();
 
 // Driver Function
-void generateWATcode();
+char * generateWATcode(char * IRcode);
 
 #endif

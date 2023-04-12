@@ -40,6 +40,7 @@ class ComposerStaticInitc7a9ecac927b5fdd68f8b9cc83457cc0
         'M' => 
         array (
             'Monolog\\' => 8,
+            'Memcached\\' => 10,
         ),
         'J' => 
         array (
@@ -89,7 +90,7 @@ class ComposerStaticInitc7a9ecac927b5fdd68f8b9cc83457cc0
         ),
         'Psr\\Log\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/src',
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -102,6 +103,10 @@ class ComposerStaticInitc7a9ecac927b5fdd68f8b9cc83457cc0
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
+        ),
+        'Memcached\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-memcached/php-memcached/src',
         ),
         'JmesPath\\' => 
         array (

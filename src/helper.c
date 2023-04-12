@@ -244,7 +244,3 @@ char * convertToASCII(char * phrase) {
     // Return ASCII value
     return asciiVal;
 }
-
-char * convertLogicalIR(char * phrase) {
-    
-}

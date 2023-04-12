@@ -3,13 +3,10 @@
 
 extern struct AST* ast;
 
-// Error log file
-extern FILE* errorFile;
+// Error logging
 extern int lines;
 
 // ---- Functions to handle IR code emissions ---- //
-
-void initIRcodeFile();
 
 char* emitBinaryOperation(char op[1], const char* id1, const char* id2);
 
@@ -21,6 +18,6 @@ void emitWriteId(char * id);
 
 void generateIRCode(); 
 
-void generateIRCodeOptimized();
+char * generateIRCodeOptimized();
 
 #endif

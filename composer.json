@@ -1,8 +1,30 @@
 {
+    "repositories": [
+    {
+        "type": "package",
+        "package": {
+            "name": "php-memcached/php-memcached",
+            "version": "3.1.5",
+            "dist": {
+                "url": "https://github.com/php-memcached-dev/php-memcached/archive/v3.1.5.zip",
+                "type": "zip"
+            },
+            "autoload": {
+                "psr-4": { "Memcached\\": "src/" }
+            },
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            }
+        }
+    }
+],
     "require": {
         "monolog/monolog": "^2.0",
         "aws/aws-sdk-php": "^3.33",
         "vlucas/phpdotenv": "^5.5",
-        "guzzlehttp/guzzle": "^6.5"
+        "guzzlehttp/guzzle": "^6.5",
+        "php-memcached/php-memcached": "^3.1"
     }
 }

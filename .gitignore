@@ -95,4 +95,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # New stuff for DB
-vendor
+vendor/
