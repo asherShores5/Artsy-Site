@@ -13,13 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Retrieve the saved code from the S3 bucket
   $s3 = new S3Client([
-    'version' => 'latest',
-    'region' => 'us-east-1',
-    'credentials' => [
-      'key' => $aws_access_key_id,
-      'secret' => $aws_secret_access_key,
+    'version'      => 'latest',
+    'region'       => 'us-west-1',
+    'credentials'  => [
+        'key'    => getenv('AWS_ACCESS_KEY_ID'),
+        'secret' => getenv('AWS_SECRET_ACCESS_KEY'),
     ],
-  ]);
+]);
   $bucket = 'artsy-project';
   $key = 'my-file.artsy';
   try {
