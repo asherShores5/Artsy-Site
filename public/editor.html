@@ -125,19 +125,17 @@
           await sleep(4000);
           save_text.innerHTML = "";
         }
+        
         async function saveCode(useMessage) {
-          $aws_access_key_id = getenv('AWS_ACCESS_KEY_ID');
-          $aws_secret_access_key = getenv('AWS_SECRET_ACCESS_KEY');
-          $s3_bucket = getenv('S3_BUCKET');
           $('#save-button').on('click', function() {
             var s3 = new AWS.S3({
-              accessKeyId: $aws_access_key_id,
-              secretAccessKey: $aws_secret_access_key
+              accessKeyId: window.AWS_ACCESS_KEY_ID,
+              secretAccessKey: window.AWS_SECRET_ACCESS_KEY
             });
             var code = editor.getValue();
             var filename = 'my-file.artsy';
             var params = {
-              Bucket: $s3_bucket,
+              Bucket: window.S3_BUCKET,
               Key: filename,
               Body: code
             };
@@ -150,6 +148,7 @@
             });
           });
         }
+        
         
         async function runCode() {
           // Reset output of terminal
