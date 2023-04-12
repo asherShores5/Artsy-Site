@@ -165,7 +165,7 @@ async function runCode() {
 
   // Retrieve the saved code from the S3 bucket
   var params = {
-    Bucket: process.env.S3_BUCKET,
+    Bucket: '<?php echo getenv("S3_BUCKET"); ?>',
     Key: 'my-file.artsy'
   };
 
