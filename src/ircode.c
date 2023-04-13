@@ -11,6 +11,7 @@
 
 // Declare a string variable for returning optimized IRcode
 char * IRcodeOptimized;
+char * copyVar;
 
 // Standard program variables
 #define MAX_LINE_LENGTH 10000
@@ -184,7 +185,8 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
             opType = getPrimaryType(token1);
         }
 
-        sprintf(IRcodeOptimized, "subop %s\n", opType);
+        sprintf(copyVar, "subop %s\n", opType);
+        strcat(IRcodeOptimized, copyVar);
         startSubOpOptimized = 1;
     }
 
@@ -260,12 +262,14 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
             opType = getPrimaryType(token1);
         }
 
-        sprintf(IRcodeOptimized, "subop %s\n", opType);
+        sprintf(copyVar, "subop %s\n", opType);
+        strcat(IRcodeOptimized, copyVar);
         startSubOpOptimized = 1;
     }
 
     // Output optimized suboperation line
-    sprintf(IRcodeOptimized, "%s = %s %s %s\n", outputId, id1, op, id2);
+    sprintf(copyVar, "%s = %s %s %s\n", outputId, id1, op, id2);
+    strcat(IRcodeOptimized, copyVar);
     lastIndex += 1;
 
     return outputId;
@@ -333,19 +337,24 @@ void emitAssignmentOptimized(char * id1, char * id2){
 
         for (int i = 1; i < strlen(id2)-1-numEscapeCharacters; i++) {
             if (id2[i+loopEscapeChars] == '\\') {
-                sprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+1+loopEscapeChars]));
+                sprintf(copyVar, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+1+loopEscapeChars]));
+                strcat(IRcodeOptimized, copyVar);
                 loopEscapeChars++;
             // If the character is a space
             } else if (id2[i+loopEscapeChars] == ' ') {
-                sprintf(IRcodeOptimized, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+loopEscapeChars]));
+                sprintf(copyVar, "%s[%d] = \"%s\"\n", id1, i-1, escapeCharType(id2[i+loopEscapeChars]));
+                strcat(IRcodeOptimized, copyVar);
             } else {
-                sprintf(IRcodeOptimized, "%s[%d] = \"%c\"\n", id1, i-1, id2[i+loopEscapeChars]);
+                sprintf(copyVar, "%s[%d] = \"%c\"\n", id1, i-1, id2[i+loopEscapeChars]);
+                strcat(IRcodeOptimized, copyVar);
             }
         }
         // Indicate end of full string with length
-        sprintf(IRcodeOptimized, "endstring %s %ld\n", id1, strlen(id2)-2-numEscapeCharacters);
+        sprintf(copyVar, "endstring %s %ld\n", id1, strlen(id2)-2-numEscapeCharacters);
+        strcat(IRcodeOptimized, copyVar);
     } else {
-        sprintf(IRcodeOptimized, "%s = %s\n", id1, id2);
+        sprintf(copyVar, "%s = %s\n", id1, id2);
+        strcat(IRcodeOptimized, copyVar);
     }
     
     // Indicate subop stop
@@ -377,11 +386,13 @@ void emitAssignmentForElementOptimized(char *id1, char * elementNum, char * id2)
     }
 
     // Print the assignment statement using the two basic IDs with an element number
-    sprintf(IRcodeOptimized, "%s[%s] = %s\n", id1, elementNum, id2);
+    sprintf(copyVar, "%s[%s] = %s\n", id1, elementNum, id2);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitWritePrimary(char * value) {
-    sprintf(IRcodeOptimized, "output %s\n", value);
+    sprintf(copyVar, "output %s\n", value);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 // Unoptimized IRcode operation for writing standard ids
@@ -394,7 +405,8 @@ void emitWriteId(char * id) {
 void emitWriteIdOptimized(char * id){
     // Print output keyword with the associated ID
     // Unused variables are already removed prior to this step, so it is redundant to include it here
-    sprintf(IRcodeOptimized, "output %s\n", id);
+    sprintf(copyVar, "output %s\n", id);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 // Unoptimized IRcode operation for writing array callouts
@@ -407,11 +419,12 @@ void emitWriteArrayId(char * id, char * elementNum) {
 void emitWriteArrayIdOptimized(char * id, char * elementNum) {
     // Print output keyword with the associated ID and element num
     // Unused variables are already removed prior to this step, so it is redundant to include it here
-    sprintf(IRcodeOptimized, "output %s[%s]\n", id, elementNum);
+    sprintf(copyVar, "output %s[%s]\n", id, elementNum);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitWriteLn(){
-    sprintf(IRcodeOptimized, "addline\n");
+    strcat(IRcodeOptimized, "addline\n");
 }
 
 // Outputs the variable and type for variable declaration (unoptimized)
@@ -451,10 +464,12 @@ void emitTypeDeclarationOptimized(char * type, char * id){
     // If the type is a string, print a statement with a default size limit
     if (strncmp(type, "string", 6) == 0) {
         char * size = "100";
-        sprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
+        sprintf(copyVar, "%s %s %s array %s\n", varType, type, id, size);
+        strcat(IRcodeOptimized, copyVar);
     } else {
         // Else, print a standard type declaration statement
-        sprintf(IRcodeOptimized, "%s %s %s\n", varType, type, id);
+        sprintf(copyVar, "%s %s %s\n", varType, type, id);
+        strcat(IRcodeOptimized, copyVar);
     }
 
 }
@@ -498,7 +513,8 @@ void emitTypeArrayDeclarationOptimized(char * type, char * id, char * size){
 
     // Already includes optimizations prior to this step, so doing optimization beforehand is redundant
     // Print variable declaration IRcode to file
-    sprintf(IRcodeOptimized, "%s %s %s array %s\n", varType, type, id, size);
+    sprintf(copyVar, "%s %s %s array %s\n", varType, type, id, size);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitEntry(char * id) {
@@ -535,7 +551,8 @@ void emitEntryOptimized(char * id) {
     strcpy(prevScopes[totalIRScopes], currScope);
     totalIRScopes++;
 
-    sprintf(IRcodeOptimized, "entry %s %s\n", type, id);
+    sprintf(copyVar, "entry %s %s\n", type, id);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitReturn(char * id) {
@@ -551,15 +568,16 @@ void emitReturn(char * id) {
 }
 
 void emitReturnOptimized(char * id) {    
-    sprintf(IRcodeOptimized, "return %s\n", id);
+    sprintf(copyVar, "return %s\n", id);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitVoidReturn() {
-    sprintf(IRcodeOptimized, "voidreturn\n");
+    strcat(IRcodeOptimized, "voidreturn\n");
 }
 
 void emitFinish() {
-    sprintf(IRcodeOptimized, "finish\n");
+    strcat(IRcodeOptimized, "finish\n");
 }
 
 void emitExit() {
@@ -567,51 +585,53 @@ void emitExit() {
     strcpy(currScope, prevScopes[totalIRScopes-2]);
     totalIRScopes--;
 
-    sprintf(IRcodeOptimized, "exit\n");
+    strcat(IRcodeOptimized, "exit\n");
 }
 
 void emitLogicalExpression(char * opType) {
-    sprintf(IRcodeOptimized, " %s", opType);
+    sprintf(copyVar, " %s", opType);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitComparisonExpression(char * leftExpr, char * compareType, char * rightExpr) {
-    sprintf(IRcodeOptimized, " %s %s %s", leftExpr, compareType, rightExpr);
+    sprintf(copyVar, " %s %s %s", leftExpr, compareType, rightExpr);
+    strcat(IRcodeOptimized, copyVar);
 }
 
 void emitIfConditionStatement() {
-    sprintf(IRcodeOptimized, "if");
+    strcat(IRcodeOptimized, "if");
 }
 
 void emitIfEndStatement() {
-    sprintf(IRcodeOptimized, "endif\n");
+    strcat(IRcodeOptimized, "endif\n");
 }
 
 void emitElifConditionStatement() {
-    sprintf(IRcodeOptimized, "elif");
+    strcat(IRcodeOptimized, "elif");
 }
 
 void emitElifEndStatement() {
-    sprintf(IRcodeOptimized, "endelif\n");
+    strcat(IRcodeOptimized, "endelif\n");
 }
 
 void emitElseConditionStatement() {
-    sprintf(IRcodeOptimized, "else");
+    strcat(IRcodeOptimized, "else");
 }
 
 void emitElseEndStatement() {
-    sprintf(IRcodeOptimized, "endelse\n");
+    strcat(IRcodeOptimized, "endelse\n");
 }
 
 void emitWhileConditionStatement() {
-    sprintf(IRcodeOptimized, "while");
+    strcat(IRcodeOptimized, "while");
 }
 
 void emitWhileEndStatement() {
-    sprintf(IRcodeOptimized, "endwhile\n");
+    strcat(IRcodeOptimized, "endwhile\n");
 }
 
 void emitLogicEndStatement() {
-    sprintf(IRcodeOptimized, "endlogic\n");
+    strcat(IRcodeOptimized, "endlogic\n");
 }
 
 char * emitFunctionCall(char *id) {
@@ -672,23 +692,27 @@ char * emitFunctionCallOptimized(char *id) {
 
         // Do not generate a subop if its a void function call
         if (strncmp(opType, "void", 4) != 0) {
-            sprintf(IRcodeOptimized, "subop %s\n", opType);
+            sprintf(copyVar, "subop %s\n", opType);
+            strcat(IRcodeOptimized, copyVar);
             startSubOpOptimized = 1;
         }
     }
 
     // Generate function call based on if there is a void keyword
     if (strncmp(opType, "void", 4) != 0) {
-        sprintf(IRcodeOptimized, "%s = call %s args", outputId, id);
+        sprintf(copyVar, "%s = call %s args", outputId, id);
+        strcat(IRcodeOptimized, copyVar);
     } else {
-        sprintf(IRcodeOptimized, "call %s args", id);
+        sprintf(copyVar, "call %s args", id);
+        strcat(IRcodeOptimized, copyVar);
     }
 
     // Generate arguments
     for(int i = 0; i < paramIndex; i ++) {
-        sprintf(IRcodeOptimized, " %s", params[i]);
+        sprintf(copyVar, " %s", params[i]);
+        strcat(IRcodeOptimized, copyVar);
     }
-    sprintf(IRcodeOptimized, "\n");
+    strcat(IRcodeOptimized, "\n");
     lastIndex += 1;
 
     return outputId;
@@ -1171,7 +1195,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            sprintf(IRcodeOptimized, "\n");
+            strcat(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
@@ -1211,7 +1235,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            sprintf(IRcodeOptimized, "\n");
+            strcat(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
@@ -1250,7 +1274,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            sprintf(IRcodeOptimized, "\n");
+            strcat(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
@@ -1286,7 +1310,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             strcpy(currScope, newScope);
             totalIRScopes++;
 
-            sprintf(IRcodeOptimized, "\n");
+            strcat(IRcodeOptimized, "\n");
 
             // Traverse to the right to generate block code
             ASTTraversalOptimized(root->right);
@@ -1535,7 +1559,9 @@ char * generateIRCodeOptimized() {
 
     // Set IRcodeOptimized String memory
     IRcodeOptimized = malloc(1000000 * sizeof(char));
-    strcpy(IRcodeOptimized,  "#### Optimized IR Code ####\n");
+
+    // Set copy variable string memory
+    copyVar = malloc(MAX_LINE_LENGTH * sizeof(char));
 
     // Set Scope Memory
     strcpy(currScope, "global");

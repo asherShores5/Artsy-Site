@@ -1,4 +1,6 @@
 <?php
+require('../vendor/autoload.php');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Set the code variable
   $code = $_COOKIE['codeInput'];
@@ -20,9 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Execute the set of commands in a new working directory
   $working_dir = '../src/';
   chdir($working_dir);
-  // $command = 'make artsy ARGS=\"' . $code . "\"";
-
-  $command = "make run ARGS=\"" . $code . "\"";
+  $command = "make artsy ARGS=\"" . $code . "\"";
   $output = shell_exec($command);
 
   // Check if the command actually executed
@@ -35,7 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
+  // $wat_text = strstr($output, "(module");
+  // echo $wat_text;
   echo $output;
+
+  // Convert WebAssembly Text to WebAssembly Binary
+  // $wasmText = '(module (func (export "sum") (param i32) (param i32) (result i32) (i32.add (local.get 0) (local.get 1))))';
+  // $waswmText = file_get_contents("../src/WATcode.wat");
+  // $wasmBytes = exec("python3 ../src/get_wasm.py '$wasmText'");
+  // echo $wasmBytes;
   exit;
 }
 ?>
