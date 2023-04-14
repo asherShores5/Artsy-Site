@@ -584,14 +584,14 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    88,    88,    92,    95,   107,   109,   112,   114,   123,
-     148,   171,   172,   173,   176,   177,   180,   204,   231,   240,
-     243,   246,   247,   250,   254,   260,   263,   268,   273,   274,
-     278,   290,   294,   305,   319,   330,   331,   332,   335,   341,
-     342,   343,   345,   350,   359,   382,   402,   412,   432,   442,
-     459,   470,   471,   472,   473,   479,   480,   488,   489,   492,
-     503,   504,   509,   515,   524,   548,   574,   584,   594,   604,
-     642,   652,   661,   666,   671,   672,   673,   674,   678
+       0,    91,    91,    95,    98,   110,   112,   115,   117,   126,
+     152,   175,   176,   177,   180,   181,   184,   208,   235,   244,
+     247,   250,   251,   254,   257,   262,   265,   270,   275,   276,
+     280,   293,   297,   308,   322,   333,   334,   335,   338,   344,
+     345,   346,   348,   353,   362,   385,   405,   415,   435,   445,
+     463,   474,   475,   476,   477,   483,   484,   493,   494,   497,
+     508,   509,   514,   519,   527,   551,   577,   587,   596,   607,
+     644,   653,   661,   666,   671,   672,   673,   674,   678
 };
 #endif
 
@@ -1269,7 +1269,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* ProgramStart: Program  */
-#line 88 "parser.y"
+#line 91 "parser.y"
                       {
 	ast = (yyval.ast);
 }
@@ -1277,7 +1277,7 @@ yyreduce:
     break;
 
   case 3: /* Program: DeclList StmtList  */
-#line 92 "parser.y"
+#line 95 "parser.y"
                            {
 		(yyval.ast) = AST_DoublyChildNodes("program", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	}
@@ -1285,9 +1285,9 @@ yyreduce:
     break;
 
   case 4: /* Program: DeclList StmtList Program  */
-#line 95 "parser.y"
+#line 98 "parser.y"
                                   {
-		// printf("\nProgram Version: DeclList StmtList Program\n");
+		printf("\nProgram Version: DeclList StmtList Program\n");
 		struct AST * funcChildNode = AST_DoublyChildNodes("program", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_DoublyChildNodes("program",(yyvsp[-2].ast), funcChildNode, (yyvsp[-2].ast), funcChildNode);
 	}
@@ -1295,27 +1295,27 @@ yyreduce:
     break;
 
   case 5: /* DeclList: VarDecl DeclList  */
-#line 107 "parser.y"
+#line 110 "parser.y"
                                 { (yyval.ast) = AST_DoublyChildNodes("vardec", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 							}
 #line 1302 "parser.tab.c"
     break;
 
   case 6: /* DeclList: Decl  */
-#line 109 "parser.y"
+#line 112 "parser.y"
                 { (yyval.ast) = (yyvsp[0].ast); }
 #line 1308 "parser.tab.c"
     break;
 
   case 7: /* Decl: %empty  */
-#line 112 "parser.y"
+#line 115 "parser.y"
       {
 	(yyval.ast) = AST_SingleChildNode("empty", "empty", "empty");}
 #line 1315 "parser.tab.c"
     break;
 
   case 8: /* Decl: VarDecl  */
-#line 114 "parser.y"
+#line 117 "parser.y"
                   {
 	// Basic Var Declaration Rule, generates AST for all variable declarations
 	(yyval.ast) = (yyvsp[0].ast);
@@ -1324,14 +1324,14 @@ yyreduce:
     break;
 
   case 9: /* VarDecl: DECLARE ID AS TYPE SEMICOLON  */
-#line 123 "parser.y"
+#line 126 "parser.y"
                                         {
-		// printf("\n RECOGNIZED RULE: Variable declaration %s\n", $2);
+		printf("\n RECOGNIZED RULE: Variable declaration %s\n", (yyvsp[-3].string));
 		// Variable declaration rule
 		// Symbol Table
-		
+		symTabAccess();
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
-		// printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
+		//printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
 		
 		// Check if the variable has been declared
 		// If it has, throw an error
@@ -1339,93 +1339,94 @@ yyreduce:
 			addItem((yyvsp[-3].string), "Var", (yyvsp[-1].string), 0, scopeStack[stackPointer], stackPointer, blockNumber);
 		else {
 			// New semantic system test
-			printf("Semantic Error, line %d: Variable %s has already been declared.\n", lines, (yyvsp[-3].string));
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s has already been declared.\n", lines, (yyvsp[-3].string));
+			exit(1);
 		}
 		// If the variable has not been declared 
-		// showSymTable();
+		showSymTable();
+		
 
 		// Generate AST node as a doubly node
 		(yyval.ast) = AST_DoublyChildNodes("type", (yyvsp[-1].string), (yyvsp[-3].string), (yyvsp[-1].string), (yyvsp[-3].string));
 
 	}
-#line 1353 "parser.tab.c"
+#line 1354 "parser.tab.c"
     break;
 
   case 10: /* VarDecl: DECLARE ID AS TYPE LEFTSQUARE INTEGER RIGHTSQUARE SEMICOLON  */
-#line 148 "parser.y"
+#line 152 "parser.y"
                                                                       {
-		// printf("RECOGNIZED RULE: Array declaration"); 
-		 
+		printf("RECOGNIZED RULE: Array declaration"); 
+		symTabAccess(); 
 		int inSymTab = found((yyvsp[-6].string), scopeStack, stackPointer);
-		// printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
+		//printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
 							
 		// Check if the variable has been declared
 		// If it has, throw an error
 		if (inSymTab == 0) 
 			addItem((yyvsp[-6].string), "Array", (yyvsp[-4].string), atoi((yyvsp[-2].string)), scopeStack[stackPointer], stackPointer, blockNumber);
 		else {
-			printf("Semantic Error, line %d: Variable %s has already been declared.\n", lines, (yyvsp[-6].string));
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s has already been declared.\n", lines, (yyvsp[-6].string));
+			exit(1);
 		}
 		// If the variable has not been declared 
-		// showSymTable();
+		showSymTable();
 
 		struct AST* arraySize = AST_SingleChildNode("size", (yyvsp[-2].string), (yyvsp[-2].string)); 
 		struct AST* array = AST_DoublyChildNodes((yyvsp[-6].string), "array", arraySize, "array", arraySize);
 		(yyval.ast) = AST_DoublyChildNodes("type", (yyvsp[-4].string), array, (yyvsp[-4].string), array);
 	}
-#line 1379 "parser.tab.c"
+#line 1380 "parser.tab.c"
     break;
 
   case 11: /* ActionDeclList: %empty  */
-#line 171 "parser.y"
+#line 175 "parser.y"
                 { 	(yyval.ast) = AST_SingleChildNode("empty", "empty", "empty");}
-#line 1385 "parser.tab.c"
+#line 1386 "parser.tab.c"
     break;
 
   case 12: /* ActionDeclList: ActionDecl  */
-#line 172 "parser.y"
+#line 176 "parser.y"
                      {(yyval.ast) = (yyvsp[0].ast);}
-#line 1391 "parser.tab.c"
+#line 1392 "parser.tab.c"
     break;
 
   case 13: /* ActionDeclList: ActionDeclListTail  */
-#line 173 "parser.y"
+#line 177 "parser.y"
                              {(yyval.ast) = (yyvsp[0].ast);}
-#line 1397 "parser.tab.c"
+#line 1398 "parser.tab.c"
     break;
 
   case 14: /* ActionDeclListTail: ActionDecl  */
-#line 176 "parser.y"
+#line 180 "parser.y"
                                {(yyval.ast) = (yyvsp[0].ast);}
-#line 1403 "parser.tab.c"
+#line 1404 "parser.tab.c"
     break;
 
   case 15: /* ActionDeclListTail: ActionDecl ActionDeclListTail  */
-#line 177 "parser.y"
+#line 181 "parser.y"
                                         {(yyval.ast) = AST_DoublyChildNodes("ActionDecl ActionDeclListTail",(yyvsp[-1].ast),(yyvsp[0].ast),(yyvsp[-1].ast), (yyvsp[0].ast));}
-#line 1409 "parser.tab.c"
+#line 1410 "parser.tab.c"
     break;
 
   case 16: /* ActionHeader: ACTION TYPE ID LEFTPAREN ParamDeclList RIGHTPAREN  */
-#line 180 "parser.y"
+#line 184 "parser.y"
                                                                 {
-		// printf("RECOGNIZED RULE: Standard Action\n");
+		printf("RECOGNIZED RULE: Standard Action\n");
 
 		// Check if the function variable has already been declared
 		// If it has, throw an error
-		
+		symTabAccess();
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
 		if (inSymTab == 0){
 			addAction((yyvsp[-4].string), (yyvsp[-3].string), (yyvsp[-1].ast), scopeStack, stackPointer, blockNumber); //id
 		}
 		else {
-			printf("Semantic Error, line %d: Action %s has already been declared.\n", lines, (yyvsp[-3].string));
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Action %s has already been declared.\n", lines, (yyvsp[-3].string));
+			exit(1);
 		}
 
-		// showSymTable();
+		showSymTable();
 		(yyval.ast) = AST_DoublyChildNodes("action context", (yyvsp[-3].string), (yyvsp[-1].ast), (yyvsp[-3].string), (yyvsp[-1].ast));
 
 		stackPointer++;
@@ -1434,15 +1435,15 @@ yyreduce:
 		memset(currentFunctionScope, 0, 50 * sizeof(char));
 		strcpy(currentFunctionScope, (yyvsp[-3].string));
 	}
-#line 1438 "parser.tab.c"
+#line 1439 "parser.tab.c"
     break;
 
   case 17: /* ActionHeader: ACTION ID LEFTPAREN ParamDeclList RIGHTPAREN  */
-#line 204 "parser.y"
+#line 208 "parser.y"
                                                        {
-		// printf("RECOGNIZED RULE: Void Action\n");
+		printf("RECOGNIZED RULE: Void Action\n");
 		
-		
+		symTabAccess();
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
 
 		// Check if the function variable has already been declared
@@ -1451,11 +1452,11 @@ yyreduce:
 			addAction("void", (yyvsp[-3].string), (yyvsp[-1].ast), scopeStack, stackPointer, blockNumber); //id
 		}
 		else {
-			printf("Semantic Error, line %d: Action %s has already been declared.\n", lines, (yyvsp[-3].string));
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Action %s has already been declared.\n", lines, (yyvsp[-3].string));
+			exit(1);
 		}
 
-		// showSymTable();
+		showSymTable();
 		(yyval.ast) = AST_DoublyChildNodes("action context", (yyvsp[-3].string), (yyvsp[-1].ast), (yyvsp[-3].string), (yyvsp[-1].ast));
 
 		stackPointer++;
@@ -1464,11 +1465,11 @@ yyreduce:
 		memset(currentFunctionScope, 0, 50 * sizeof(char));
 		strcpy(currentFunctionScope, (yyvsp[-3].string));
 	}
-#line 1468 "parser.tab.c"
+#line 1469 "parser.tab.c"
     break;
 
   case 18: /* ActionDecl: ActionHeader Block  */
-#line 231 "parser.y"
+#line 235 "parser.y"
                                {
 	// Generate AST node as a doubly node
 	(yyval.ast) = AST_DoublyChildNodes("action", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
@@ -1476,105 +1477,104 @@ yyreduce:
 	memset(currentFunctionScope, 0, 50 * sizeof(char));
 	strcpy(currentFunctionScope, scopeStack[stackPointer]);
 }
-#line 1480 "parser.tab.c"
+#line 1481 "parser.tab.c"
     break;
 
   case 19: /* ParamDeclList: %empty  */
-#line 240 "parser.y"
+#line 244 "parser.y"
                {
 		(yyval.ast) = AST_SingleChildNode("empty", "empty", "empty");
 }
-#line 1488 "parser.tab.c"
+#line 1489 "parser.tab.c"
     break;
 
   case 20: /* ParamDeclList: ParamDeclListTail  */
-#line 243 "parser.y"
+#line 247 "parser.y"
                             {(yyval.ast) = (yyvsp[0].ast);}
-#line 1494 "parser.tab.c"
+#line 1495 "parser.tab.c"
     break;
 
   case 21: /* ParamDeclListTail: ParamDecl  */
-#line 246 "parser.y"
+#line 250 "parser.y"
                              {(yyval.ast) = (yyvsp[0].ast);}
-#line 1500 "parser.tab.c"
+#line 1501 "parser.tab.c"
     break;
 
   case 22: /* ParamDeclListTail: ParamDecl COMMA ParamDeclListTail  */
-#line 247 "parser.y"
+#line 251 "parser.y"
                                             {(yyval.ast) = AST_DoublyChildNodes("ParaDecl comma ParaDeclListTail", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));}
-#line 1506 "parser.tab.c"
+#line 1507 "parser.tab.c"
     break;
 
   case 23: /* ParamDecl: TYPE ID  */
-#line 250 "parser.y"
-                   {
-		// printf("RECOGNIZED RULE: Variable Parameter\n");
+#line 254 "parser.y"
+                   { printf("RECOGNIZED RULE: Variable Parameter\n");
 		(yyval.ast) = AST_DoublyChildNodes("variable parm", (yyvsp[-1].string), (yyvsp[0].string), (yyvsp[-1].string), (yyvsp[0].string));
 	}
 #line 1515 "parser.tab.c"
     break;
 
   case 24: /* ParamDecl: TYPE ID LEFTSQUARE RIGHTSQUARE  */
-#line 254 "parser.y"
-                                         {
-		// printf("RECOGNIZED RULE: Array Parameter\n");
+#line 257 "parser.y"
+                                         { printf("RECOGNIZED RULE: Array Parameter\n");
 		(yyval.ast) = AST_DoublyChildNodes("array parm", (yyvsp[-3].string), (yyvsp[-2].string), (yyvsp[-3].string), (yyvsp[-2].string));
 	}
-#line 1524 "parser.tab.c"
+#line 1523 "parser.tab.c"
     break;
 
   case 25: /* StmtList: Stmt  */
-#line 260 "parser.y"
+#line 262 "parser.y"
                {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 1532 "parser.tab.c"
+#line 1531 "parser.tab.c"
     break;
 
   case 26: /* StmtList: Stmt StmtList  */
-#line 263 "parser.y"
+#line 265 "parser.y"
                         {
-		// printf("\n RECOGNIZED RULE: StmtList statement\n");
+		printf("\n RECOGNIZED RULE: StmtList statement\n");
 		// Generate a list of all statement declarations below vardecl
 		(yyval.ast) = AST_DoublyChildNodes("statements", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		}
-#line 1542 "parser.tab.c"
+#line 1541 "parser.tab.c"
     break;
 
   case 27: /* StmtList: ActionDeclList  */
-#line 268 "parser.y"
+#line 270 "parser.y"
                          {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 1550 "parser.tab.c"
+#line 1549 "parser.tab.c"
     break;
 
   case 28: /* Stmt: SEMICOLON  */
-#line 273 "parser.y"
+#line 275 "parser.y"
                         { 	(yyval.ast) = AST_SingleChildNode("empty", "empty", "empty");}
-#line 1556 "parser.tab.c"
+#line 1555 "parser.tab.c"
     break;
 
   case 29: /* Stmt: Expr SEMICOLON  */
-#line 274 "parser.y"
+#line 276 "parser.y"
                                 {
 		// Simplest expr statement in grammar
 		(yyval.ast) = (yyvsp[-1].ast);
 	}
-#line 1565 "parser.tab.c"
+#line 1564 "parser.tab.c"
     break;
 
   case 30: /* Stmt: PRINT Expr SEMICOLON  */
-#line 278 "parser.y"
-                                {
-		// printf("\n RECOGNIZED RULE: PRINT statement\n");
+#line 280 "parser.y"
+                                { printf("\n RECOGNIZED RULE: PRINT statement\n");
 		// Generate write declarations as a statement in the parser
 		(yyval.ast) = AST_SingleChildNode("write", (yyvsp[-1].ast), (yyvsp[-1].ast));
 
+		printf("Write: %s\n", (yyvsp[-1].ast)->nodeType);
+
 		// If the primary type is a variable, check if the variable is in the symbol table
 		if (!strcmp((yyvsp[-1].ast)->nodeType, "int") && !strcmp((yyvsp[-1].ast)->nodeType, "float") && !strcmp((yyvsp[-1].ast)->nodeType, "string") && strncmp(getPrimaryType((yyvsp[-1].ast)), "var", 3) == 0 && !found((yyvsp[-1].ast), scopeStack, stackPointer)) {
-			printf("Semantic Error, line %d: Variable %s does not exist.\n", lines, (yyvsp[-1].ast));
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, (yyvsp[-1].ast));
+			exit(1);
 		}
 
 	}
@@ -1582,41 +1582,41 @@ yyreduce:
     break;
 
   case 31: /* Stmt: ADDLINE SEMICOLON  */
-#line 290 "parser.y"
+#line 293 "parser.y"
                             {
-		// printf("\n RECOGNIZED RULE: ADDLINE statement\n");
+		printf("\n RECOGNIZED RULE: ADDLINE statement\n");
 		(yyval.ast) = AST_SingleChildNode("addline", "\n", 0);
 	}
 #line 1591 "parser.tab.c"
     break;
 
   case 32: /* Stmt: FINISH SEMICOLON  */
-#line 294 "parser.y"
+#line 297 "parser.y"
                            {
-		// printf("\n RECOGNIZED RULE: FINISH statement\n");
+		printf("\n RECOGNIZED RULE: FINISH statement\n");
 		(yyval.ast) = AST_SingleChildNode("finish", "finish", 0);
 
 		// Semantic check
 		// If the finish statement is not within a loop, throw a Semantic Error
 		if (!inLoop) {
-			printf("Semantic Error, line %d: The \"finish\" keyword was specified outside of a loop.\n", lines);
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: The \"finish\" keyword was specified outside of a loop.\n", lines);
+			exit(1);
 		}
 	}
 #line 1607 "parser.tab.c"
     break;
 
   case 33: /* Stmt: REPORT Expr SEMICOLON  */
-#line 305 "parser.y"
+#line 308 "parser.y"
                                 {
-		// printf("\n RECOGNIZED RULE: REPORT statement\n");
+		printf("\n RECOGNIZED RULE: REPORT statement\n");
 		(yyval.ast) = AST_SingleChildNode("report", (yyvsp[-1].ast), (yyvsp[-1].ast)); 
 
 		// Semantic check for void functions
 		// If the function is a void function and states a return, throw a Semantic Error
 		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) == 0) {
-			printf("Semantic Error, line %d: Cannot specify \"report\" with a report type for void actions.\n", lines);
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Cannot specify \"report\" with a report type for void actions.\n", lines);
+			exit(1);
 		}
 
 		// Check if the return type matches the function type
@@ -1626,68 +1626,68 @@ yyreduce:
     break;
 
   case 34: /* Stmt: REPORT SEMICOLON  */
-#line 319 "parser.y"
+#line 322 "parser.y"
                            {
-		// printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
+		printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
 		(yyval.ast) = AST_SingleChildNode("voidreport", "voidreport", 0); 
 
 		// Semantic check for non-void functions
 		// If the function is a non-void function and states a blank return, throw a Semantic Error
 		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) != 0) {
-			printf("Semantic Error, line %d: Cannot specify a \"report\" without a report type for non-void actions.\n", lines);
-			exit(0);
+			fprintf(errorFile, "Semantic Error, line %d: Cannot specify a \"report\" without a report type for non-void actions.\n", lines);
+			exit(1);
 		}
 	}
 #line 1642 "parser.tab.c"
     break;
 
   case 35: /* Stmt: Block  */
-#line 330 "parser.y"
+#line 333 "parser.y"
                 {(yyval.ast) = (yyvsp[0].ast);}
 #line 1648 "parser.tab.c"
     break;
 
   case 36: /* Stmt: Loop  */
-#line 331 "parser.y"
+#line 334 "parser.y"
                {(yyval.ast) = (yyvsp[0].ast);}
 #line 1654 "parser.tab.c"
     break;
 
   case 37: /* Stmt: IfStmt  */
-#line 332 "parser.y"
+#line 335 "parser.y"
                  {(yyval.ast) = (yyvsp[0].ast);}
 #line 1660 "parser.tab.c"
     break;
 
   case 38: /* IfStmt: If IfStmtTail  */
-#line 335 "parser.y"
+#line 338 "parser.y"
                       {
-	// printf("\n RECOGNIZED RULE: if statement block\n");
+	printf("\n RECOGNIZED RULE: if statement block\n");
 	(yyval.ast) = AST_DoublyChildNodes("IfStmt", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 }
 #line 1669 "parser.tab.c"
     break;
 
   case 39: /* IfStmtTail: %empty  */
-#line 341 "parser.y"
+#line 344 "parser.y"
             { (yyval.ast) = AST_SingleChildNode("IfStmtTail else end", "", "");}
 #line 1675 "parser.tab.c"
     break;
 
   case 40: /* IfStmtTail: Else  */
-#line 342 "parser.y"
+#line 345 "parser.y"
                { (yyval.ast) = AST_SingleChildNode("IfStmtTail else end", (yyvsp[0].ast), (yyvsp[0].ast));}
 #line 1681 "parser.tab.c"
     break;
 
   case 41: /* IfStmtTail: Elif IfStmtTail  */
-#line 343 "parser.y"
+#line 346 "parser.y"
                           { (yyval.ast) = AST_DoublyChildNodes("IfStmtTail continue", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast)); }
 #line 1687 "parser.tab.c"
     break;
 
   case 42: /* Loop: WhileL  */
-#line 345 "parser.y"
+#line 348 "parser.y"
              {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
@@ -1695,7 +1695,7 @@ yyreduce:
     break;
 
   case 43: /* WhileL: WhileHead Block  */
-#line 350 "parser.y"
+#line 353 "parser.y"
                         {
 	(yyval.ast) = AST_DoublyChildNodes("WhileL", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1707,14 +1707,14 @@ yyreduce:
     break;
 
   case 44: /* WhileHead: WHILE LEFTPAREN Expr RIGHTPAREN  */
-#line 359 "parser.y"
+#line 362 "parser.y"
                                            {
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the while loop to the symbol table
-	
+	symTabAccess();
 	addLogic("while", "While", scopeStack[stackPointer], stackPointer, blockNumber);
-	// showSymTable();
+	showSymTable();
 
 	// Indicate that it's within a loop
 	inLoop = 1;
@@ -1734,14 +1734,14 @@ yyreduce:
     break;
 
   case 45: /* IfHead: IF LEFTPAREN Expr RIGHTPAREN  */
-#line 382 "parser.y"
+#line 385 "parser.y"
                                      {
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the if-statement to the symbol table
-	
+	symTabAccess();
 	addLogic("if", "If", scopeStack[stackPointer], stackPointer, blockNumber);
-	// showSymTable();
+	showSymTable();
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1757,9 +1757,9 @@ yyreduce:
     break;
 
   case 46: /* If: IfHead Block  */
-#line 402 "parser.y"
+#line 405 "parser.y"
                  {
-	// printf("\n RECOGNIZED RULE: if statement\n");
+	printf("\n RECOGNIZED RULE: if statement\n");
 
 	(yyval.ast) = AST_DoublyChildNodes("If", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1770,14 +1770,14 @@ yyreduce:
     break;
 
   case 47: /* ElifHead: ELIF LEFTPAREN Expr RIGHTPAREN  */
-#line 412 "parser.y"
+#line 415 "parser.y"
                                          {
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the elif-statement to the symbol table
-	
+	symTabAccess();
 	addLogic("elif", "Elif", scopeStack[stackPointer], stackPointer, blockNumber);
-	// showSymTable();
+	showSymTable();
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1793,9 +1793,9 @@ yyreduce:
     break;
 
   case 48: /* Elif: ElifHead Block  */
-#line 432 "parser.y"
+#line 435 "parser.y"
                       {
-	// printf("\n RECOGNIZED RULE: elif statement\n");
+	printf("\n RECOGNIZED RULE: elif statement\n");
 
 	(yyval.ast) = AST_DoublyChildNodes("Elif", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1806,11 +1806,12 @@ yyreduce:
     break;
 
   case 49: /* ElseHead: ELSE  */
-#line 442 "parser.y"
+#line 445 "parser.y"
                {
 	// Add the else-statement to the symbol table
+	symTabAccess();
 	addLogic("else", "Else", scopeStack[stackPointer], stackPointer, blockNumber);
-	// showSymTable();
+	showSymTable();
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1822,117 +1823,116 @@ yyreduce:
 	// memset(currentFunctionScope, 0, 50 * sizeof(char));
 	// strcpy(currentFunctionScope, tempScopeName);
 }
-#line 1826 "parser.tab.c"
+#line 1827 "parser.tab.c"
     break;
 
   case 50: /* Else: ElseHead Block  */
-#line 459 "parser.y"
+#line 463 "parser.y"
                       {
-	// printf("\n RECOGNIZED RULE: else statement\n");
+	printf("\n RECOGNIZED RULE: else statement\n");
 
 	(yyval.ast) = AST_SingleChildNode("Else", (yyvsp[0].ast), (yyvsp[0].ast));
 	stackPointer--;
 	// memset(currentFunctionScope, 0, 50 * sizeof(char));
 	// strcpy(currentFunctionScope, scopeStack[stackPointer]);
 }
-#line 1839 "parser.tab.c"
+#line 1840 "parser.tab.c"
     break;
 
   case 51: /* Primary: INTEGER  */
-#line 470 "parser.y"
+#line 474 "parser.y"
                                 {(yyval.ast) = AST_SingleChildNode("int", (yyvsp[0].string), (yyvsp[0].string)); }
-#line 1845 "parser.tab.c"
+#line 1846 "parser.tab.c"
     break;
 
   case 52: /* Primary: NUMBER  */
-#line 471 "parser.y"
+#line 475 "parser.y"
                         {(yyval.ast) = AST_SingleChildNode("float", (yyvsp[0].number), (yyvsp[0].number)); }
-#line 1851 "parser.tab.c"
+#line 1852 "parser.tab.c"
     break;
 
   case 53: /* Primary: ID  */
-#line 472 "parser.y"
+#line 476 "parser.y"
               {(yyval.ast) = AST_SingleChildNode((yyvsp[0].string), (yyvsp[0].string), (yyvsp[0].string));}
-#line 1857 "parser.tab.c"
+#line 1858 "parser.tab.c"
     break;
 
   case 54: /* Primary: STRING  */
-#line 473 "parser.y"
+#line 477 "parser.y"
                   {
 		// SEMANTIC CHECK: See if the string contains any invalid escape character combinations
 		checkEscapeChars((yyvsp[0].string));
 		
 		(yyval.ast) = AST_SingleChildNode("string", (yyvsp[0].string), (yyvsp[0].string));
 	}
-#line 1868 "parser.tab.c"
+#line 1869 "parser.tab.c"
     break;
 
   case 55: /* Primary: FLOAT  */
-#line 479 "parser.y"
+#line 483 "parser.y"
                 {(yyval.ast) = AST_SingleChildNode("float", (yyvsp[0].string), (yyvsp[0].string));}
-#line 1874 "parser.tab.c"
+#line 1875 "parser.tab.c"
     break;
 
   case 56: /* Primary: ID LEFTSQUARE INTEGER RIGHTSQUARE  */
-#line 480 "parser.y"
+#line 484 "parser.y"
                                             {
 		char * arrayPrefix = malloc(100*sizeof(char));
 		strcat(arrayPrefix, "inarray_");
 		strcat(arrayPrefix, getItemType((yyvsp[-3].string), scopeStack, stackPointer));
+		printf("Prefix: %s\n", arrayPrefix);
 		(yyval.ast) = AST_DoublyChildNodes(arrayPrefix, (yyvsp[-3].string), (yyvsp[-1].string), (yyvsp[-3].string), (yyvsp[-1].string));
 	}
-#line 1885 "parser.tab.c"
+#line 1887 "parser.tab.c"
     break;
 
   case 57: /* ExprListTail: %empty  */
-#line 488 "parser.y"
+#line 493 "parser.y"
               {(yyval.ast) = AST_SingleChildNode("exprlist end", "\n", 0);}
-#line 1891 "parser.tab.c"
+#line 1893 "parser.tab.c"
     break;
 
   case 58: /* ExprListTail: Primary  */
-#line 489 "parser.y"
+#line 494 "parser.y"
                         { 
 			(yyval.ast) = AST_SingleChildNode("exprlist end", (yyvsp[0].ast), (yyvsp[0].ast)); 
 	}
-#line 1899 "parser.tab.c"
+#line 1901 "parser.tab.c"
     break;
 
   case 59: /* ExprListTail: Primary COMMA ExprListTail  */
-#line 492 "parser.y"
+#line 497 "parser.y"
                                         {
 			(yyval.ast) = AST_DoublyChildNodes("exprlist exprtail", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 	}
-#line 1907 "parser.tab.c"
+#line 1909 "parser.tab.c"
     break;
 
   case 60: /* ExprList: %empty  */
-#line 503 "parser.y"
+#line 508 "parser.y"
           {}
-#line 1913 "parser.tab.c"
+#line 1915 "parser.tab.c"
     break;
 
   case 61: /* ExprList: ExprListTail  */
-#line 504 "parser.y"
+#line 509 "parser.y"
                        {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 1921 "parser.tab.c"
+#line 1923 "parser.tab.c"
     break;
 
   case 62: /* Block: LEFTBRACKET Program RIGHTBRACKET  */
-#line 509 "parser.y"
-                                         {
-		// printf("\n RECOGNIZED RULE: Block statement\n");
+#line 514 "parser.y"
+                                         { printf("\n RECOGNIZED RULE: Block statement\n");
 		(yyval.ast) = AST_SingleChildNode("block",(yyvsp[-1].ast), (yyvsp[-1].ast));
-	}
-#line 1930 "parser.tab.c"
+		}
+#line 1931 "parser.tab.c"
     break;
 
   case 63: /* Expr: Primary  */
-#line 515 "parser.y"
-                {
-		// printf("\n RECOGNIZED RULE: Simplest expression\n");
+#line 519 "parser.y"
+                { printf("\n RECOGNIZED RULE: Simplest expression\n");
 		(yyval.ast) = (yyvsp[0].ast);
 		
 		char tempNodeType[50];
@@ -1944,9 +1944,8 @@ yyreduce:
     break;
 
   case 64: /* Expr: LET ID EQ Expr  */
-#line 524 "parser.y"
-                                {
-		// printf("\n RECOGNIZED RULE: Let Assignment statement \n");
+#line 527 "parser.y"
+                                { printf("\n RECOGNIZED RULE: Let Assignment statement \n");
 		// --- SEMANTIC CHECKS --- //
 		/*
 			int semanticCorrectness = FALSE;
@@ -1966,6 +1965,7 @@ yyreduce:
 		CheckAssignmentType((yyvsp[-2].string), getExprOp((yyvsp[0].ast)), scopeStack, stackPointer);
 
 		// Generate AST tree nodes
+		printf("DEBUG -- GENERATE AST\n");
 		(yyval.ast) = AST_DoublyChildNodes("=",(yyvsp[-2].string), (yyvsp[0].ast), (yyvsp[-2].string), (yyvsp[0].ast));
 
 	}
@@ -1973,9 +1973,8 @@ yyreduce:
     break;
 
   case 65: /* Expr: LET ID LEFTSQUARE INTEGER RIGHTSQUARE EQ Expr  */
-#line 548 "parser.y"
-                                                                {
-		// printf("\n RECOGNIZED RULE: Let Assignment element statement\n");
+#line 551 "parser.y"
+                                                                { printf("\n RECOGNIZED RULE: Let Assignment element statement\n");
 		// --- SEMANTIC CHECKS --- //
 		/*
 			int semanticCorrectness = FALSE;
@@ -1995,6 +1994,7 @@ yyreduce:
 		CheckAssignmentType((yyvsp[-5].string), (yyvsp[0].ast), scopeStack, stackPointer);
 
 		// Generate AST tree nodes
+		printf("DEBUG -- GENERATE AST\n");
 		struct AST* arrayElement = AST_DoublyChildNodes("element assignment", (yyvsp[-3].string), (yyvsp[0].ast), (yyvsp[-3].string), (yyvsp[0].ast)); 
 
 		(yyval.ast) = AST_DoublyChildNodes("=", (yyvsp[-5].string), arrayElement, (yyvsp[-5].string), arrayElement);
@@ -2004,9 +2004,8 @@ yyreduce:
     break;
 
   case 66: /* Expr: Expr PLUS Expr  */
-#line 574 "parser.y"
-                         {
-		// printf("\n RECOGNIZED RULE: PLUS statement\n");
+#line 577 "parser.y"
+                         { printf("\n RECOGNIZED RULE: PLUS statement\n");
 		// Semantic checks
 
 		// Check to see if the LHS matches the RHS
@@ -2014,14 +2013,14 @@ yyreduce:
 		
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("+", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
+		printf("EXPR PLUS EXPR: %s \n------------------------------------------------------------------\n", (yyvsp[0].ast)->nodeType);
 	}
 #line 2019 "parser.tab.c"
     break;
 
   case 67: /* Expr: Expr MINUS Expr  */
-#line 584 "parser.y"
-                          {
-		// printf("\n RECOGNIZED RULE: MINUS statement\n");
+#line 587 "parser.y"
+                          { printf("\n RECOGNIZED RULE: MINUS statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2030,17 +2029,18 @@ yyreduce:
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("-", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 	}
-#line 2034 "parser.tab.c"
+#line 2033 "parser.tab.c"
     break;
 
   case 68: /* Expr: Expr MULTIPLY Expr  */
-#line 594 "parser.y"
-                             {
-		// printf("\n RECOGNIZED RULE: MULTIPLY statement\n");
+#line 596 "parser.y"
+                             { printf("\n RECOGNIZED RULE: MULTIPLY statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
 		CheckOperationType(getExprOp((yyvsp[-2].ast)), getExprOp((yyvsp[0].ast)));
+
+		printf("Node: *, Term 1: %s, Term 2: %s\n", (yyvsp[-2].ast)->RHS, (yyvsp[0].ast)->RHS);
 		
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("*", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
@@ -2049,9 +2049,8 @@ yyreduce:
     break;
 
   case 69: /* Expr: Expr DIVIDE Expr  */
-#line 604 "parser.y"
-                           {
-		// printf("\n RECOGNIZED RULE: DIVIDE statement\n");
+#line 607 "parser.y"
+                           { printf("\n RECOGNIZED RULE: DIVIDE statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2088,13 +2087,12 @@ yyreduce:
 		}
 
 	}
-#line 2092 "parser.tab.c"
+#line 2091 "parser.tab.c"
     break;
 
   case 70: /* Expr: Expr EXPONENT Expr  */
-#line 642 "parser.y"
-                             {
-		// printf("\n RECOGNIZED RULE: BinOp statement\n");
+#line 644 "parser.y"
+                             { printf("\n RECOGNIZED RULE: BinOp statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2103,13 +2101,12 @@ yyreduce:
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("^", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 	}
-#line 2107 "parser.tab.c"
+#line 2105 "parser.tab.c"
     break;
 
   case 71: /* Expr: Expr COMMA Expr  */
-#line 652 "parser.y"
-                          {
-		// printf("\n RECOGNIZED RULE: BinOp statement\n");
+#line 653 "parser.y"
+                          { printf("\n RECOGNIZED RULE: BinOp statement\n");
 		// Semantic checks
 		
 		// Check if both exprs exist
@@ -2117,57 +2114,57 @@ yyreduce:
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("EXP ", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 	}
-#line 2121 "parser.tab.c"
+#line 2118 "parser.tab.c"
     break;
 
   case 72: /* Expr: Expr COMPARISONOPERATOR Expr  */
 #line 661 "parser.y"
                                        {
-		// printf("\n RECOGNIZED RULE: Comparison statement\n");
+		printf("\n RECOGNIZED RULE: Comparison statement\n");
 		struct AST * tempNode = AST_DoublyChildNodes((yyvsp[-1].string), (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_SingleChildNode("Comparison", tempNode, tempNode);
 	}
-#line 2131 "parser.tab.c"
+#line 2128 "parser.tab.c"
     break;
 
   case 73: /* Expr: Expr LOGICALOPERATOR Expr  */
 #line 666 "parser.y"
                                     {
-		// printf("\n RECOGNIZED RULE: Logical statement\n");
+		printf("\n RECOGNIZED RULE: Logical statement\n");
 		struct AST * tempNode = AST_DoublyChildNodes((yyvsp[-1].string), (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_SingleChildNode("Logical", tempNode, tempNode);
 	}
-#line 2141 "parser.tab.c"
+#line 2138 "parser.tab.c"
     break;
 
   case 74: /* Expr: LEFTPAREN Expr RIGHTPAREN  */
 #line 671 "parser.y"
                                     {(yyval.ast) = (yyvsp[-1].ast);}
-#line 2147 "parser.tab.c"
+#line 2144 "parser.tab.c"
     break;
 
   case 75: /* Expr: ActionCall  */
 #line 672 "parser.y"
                      {(yyval.ast) = (yyvsp[0].ast);}
-#line 2153 "parser.tab.c"
+#line 2150 "parser.tab.c"
     break;
 
   case 76: /* Expr: TRUE  */
 #line 673 "parser.y"
                {(yyval.ast) = AST_SingleChildNode("flag", (yyvsp[0].string), (yyvsp[0].string));}
-#line 2159 "parser.tab.c"
+#line 2156 "parser.tab.c"
     break;
 
   case 77: /* Expr: FALSE  */
 #line 674 "parser.y"
                 {(yyval.ast) = AST_SingleChildNode("flag",(yyvsp[0].string), (yyvsp[0].string));}
-#line 2165 "parser.tab.c"
+#line 2162 "parser.tab.c"
     break;
 
   case 78: /* ActionCall: ID LEFTPAREN ExprList RIGHTPAREN  */
 #line 678 "parser.y"
                                              {
-	// printf("\nRECOGNIZED RULE: ActionCall\n");
+	printf("\nRECOGNIZED RULE: ActionCall\n");
 	struct AST* funcCallParamList = AST_SingleChildNode("action call param list", (yyvsp[-1].ast), (yyvsp[-1].ast));
 	(yyval.ast) = AST_DoublyChildNodes("action call", (yyvsp[-3].string), funcCallParamList, (yyvsp[-3].string), funcCallParamList);
 
@@ -2190,17 +2187,17 @@ yyreduce:
             // Check to see if the two types do not match
             // If they don't, return a Semantic Error
             if (strncmp(funcParamType, callParamType, strlen(callParamType)) != 0) {
-                printf("Semantic Error, line %d: The call for parameter #%d (%s) does not match the type for parameter #%d (%s) in the function declaration for \"%s\".\n", lines, i, callParamType, i, funcParamType, (yyvsp[-3].string));
-                exit(0);
+                fprintf(errorFile, "Semantic Error, line %d: The call for parameter #%d (%s) does not match the type for parameter #%d (%s) in the function declaration for \"%s\".\n", lines, i, callParamType, i, funcParamType, (yyvsp[-3].string));
+                exit(1);
             }
         }
     }
 }
-#line 2200 "parser.tab.c"
+#line 2197 "parser.tab.c"
     break;
 
 
-#line 2204 "parser.tab.c"
+#line 2201 "parser.tab.c"
 
       default: break;
     }
@@ -2396,21 +2393,21 @@ yyreturnlab:
 #line 710 "parser.y"
 
 
-int parser_main(FILE * inputStream)
+int parser_main(FILE * inputfile)
 {
-	// printf("\n----Starting Lexer and Parser----\n\n");
+	printf("\n----Starting Lexer and Parser----\n\n");
 	stackPointer = 0;
 	blockNumber = 0;
 	inLoop = 0;
 	memset(scopeStack[stackPointer], 0, 50 * sizeof(char));
 	strcpy(scopeStack[stackPointer], "global");
 	
-	yyin = inputStream;
+	yyin = inputfile;
 	
 	return yyparse();
 }
 
-void yyerror(const char * s) {
-	printf("Parse error: %s\n", s);
-	exit(0);
+void yyerror(const char* s) {
+	fprintf(stderr, "Parse error: %s\n", s);
+	exit(1);
 }

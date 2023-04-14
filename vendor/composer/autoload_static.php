@@ -38,7 +38,6 @@ class ComposerStaticInitc7a9ecac927b5fdd68f8b9cc83457cc0
         'M' => 
         array (
             'Monolog\\' => 8,
-            'Memcached\\' => 10,
         ),
         'G' => 
         array (
@@ -93,10 +92,6 @@ class ComposerStaticInitc7a9ecac927b5fdd68f8b9cc83457cc0
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
-        ),
-        'Memcached\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/php-memcached/php-memcached/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (

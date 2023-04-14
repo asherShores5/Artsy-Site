@@ -83,7 +83,6 @@ ehthumbs.db
 
 # dotenv environment variables file
 .env
-env.js
 
 # Recommend not to track the following files
 .env.*.local
@@ -93,6 +92,4 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# New stuff for DB
-vendor/
+vendor

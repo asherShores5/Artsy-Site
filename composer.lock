@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61e974ad5cda1d42b70f9bc1033c462b",
+    "content-hash": "7b8c425339a8fc1beefa6b6e88e7eff3",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -478,25 +478,6 @@
                 }
             ],
             "time": "2023-02-06T13:44:46+00:00"
-        },
-        {
-            "name": "php-memcached/php-memcached",
-            "version": "3.1.5",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/php-memcached-dev/php-memcached/archive/v3.1.5.zip"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Memcached\\": "src/"
-                }
-            }
         },
         {
             "name": "phpoption/phpoption",

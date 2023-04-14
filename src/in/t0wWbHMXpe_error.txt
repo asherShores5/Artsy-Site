@@ -1,1 +1,0 @@
-Semantic Error, line 25: The total number of call parameters for "fibonacci" (2) does not match function declaration (1).

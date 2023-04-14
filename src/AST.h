@@ -10,7 +10,8 @@
 
 // Header file to list the AST structure and all functions to generate an AST
 
-// Error logging
+// Error log file
+extern FILE* errorFile;
 extern int lines;
 
 // An AST node contains a LHS, a RHS, and pointers to new AST nodes on the LHS & RHS

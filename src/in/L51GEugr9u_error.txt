@@ -1,1 +1,0 @@
-Semantic Error, line 27: Variable test2 d4 does not exist.

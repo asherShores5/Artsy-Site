@@ -8,7 +8,7 @@
 #include "semantic.h"
 #include "symbolTable.h"
 
-// All file string variables
+// All file variables
 
 // The WATcode file has the following purposes:
 // 1. To place code directly first within the final file first (e.g., start module code)
@@ -18,15 +18,20 @@
 // 5. To place temporary variables at the top of a local scope
 // 6. Once the compilation process is complete, the other files will copy their contents into this file
 
-char * WATcode; // Generates final WATcode string
+FILE * WATcode; // Generates WATcode.wat
 
-// All other variables are helper strings used in the compilation process
-char * MAINcode; // File used to place code within the main function
-char * VARScode; // File used to place variables at the top of the main function
-char * LOCALcode; // File used to place code within a local scope
+// All other files are helper files used in the compilation process
+FILE * MAINcode; // File used to place code within the main function
+FILE * VARScode; // File used to place variables at the top of the main function
+FILE * LOCALcode; // File used to place code within a local scope
+FILE * IRfile; // Optimized IRfile file
 
-// Copy variable
-char * copyWAT;
+// Path name variables
+char * IRfilePath;
+char * WATcodePath;
+char * MAINcodePath;
+char * VARScodePath;
+char * LOCALcodePath;
 
 // Standard program variables
 #define MAX_LINE_LENGTH 10000
@@ -36,8 +41,8 @@ char * returnType;
 char * currOp;
 
 // Scope Variables
-char * currScope;
-char ** prevScopes;
+char * currScopeWAT;
+extern char ** prevScopes;
 int totalWebScopes = 1;
 
 // Variables to detect if declared types and params are within a function
@@ -53,16 +58,45 @@ int stackNumber = 0;
 
 // Function to open the files for the WebAssembly Generator
 // Required before generating any WAT code
-void initAssemblyFile() {
-    WATcode = malloc(1000000 * sizeof(char));
-    MAINcode = malloc(1000000 * sizeof(char));
-    VARScode = malloc(1000000 * sizeof(char));
-    LOCALcode = malloc(1000000 * sizeof(char));
-    copyWAT = malloc(MAX_LINE_LENGTH * sizeof(char));
+void initAssemblyFile(char * sessionID) {
+    // Create all the path names
+    IRfilePath = malloc(1000 * sizeof(char));
+    WATcodePath = malloc(1000 * sizeof(char));
+    MAINcodePath = malloc(1000 * sizeof(char));
+    VARScodePath = malloc(1000 * sizeof(char));
+    LOCALcodePath = malloc(1000 * sizeof(char));
+
+    strcpy(IRfilePath, "./in/");
+    strcat(IRfilePath, sessionID);
+    strcat(IRfilePath, "_IRcodeOptimized.ir");
+
+    strcpy(WATcodePath, "./in/");
+    strcat(WATcodePath, sessionID);
+    strcat(WATcodePath, "_WATcode.wat");
+
+    strcpy(MAINcodePath, "./in/");
+    strcat(MAINcodePath, sessionID);
+    strcat(MAINcodePath, "_MAINcode.wat");
+
+    strcpy(VARScodePath, "./in/");
+    strcat(VARScodePath, sessionID);
+    strcat(VARScodePath, "_VARScode.wat");
+
+    strcpy(LOCALcodePath, "./in/");
+    strcat(LOCALcodePath, sessionID);
+    strcat(LOCALcodePath, "_LOCALcode.wat");
+
+    // Open all files
+    printf("\n----Generating WebAssembly Text File----\n\n");
+    IRfile = fopen(IRfilePath, "r");
+    WATcode = fopen(WATcodePath, "w"); 
+    MAINcode = fopen(MAINcodePath, "w"); 
+    VARScode = fopen(VARScodePath, "w"); 
+    LOCALcode = fopen(LOCALcodePath, "w"); 
 }
 
 // Function to get file type from string
-char * getFileType(char * fileType) {
+FILE * getFileType(char * fileType) {
     if (strncmp(fileType, "MAINcode", 8) == 0) {
         return MAINcode;
     } else if (strncmp(fileType, "LOCALcode", 9) == 0) {
@@ -76,7 +110,7 @@ char * getFileType(char * fileType) {
 }
 
 // Function to get file type from string
-char * getHelperFileType(char * fileType) {
+FILE * getHelperFileType(char * fileType) {
     if (strncmp(fileType, "MAINcode", 8) == 0) {
         return VARScode;
     } else if (strncmp(fileType, "LOCALcode", 9) == 0) {
@@ -240,8 +274,10 @@ void checkParamContext() {
 int getFinishIndex() {
     int newIndex = 0;
     for (int i = 0; i < stackNumber + 1; i++) {
+        printf("Stack num #%d: %d\n", i, finishIndexes[i]);
         newIndex += finishIndexes[i];
     }
+    printf("New index: %d\n", newIndex);
     return newIndex;
 }
 
@@ -249,38 +285,38 @@ int getFinishIndex() {
 
 // Function to generate the initial set of lines required for proper WebAssembly output
 void generateStartModule() {
-    strcat(WATcode, "(module\n");
-    strcat(WATcode, "\t;; WAT Setup Declarations\n");
-    strcat(WATcode, "\t(import \"env\" \"print_int\" (func $print_int (param i32)))\n");
-    strcat(WATcode, "\t(import \"env\" \"print_float\" (func $print_float (param f32)))\n");
-	strcat(WATcode, "\t(import \"env\" \"print_string\" (func $print_string (param i32)))\n");
-    strcat(WATcode, "\t(import \"env\" \"newline\" (func $newline))\n");
-    strcat(WATcode, "\t(memory $0 100)\n");
-    strcat(WATcode, "\t(export \"pagememory\" (memory $0))\n");
-    strcat(WATcode, "\t(func $create_array (param $size i32) (result i32) (local $ptr i32) (set_local $ptr (i32.const 0)) (block (loop $loop (br_if $loop (i32.eq (get_local $size) (i32.const 0))) (set_local $ptr (i32.add (get_local $ptr) (i32.const 4))) (set_local $size (i32.sub (get_local $size) (i32.const 1))))) (get_local $ptr))\n");
-    strcat(WATcode, "\t(export \"create_array\" (func $create_array))\n");
-    strcat(WATcode, "\t(func $get_element_i32 (param $ptr i32) (param $index i32) (result i32) (i32.load (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4)))))\n");
-    strcat(WATcode, "\t(export \"get_element_i32\" (func $get_element_i32))\n");
-    strcat(WATcode, "\t(func $set_element_i32 (param $ptr i32) (param $index i32) (param $value i32) (i32.store (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4))) (get_local $value)))\n");
-    strcat(WATcode, "\t(export \"set_element_i32\" (func $set_element_i32))\n\n");
-    strcat(WATcode, "\t(func $get_element_f32 (param $ptr i32) (param $index i32) (result f32) (f32.load (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4)))))\n");
-    strcat(WATcode, "\t(export \"get_element_f32\" (func $get_element_f32))\n");
-    strcat(WATcode, "\t(func $set_element_f32 (param $ptr i32) (param $index i32) (param $value f32) (f32.store (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4))) (get_local $value)))\n");
-    strcat(WATcode, "\t(export \"set_element_f32\" (func $set_element_f32))\n\n");
-    strcat(WATcode, "\t;; Artsy Program in WAT\n");
+    fprintf(WATcode, "(module\n");
+    fprintf(WATcode, "\t;; WAT Setup Declarations\n");
+    fprintf(WATcode, "\t(import \"env\" \"print_int\" (func $print_int (param i32)))\n");
+    fprintf(WATcode, "\t(import \"env\" \"print_float\" (func $print_float (param f32)))\n");
+	fprintf(WATcode, "\t(import \"env\" \"print_string\" (func $print_string (param i32)))\n");
+    fprintf(WATcode, "\t(import \"env\" \"newline\" (func $newline))\n");
+    fprintf(WATcode, "\t(memory $0 100)\n");
+    fprintf(WATcode, "\t(export \"pagememory\" (memory $0))\n");
+    fprintf(WATcode, "\t(func $create_array (param $size i32) (result i32) (local $ptr i32) (set_local $ptr (i32.const 0)) (block (loop $loop (br_if $loop (i32.eq (get_local $size) (i32.const 0))) (set_local $ptr (i32.add (get_local $ptr) (i32.const 4))) (set_local $size (i32.sub (get_local $size) (i32.const 1))))) (get_local $ptr))\n");
+    fprintf(WATcode, "\t(export \"create_array\" (func $create_array))\n");
+    fprintf(WATcode, "\t(func $get_element_i32 (param $ptr i32) (param $index i32) (result i32) (i32.load (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4)))))\n");
+    fprintf(WATcode, "\t(export \"get_element_i32\" (func $get_element_i32))\n");
+    fprintf(WATcode, "\t(func $set_element_i32 (param $ptr i32) (param $index i32) (param $value i32) (i32.store (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4))) (get_local $value)))\n");
+    fprintf(WATcode, "\t(export \"set_element_i32\" (func $set_element_i32))\n\n");
+    fprintf(WATcode, "\t(func $get_element_f32 (param $ptr i32) (param $index i32) (result f32) (f32.load (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4)))))\n");
+    fprintf(WATcode, "\t(export \"get_element_f32\" (func $get_element_f32))\n");
+    fprintf(WATcode, "\t(func $set_element_f32 (param $ptr i32) (param $index i32) (param $value f32) (f32.store (i32.add (get_local $ptr) (i32.mul (get_local $index) (i32.const 4))) (get_local $value)))\n");
+    fprintf(WATcode, "\t(export \"set_element_f32\" (func $set_element_f32))\n\n");
+    fprintf(WATcode, "\t;; Artsy Program in WAT\n");
 }
 
 // Function module for handling addline statements
-void generateAddLineWAT(char * printFile) {
-    strcat(printFile, "\t\t(call $newline)\n");
+void generateAddLineWAT(FILE * printFile) {
+    fprintf(printFile, "\t\t(call $newline)\n");
 }
 
 // Function module for declaring a variable
-void generateVarDeclareStatementWAT(char * printFile, char * varType, char * varName) {
+void generateVarDeclareStatementWAT(FILE * printFile, char * varType, char * varName) {
     // Step 1: Get the WAT Type, current scope, and files
     char * scopeType = getScopeType(varName);
     char * varScope = findVarScope(varName, prevScopes, totalWebScopes);
-    char * WATType = strncmp(getItemKind(varName, varScope, 1), "Array", 5) == 0 ? getWATType("int") : getWATType(getItemType(varName, currScope, 1));
+    char * WATType = strncmp(getItemKind(varName, varScope, 1), "Array", 5) == 0 ? getWATType("int") : getWATType(getItemType(varName, currScopeWAT, 1));
     char * printFileStr = inMain ? "MAINcode" : "LOCALcode";
     char * helperFile = getHelperFileType(printFileStr);
 
@@ -291,15 +327,13 @@ void generateVarDeclareStatementWAT(char * printFile, char * varType, char * var
         placeholderVar = strncmp(WATType, "f32", 3) == 0 ? "0.0" : "0";
 
         // Output the type to the global section
-        sprintf(copyWAT, "\t(global $%s (mut %s) (%s.const %s))\n", varName, WATType, WATType, placeholderVar);
-        strcat(WATcode, copyWAT);
+        fprintf(WATcode, "\t(global $%s (mut %s) (%s.const %s))\n", varName, WATType, WATType, placeholderVar);
     } else {
-        sprintf(copyWAT, "\t\t(local $%s %s)\n", varName, WATType);
-        strcat(helperFile, copyWAT);
+        fprintf(helperFile, "\t\t(local $%s %s)\n", varName, WATType);
     }
 }
 
-void generateArrayDeclareStatementWAT(char * printFile, char * varType, char * varName, char * arrSize) {    
+void generateArrayDeclareStatementWAT(FILE * printFile, char * varType, char * varName, char * arrSize) {    
     // Step 1: Create string variable in hash table
     int indexEntry = currMaxStringIndex;
     char * varScope = findVarScope(varName, prevScopes, totalWebScopes);
@@ -313,12 +347,11 @@ void generateArrayDeclareStatementWAT(char * printFile, char * varType, char * v
     char * scopeType = getScopeType(varName);
 
     // Step 3: Generate WAT code for creating the new array
-    sprintf(copyWAT, "\t\t(%s.set $%s (call $create_array (i32.const %s)))", scopeType, varName, arrSize);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(%s.set $%s (call $create_array (i32.const %s)))", scopeType, varName, arrSize);
 }
 
 // Function module for printing get statements for all variable types in WAT
-void generateGetStatementWAT(char * printFile, char * varName) {
+void generateGetStatementWAT(FILE * printFile, char * varName) {
     // Step 1: Get the primary type, the length, and the scope type of the variable name
     char * primaryType = getPrimaryType(varName);
     int len = strlen(varName);
@@ -342,8 +375,7 @@ void generateGetStatementWAT(char * printFile, char * varName) {
         }
 
         // Print the statement
-        sprintf(copyWAT, " (%s.const %s)", WATType, varName);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, " (%s.const %s)", WATType, varName);
     }
 
     // Step 2b: Generate an array index get statement if it's a variable with a "[]"
@@ -370,18 +402,16 @@ void generateGetStatementWAT(char * printFile, char * varName) {
         sprintf(arrIndex, "%d", get(&stringAddresses, arrName, arrScope) + atoi(arrEl));
 
         // Print array index return statement
-        sprintf(copyWAT, " (call $get_element_%s (%s.get $%s) (i32.const %s))\n", WATType, scopeType, arrName, arrIndex);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, " (call $get_element_%s (%s.get $%s) (i32.const %s))\n", WATType, scopeType, arrName, arrIndex);   
     }
     
     // Step 2c: Generate a standard scope.get statment using the variable name
     else {
-        sprintf(copyWAT, "\t\t(%s.get $%s)", scopeType, varName);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "\t\t(%s.get $%s)", scopeType, varName); 
     }
 }
 
-void generateAssignmentWAT(char * printFile, char * assignVar, char * setVar) {
+void generateAssignmentWAT(FILE * printFile, char * assignVar, char * setVar) {
     // Step 1: Get the scope type and assignment variable length
     char * scopeType = getScopeType(assignVar);
     int len = strlen(assignVar);
@@ -417,12 +447,11 @@ void generateAssignmentWAT(char * printFile, char * assignVar, char * setVar) {
         sprintf(arrIndex, "%d", get(&stringAddresses, arrName, arrScope) + atoi(arrEl));
 
         // Print a starting set call for an array index callout
-        sprintf(copyWAT, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %s)", WATType, scopeType, arrName, arrIndex);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %s)", WATType, scopeType, arrName, arrIndex);
 
         // Generate an array index get call
         generateGetStatementWAT(printFile, setVar);
-        strcat(printFile, ")\n");
+        fprintf(printFile, ")\n");
     }
     
     // Step 4: If its an array assignment, copy all array indexes to the new array using a for-loop
@@ -440,22 +469,19 @@ void generateAssignmentWAT(char * printFile, char * assignVar, char * setVar) {
 
         for (int i = 0; i < get(&stringSizes, assignVar, assignmentScope); i++) {
             // Print a starting set call for an array index callout
-            sprintf(copyWAT, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %d)", WATType, scopeType, assignVar, i + get(&stringAddresses, assignVar, assignmentScope));
-            strcat(printFile, copyWAT);
+            fprintf(printFile, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %d)", WATType, scopeType, assignVar, i + get(&stringAddresses, assignVar, assignmentScope));
             
             // Generate an array index get call for each element
-            sprintf(copyWAT, " (call $get_element_%s (%s.get $%s) (i32.const %d))\n", WATType, setVarScopeType, setVar, i + get(&stringAddresses, setVar, setVarScope));
-            strcat(printFile, copyWAT);
-            strcat(printFile, ")\n");
+            fprintf(printFile, " (call $get_element_%s (%s.get $%s) (i32.const %d))\n", WATType, setVarScopeType, setVar, i + get(&stringAddresses, setVar, setVarScope));
+            fprintf(printFile, ")\n");
         }
     }
 
     // Step 5: If its a standard assignment variable, generate standard starting call and get call
     else {
-        sprintf(copyWAT, "\t\t(%s.set $%s\n", scopeType, assignVar);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "\t\t(%s.set $%s\n", scopeType, assignVar);
         generateGetStatementWAT(printFile, setVar);
-        strcat(printFile, ")\n");
+        fprintf(printFile, ")\n");
     }
     
     // Step 7: Reset currOp variable
@@ -463,65 +489,59 @@ void generateAssignmentWAT(char * printFile, char * assignVar, char * setVar) {
 }
 
 // Function module for handling parameter statements
-void generateParameterWAT(char * printFile, char * type, char * varName) {
-    sprintf(copyWAT, "(param $%s %s) ", varName, getWATType(type));
-    strcat(printFile, copyWAT);
+void generateParameterWAT(FILE * printFile, char * type, char * varName) {
+    fprintf(printFile, "(param $%s %s) ", varName, getWATType(type));
 }
 
 // Function module for handling return parameters
-void generateResultWAT(char * printFile, char * returnType) {
+void generateResultWAT(FILE * printFile, char * returnType) {
     if (strncmp(returnType, "void", 4) != 0) {
-        sprintf(copyWAT, "(result %s)\n", returnType);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "(result %s)\n", returnType);
     } else {
-        strcat(printFile, "\n");
+        fprintf(printFile, "\n");
     }
 }
 
 // Function module for handling action returns with a return type
 void generateReturnWAT(char * varName, char * scopeType) {
     // Create starting return statement in WAT
-    strcat(LOCALcode, "\t\t(return");
+    fprintf(LOCALcode, "\t\t(return");
 
     // Generate the Get Statement in WAT
     generateGetStatementWAT(LOCALcode, varName);
 
     // Generate the return ending statement in WAT
-    strcat(LOCALcode, ")\n");    
+    fprintf(LOCALcode, ")\n");    
 }
 
 // Function module for handling action returns without a return type
 void generateVoidReturnWAT() {
     // Create void return statement in WAT
-    strcat(LOCALcode, "\t\t(return)\n");
+    fprintf(LOCALcode, "\t\t(return)\n");
 }
 
-void generateFinishWAT(char * printFile) {
+void generateFinishWAT(FILE * printFile) {
     // Create finish statement in wat
-    sprintf(copyWAT, "\t\t(br %d)\n", getFinishIndex());
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(br %d)\n", getFinishIndex());
 }
 
 
 void generateActionEndWAT(char * actionScope) {
-    sprintf(copyWAT, "\t)\n\t(export \"%s\" (func $%s))\n", actionScope, actionScope);
-    strcat(WATcode, copyWAT);
+    fprintf(WATcode, "\t)\n\t(export \"%s\" (func $%s))\n", actionScope, actionScope);
 }
 
 // Function module for handling set_element statements in WAT strings
-void setStringElementWAT(char * printFile, char * WATType, char * scopeType, char * arrName, int arrIndex, int arrVal) {
-    sprintf(copyWAT, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %d) (%s.const %d))\n", WATType, scopeType, arrName, arrIndex, WATType, arrVal);
-    strcat(printFile, copyWAT);
+void setStringElementWAT(FILE * printFile, char * WATType, char * scopeType, char * arrName, int arrIndex, int arrVal) {
+    fprintf(printFile, "\t\t(call $set_element_%s (%s.get $%s) (i32.const %d) (%s.const %d))\n", WATType, scopeType, arrName, arrIndex, WATType, arrVal);
 }
 
 // Function module for generating print module calls
-void generatePrintModuleWAT(char * printFile, char * printType) {
-    sprintf(copyWAT, "\t\t(call $print_%s", printType);
-    strcat(printFile, copyWAT);
+void generatePrintModuleWAT(FILE * printFile, char * printType) {
+    fprintf(printFile, "\t\t(call $print_%s", printType);
 }
 
 // Function module for handling printing solo string in Artsy code
-void generateSoloStringWAT(char * printFile, char * strVal) {
+void generateSoloStringWAT(FILE * printFile, char * strVal) {
     // Step 1: Generate a unique print variable name
     char * printVar = malloc(sizeof(char)*100);
     snprintf(printVar, 100, "_printstr_%d", currprint_strings);
@@ -558,24 +578,22 @@ void generateSoloStringWAT(char * printFile, char * strVal) {
     // Step 3: Add the string to the string hash table
     int indexEntry = currMaxStringIndex;
     int strSize = printStrArrSize;
-    set(&stringAddresses, printVar, currScope, indexEntry);
-    set(&stringSizes, printVar, currScope, strSize);
+    set(&stringAddresses, printVar, currScopeWAT, indexEntry);
+    set(&stringSizes, printVar, currScopeWAT, strSize);
     currMaxStringIndex += strSize; // Update max string index for the next array entry
 
     // Step 4: Print the whole string in one area
 
     // Step 4A: Determine helper file type
     char * printFileStr = inMain ? "MAINcode" : "LOCALcode";
-    char * helperFile = getHelperFileType(printFileStr);
+    FILE * helperFile = getHelperFileType(printFileStr);
 
     // Step 4B: Declare the new array variable
     char * scopeType = "local"; // Declare scope variable
-    sprintf(copyWAT, "\t\t(%s $%s i32)\n", scopeType, printVar);
-    strcat(helperFile, copyWAT);
+    fprintf(helperFile, "\t\t(%s $%s i32)\n", scopeType, printVar);
 
     // Step 4C: Generate WAT code for creating the new array
-    sprintf(copyWAT, "\t\t(%s.set $%s (call $create_array (i32.const %d)))\n", scopeType, printVar, strlen(strVal));
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(%s.set $%s (call $create_array (i32.const %d)))\n", scopeType, printVar, strlen(strVal));
 
     // Step 4D: Get the WAT type for the solo string
     char * WATType = getWATType(getPrimaryType(strVal));
@@ -588,13 +606,12 @@ void generateSoloStringWAT(char * printFile, char * strVal) {
     // Step 4F: Print each element in the new string array using a for-loop
     for (int currArrIndex = 0; currArrIndex < strSize; currArrIndex++) {
         generatePrintModuleWAT(printFile, "string");
-        sprintf(copyWAT, "\t\t (call $get_element_%s (%s.get $%s) (i32.const %d)))\n", WATType, scopeType, printVar, indexEntry + currArrIndex);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "\t\t (call $get_element_%s (%s.get $%s) (i32.const %d)))\n", WATType, scopeType, printVar, indexEntry + currArrIndex);
     }
 
 }
 
-void generateOutputStatementWAT(char * printFile, char * varName) {
+void generateOutputStatementWAT(FILE * printFile, char * varName) {
     // Step 1a: Get the primary type, the length, and the scope type of the variable name
     char * primaryType = getPrimaryType(varName);
     int len = strlen(varName);
@@ -630,7 +647,7 @@ void generateOutputStatementWAT(char * printFile, char * varName) {
     else if (strncmp(primaryType, "var", 3) != 0) {
         generatePrintModuleWAT(printFile, primaryType);
         generateGetStatementWAT(printFile, varName);
-        strcat(printFile, "\t\t)\n");
+        fprintf(printFile, "\t\t)\n");
     } 
     
     // Step 4: If the type is an array index callout, get the statement and print it
@@ -642,7 +659,7 @@ void generateOutputStatementWAT(char * printFile, char * varName) {
         generateGetStatementWAT(printFile, varName);
 
         // End the output statement
-        strcat(printFile, ")\n");
+        fprintf(printFile, ")\n");
     }
 
     // Step 5: If the type is a full array or a string variable, output all available indexes
@@ -656,8 +673,7 @@ void generateOutputStatementWAT(char * printFile, char * varName) {
         // Print out all available indexes using a for-loop
         for (int newIndex = 0; newIndex < get(&stringSizes, varName, itemScope); newIndex++) {
             generatePrintModuleWAT(printFile, varType);
-            sprintf(copyWAT, " (call $get_element_%s (%s.get $%s) (i32.const %d)))\n", WATType, scopeType, varName, arrIndex + newIndex);
-            strcat(printFile, copyWAT);
+            fprintf(printFile, " (call $get_element_%s (%s.get $%s) (i32.const %d)))\n", WATType, scopeType, varName, arrIndex + newIndex);
         }
     }
 
@@ -670,47 +686,43 @@ void generateOutputStatementWAT(char * printFile, char * varName) {
         generateGetStatementWAT(printFile, varName);
 
         // End the output statement
-        strcat(printFile, ")\n");
+        fprintf(printFile, ")\n");
     }
 }
 
-void generateActionCallStartWAT(char * printFile, char * assignVar, char * actionVar) {
+void generateActionCallStartWAT(FILE * printFile, char * assignVar, char * actionVar) {
     // Step 1: Get the file type, helper file type, scope type, and the operation type
     char * printFileStr = inMain ? "MAINcode" : "LOCALcode";
-    char * helperFile = getHelperFileType(printFileStr);
+    FILE * helperFile = getHelperFileType(printFileStr);
     char * scopeType = getScopeType(assignVar);
     char * opType = getWATType(currOp);
 
     // Step 2: Print a temporary variable declaration line with the WAT type
     // Save the temporary variable to the table
     addTempVarItem(assignVar, currOp, "Var");
-    sprintf(copyWAT, "\t\t(%s $%s %s)\n", scopeType, assignVar, opType);
-    strcat(helperFile, copyWAT);
+    fprintf(helperFile, "\t\t(%s $%s %s)\n", scopeType, assignVar, opType);
 
     // Step 3: Output the assignVar call line
-    sprintf(copyWAT, "\t\t(%s.set $%s", scopeType, assignVar);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(%s.set $%s", scopeType, assignVar);
 
     // Step 4: Generate starting action call line
-    sprintf(copyWAT, " (call $%s\n", actionVar);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, " (call $%s\n", actionVar);
 }
 
-void generateOperationWAT(char * printFile, char * assignVar, char * leftVar, char * opChar, char * rightVar) {
+void generateOperationWAT(FILE * printFile, char * assignVar, char * leftVar, char * opChar, char * rightVar) {
     // Step 1: Get the file type, helper file type, scope type, and the operation type
     char * printFileStr = inMain ? "MAINcode" : "LOCALcode";
-    char * helperFile = getHelperFileType(printFileStr);
+    FILE * helperFile = getHelperFileType(printFileStr);
     char * scopeType = getScopeType(assignVar);
     char * opType = getWATType(currOp);
 
     // Step 2: Generate a temporary variable declaration line and add to the TempVar table
     addTempVarItem(assignVar, currOp, "Var");
-    sprintf(copyWAT, "\t\t(%s $%s %s)\n", scopeType, assignVar, opType);
-    strcat(helperFile, copyWAT);
+    fprintf(helperFile, "\t\t(%s $%s %s)\n", scopeType, assignVar, opType);
+
 
     // Step 3: Output the assignment variable set line
-    sprintf(copyWAT, "\t\t(%s.set $%s\n", scopeType, assignVar);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(%s.set $%s\n", scopeType, assignVar);
 
     // Step 4a: Determine operation call for WAT
     // "+" = "add", "-" = sub, "*" = mul, and "/" = "div" or "div_s" 
@@ -732,18 +744,17 @@ void generateOperationWAT(char * printFile, char * assignVar, char * leftVar, ch
     }
 
     // Step 5: Start the operation call line
-    sprintf(copyWAT, "\t\t(%s.%s", opType, opCall);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, "\t\t(%s.%s", opType, opCall);
 
     // Step 6: Declare the get statements for the left and right variable
     generateGetStatementWAT(printFile, leftVar);
     generateGetStatementWAT(printFile, rightVar);
 
     // Step 7: End the operation call
-    strcat(printFile, "\t\t))\n");
+    fprintf(printFile, "\t\t))\n");
 }
 
-void generateComparisonWAT(char * printFile, char * leftTerm, char * compareType, char * rightTerm, char * logicType) {
+void generateComparisonWAT(FILE * printFile, char * leftTerm, char * compareType, char * rightTerm, char * logicType) {
     // Step 1: Determine Item Scope and WAT Type
     char * compareWATType = calloc(10, sizeof(char));
     
@@ -758,61 +769,54 @@ void generateComparisonWAT(char * printFile, char * leftTerm, char * compareType
     char * compareOpWAT = getCompareWATType(compareType, compareWATType, logicType);
 
     // Step 3a: Print the starting statement in WAT
-    sprintf(copyWAT, " (%s.%s", compareWATType, compareOpWAT);
-    strcat(printFile, copyWAT);
+    fprintf(printFile, " (%s.%s", compareWATType, compareOpWAT);
 
     // Step 3b: Print out the WAT format for both the terms
     generateGetStatementWAT(printFile, leftTerm);
     generateGetStatementWAT(printFile, rightTerm);
 
     // Step 3c: Finish the comparison statement in WAT
-    strcat(printFile, ")");
+    fprintf(printFile, ")");
 }
 
 // Function module for handling starting while loops
-void generateWhileStartWAT(char * printFile) {
-    strcat(printFile, "\t\t(block (loop\n\t\t(br_if 1");
+void generateWhileStartWAT(FILE * printFile) {
+    fprintf(printFile, "\t\t(block (loop\n\t\t(br_if 1");
 }
 
 // Function module for handling exiting from While Loops
-void generateWhileExitWAT(char * printFile) {
-    strcat(printFile, "\t\t(br 0)\n\t\t))\n");
+void generateWhileExitWAT(FILE * printFile) {
+    fprintf(printFile, "\t\t(br 0)\n\t\t))\n");
 }
 
 // Function module for starting if statements
-void generateIfStartWAT(char * printFile, char * ifType) {
+void generateIfStartWAT(FILE * printFile, char * ifType) {
     if (strncmp(ifType, "elif", 4) == 0) {
-        strcat(printFile, "\t\t(else (if");
+        fprintf(printFile, "\t\t(else (if");
     } else if (strncmp(ifType, "then", 4) == 0) {
-        strcat(printFile, "\n\t\t(then");
+        fprintf(printFile, "\n\t\t(then");
     } else {
-        sprintf(copyWAT, "\t\t(%s", ifType);
-        strcat(printFile, copyWAT);
+        fprintf(printFile, "\t\t(%s", ifType);
     }
 }
 
 // Function module for exiting if statements
-void generateIfExitWAT(char * printFile, char * ifType) {
+void generateIfExitWAT(FILE * printFile, char * ifType) {
     if (strncmp(ifType, "then", 4) == 0) {
-        strcat(printFile, "\t\t)");
+        fprintf(printFile, "\t\t)");
     } else if (strncmp(ifType, "elif", 4) == 0) {
-        strcat(printFile, "\t\t))");
+        fprintf(printFile, "\t\t))");
     }
     else {
-        strcat(printFile, "\t\t)\n");
+        fprintf(printFile, "\t\t)\n");
     }
 }
 
 // Standard function to generate the main section and text section
 // Required before generating any WAT statements
-void generateText(char * IRcode) {
-    // Create a copy of IRCode, called IRText so that memory doesn't get overwritten
-    char * IRText = malloc(1000000 * sizeof(char));
-    strncpy(IRText, IRcode, 1000000);
-
-    // Get the first line, and delimit by newline characters, along with the line number
-    char * line;
-    line = strtok(IRText, "\n");
+void generateText() {
+    // Line variable
+    char line[10000];
     int lineNumber = 1;
 
     // Current operation variable
@@ -826,48 +830,48 @@ void generateText(char * IRcode) {
     for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { prevScopes[i] = 0; }
 
     // Print file variable
-    char * printFile = MAINcode;
+    FILE * printFile = MAINcode;
 
     // Current scope and previous scope variables
-    currScope = calloc(1000, sizeof(char));
-    strcpy(currScope, "global");
+    currScopeWAT = calloc(1000, sizeof(char));
+    strcpy(currScopeWAT, "global");
     prevScopes = malloc(MAX_ARRAY_LENGTH * sizeof(char*));
     for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { prevScopes[i] = malloc(100 * sizeof(char)); }
     strcpy(prevScopes[0], "global");
 
     // Loop through each line in the code and generate WAT for each valid statement
-    while (line != NULL) {
-        // Ensure the line isn't beyond the max
+    while (fgets(line, MAX_LINE_LENGTH, IRfile) != NULL) {
+        // Ensure the line from fgets isn't beyond the max
         // Avoids buffer overflow attacks
         if (strlen(line) == MAX_LINE_LENGTH - 1 && line[MAX_LINE_LENGTH - 2] != '\n') 	  {
-            printf("Semantic Error: Line %d is too long.\n", lineNumber);
-            exit(0);
+            fprintf(errorFile, "Semantic Error: Line %d is too long.\n", lines);
+            exit(1);
         }
-        printf("Line: %s\n", line);
-        lineNumber++;
+        printf("%s", line);
 
         // Break apart the line into an iterable array of strings
         // Set the program delimiter for separating terms by word
         char ** strArr;
         strArr = malloc(MAX_ARRAY_LENGTH * sizeof(char *));
-        for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { strArr[i] = malloc(100 * sizeof(char)); }
         char progDelimiter[] = " ";
-        char * lineCopy = malloc(MAX_LINE_LENGTH * sizeof(char));
-        strcpy(lineCopy, line);
-        char * token = strtok(lineCopy, progDelimiter);
+        char * token = strtok(line, progDelimiter);
+
+        // Free specific string index for loop reuse
+        strArr[3] = "\0";
+        strArr[7] = "\0";
 
         // Add all tokens to a string array
         int lenIndex = 0;
-        while (token != NULL) {
+        while(token != NULL) {
             // Assign to string array
-            strcpy(strArr[lenIndex], token);
+            strArr[lenIndex] = token;
             lenIndex++;
             token = strtok(NULL, progDelimiter);
         }
 
         // Remove "\n" character from the last string
-        // lenIndex--;
-        // strArr[lenIndex][strlen(strArr[lenIndex])-1] = '\0';
+        lenIndex--;
+        strArr[lenIndex][strlen(strArr[lenIndex])-1] = '\0';
 
         // Get the current print file for the loop iteration
         printFile = inMain ? MAINcode : LOCALcode;
@@ -888,14 +892,13 @@ void generateText(char * IRcode) {
             returnType = newType;
 
             // Set new scope and retain history using previous scope
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, strArr[2]);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, strArr[2]);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Start function declaration
-            sprintf(copyWAT, "\t(func $%s ", strArr[2]);
-            strcat(WATcode, copyWAT);
+            fprintf(WATcode, "\t(func $%s ", strArr[2]);
         }
 
         // Case for handling suboperation states
@@ -938,10 +941,10 @@ void generateText(char * IRcode) {
         else if (strncmp(strArr[0], "exit", 4) == 0) { 
             inMain = 1; // Set flag back to global
             generateLocalOperations(); // Load in everything from the local file
-            generateActionEndWAT(currScope); // Generate WAT function ending code
+            generateActionEndWAT(currScopeWAT); // Generate WAT function ending code
             
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
         }
 
@@ -1011,10 +1014,10 @@ void generateText(char * IRcode) {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000 * sizeof(char));
-            snprintf(newScope, 1000, "while %s %d", currScope, getItemBlockNumber("while", findVarScope("while", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "while %s %d", currScopeWAT, getItemBlockNumber("while", findVarScope("while", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1027,7 +1030,7 @@ void generateText(char * IRcode) {
             }
 
             // End While Condition Line
-            strcat(printFile, ")\n");
+            fprintf(printFile, ")\n");
 
             // Set scope to be in a logical statement
             inLogic = 1;
@@ -1039,10 +1042,10 @@ void generateText(char * IRcode) {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000 * sizeof(char));
-            snprintf(newScope, 1000, "if %s %d", currScope, getItemBlockNumber("if", findVarScope("if", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "if %s %d", currScopeWAT, getItemBlockNumber("if", findVarScope("if", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1067,10 +1070,10 @@ void generateText(char * IRcode) {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
-            snprintf(newScope, 1000, "elif %s %d", currScope, getItemBlockNumber("elif", findVarScope("elif", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "elif %s %d", currScopeWAT, getItemBlockNumber("elif", findVarScope("elif", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1094,10 +1097,10 @@ void generateText(char * IRcode) {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
-            snprintf(newScope, 1000, "else %s %d", currScope, getItemBlockNumber("else", findVarScope("else", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "else %s %d", currScopeWAT, getItemBlockNumber("else", findVarScope("else", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1112,7 +1115,7 @@ void generateText(char * IRcode) {
             generateWhileExitWAT(printFile);
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // Reduce stack number
@@ -1120,7 +1123,7 @@ void generateText(char * IRcode) {
             stackNumber--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1130,11 +1133,11 @@ void generateText(char * IRcode) {
             generateIfExitWAT(printFile, "then");
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1144,11 +1147,11 @@ void generateText(char * IRcode) {
             generateIfExitWAT(printFile, "then");
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1165,11 +1168,11 @@ void generateText(char * IRcode) {
             }
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1189,8 +1192,7 @@ void generateText(char * IRcode) {
             checkParamContext();
 
             // Print starting call line
-            sprintf(copyWAT, "\t\t(call $%s)", strArr[1]);
-            strcat(printFile, copyWAT);
+            fprintf(printFile, "\t\t(call $%s)", strArr[1]);
 
             // If there are any arguments after the "args" token, generate the call with the list of parameters
             if (strArr[3] != NULL && strncmp(strArr[3], "\0", 1) != 0) {
@@ -1203,7 +1205,7 @@ void generateText(char * IRcode) {
                 }
 
                 // End the call statement with parameters
-                strcat(printFile, ")\n");
+                fprintf(printFile, ")\n");
             }
         }
 
@@ -1234,74 +1236,127 @@ void generateText(char * IRcode) {
                     index++;
                 }
                 // End the call statement with parameters
-                strcat(printFile, ")");
+                fprintf(printFile, ")");
             } else {
                 // End the call statement with parameters
-                strcat(printFile, ")");
+                fprintf(printFile, ")");
             }
             // End the assignment statement
-            strcat(printFile, ")\n");
+            fprintf(printFile, ")\n");
         }
 
         // Case for Basic Operations
         else if (strncmp(strArr[3], "+", 1) == 0 || strncmp(strArr[3], "-", 1) == 0 || strncmp(strArr[3], "*", 1) == 0 || strncmp(strArr[3], "/", 1) == 0) {
             generateOperationWAT(printFile, strArr[0], strArr[2], strArr[3], strArr[4]);
         }
-
-        // Move to next line
-        line = strtok(NULL, "\n");
     }
 }
 
 void generateLocalOperations() {
-    strncat(WATcode, LOCALcode, 1000000);
-    strcat(WATcode, "\t\t\n");
+    // Temp variable
+    char tempLocal[10000];
 
-    // Clear LOCALcode
-    strcpy(LOCALcode, "");
+    // Char pointer
+    char ch = '0';
+
+    // Open LOCALcode file in read mode
+    fclose(LOCALcode);
+    LOCALcode = fopen(LOCALcodePath, "r");
+
+    // Read all WAT code that was inserted into the local file
+    while (ch != EOF) {
+        ch = fgetc(LOCALcode);
+        if (ch == EOF) {
+            break;
+        }
+        fprintf(WATcode, "%c", ch);
+    }
+
+    // End the local function
+    fprintf(WATcode, "\t\t\n");
+
+    // Close file and reopen in write mode
+    fclose(LOCALcode);
+    LOCALcode = fopen(LOCALcodePath, "w");
 }
 
 void generateMainVars() {
-    strncat(WATcode, VARScode, 1000000);
-    strcat(WATcode, "\n");
+    // Temp variable
+    char tempVars[10000];
+
+    // Char pointer
+    char ch = '0';
+
+    // Open LOCALcode file in read mode
+    fclose(VARScode);
+    VARScode = fopen(VARScodePath, "r");
+
+    // Read all WAT code that was inserted into the vars file
+    while (ch != EOF) {
+        ch = fgetc(VARScode);
+        if (ch == EOF) {
+            break;
+        }
+        fprintf(WATcode, "%c", ch);
+    }
+
+    fprintf(WATcode, "\n");
+
+    // Close file
+    fclose(VARScode);
 }
 
 void generateMain() {
+    // Char pointer
+    char ch = '0';
+
+    // Open MAINcode file in read mode
+    fclose(MAINcode);
+    MAINcode = fopen(MAINcodePath, "r");
+
     // Generate the starting code for the main function
-    strcat(WATcode, "\t;; Start Main Function\n");
-    strcat(WATcode, "\t(func $main\n");
+    fprintf(WATcode, "\t;; Start Main Function\n");
+    fprintf(WATcode, "\t(func $main\n");
 
     // Generate main function vars
     generateMainVars();
 
     // Read all WAT code that was inserted into the main file
-    strncat(WATcode, MAINcode, 1000000);
+    while (ch != EOF) {
+        ch = fgetc(MAINcode);
+        if (ch == EOF) {
+            break;
+        }
+        fprintf(WATcode, "%c", ch);
+    }
 
     // End the main function
-    strcat(WATcode, "\t)\n");
-    strcat(WATcode, "\t(start $main)\n");
+    fprintf(WATcode, "\t)\n");
+    fprintf(WATcode, "\t(start $main)\n");
 }
 
-// Function to end WAT generation once all commands are printed from the IRcodeOptimized
+// Function to end WAT generation once all commands are printed from the IRcodeOptimized.ir file
 void completeFile() {
     // Print ending WAT commands to the file    
-    strcat(WATcode, ")\n");
+    fprintf(WATcode, ")\n");
+
+    // Closes all files once complete
+    fclose(IRfile);
+    fclose(WATcode);
+    fclose(MAINcode);
+    fclose(LOCALcode);
 }
 
 
 // Main driver function to generate all WAT code
-char * generateWATcode(char * IRcode) {
+void generateWATcode(char * sessionID) {
     // Initialize String Hash Tables
     init(&stringAddresses);
     init(&stringSizes);
 
-    // Generate the WATcode
-    initAssemblyFile();
+    initAssemblyFile(sessionID);
     generateStartModule();
-    generateText(IRcode);
+    generateText();
     generateMain();
     completeFile();
-
-    // Return final WATcode
-    return WATcode;
 }

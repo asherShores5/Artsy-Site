@@ -1,4 +1,0 @@
-# Artsy Starter Program
-print "Hello Artsy";
-
-print "Test!!!";

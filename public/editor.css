@@ -7,20 +7,6 @@ body {
     width: 80%;
     margin: 0 auto;
   }
-
-  .center-button { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    height: 50px; 
-    width: 200px; 
-    margin: 50px auto; 
-    background-color: blue; 
-    color: white; 
-    border-radius: 25px; 
-    text-align: center; 
-    cursor: pointer; 
-  } 
   
   /* Styles for code editor box */
   #editor {

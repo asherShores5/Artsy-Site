@@ -2,7 +2,8 @@
 #define SEMANTIC_H
 #include "AST.h"
 
-// Error logging
+// Error log file
+extern FILE* errorFile;
 extern int lines;
 
 // Header file for all semantic check functions
