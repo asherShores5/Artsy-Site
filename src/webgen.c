@@ -807,7 +807,8 @@ void generateIfExitWAT(char * printFile, char * ifType) {
 // Required before generating any WAT statements
 void generateText(char * IRcode) {
     // Create a copy of IRCode, called IRText so that memory doesn't get overwritten
-    char * IRText = strdup(IRcode);
+    char * IRText = malloc(1000000 * sizeof(char));
+    strncpy(IRText, IRcode, 1000000);
 
     // Get the first line, and delimit by newline characters, along with the line number
     char * line;
@@ -836,7 +837,7 @@ void generateText(char * IRcode) {
 
     // Loop through each line in the code and generate WAT for each valid statement
     while (line != NULL) {
-        // Ensure the line from fgets isn't beyond the max
+        // Ensure the line isn't beyond the max
         // Avoids buffer overflow attacks
         if (strlen(line) == MAX_LINE_LENGTH - 1 && line[MAX_LINE_LENGTH - 2] != '\n') 	  {
             printf("Semantic Error: Line %d is too long.\n", lineNumber);
@@ -849,27 +850,24 @@ void generateText(char * IRcode) {
         // Set the program delimiter for separating terms by word
         char ** strArr;
         strArr = malloc(MAX_ARRAY_LENGTH * sizeof(char *));
+        for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { strArr[i] = malloc(100 * sizeof(char)); }
         char progDelimiter[] = " ";
-        char * lineCopy = strdup(line);
+        char * lineCopy = malloc(MAX_LINE_LENGTH * sizeof(char));
+        strcpy(lineCopy, line);
         char * token = strtok(lineCopy, progDelimiter);
-
-        // Free specific string index for loop reuse
-        strArr[3] = "\0";
-        strArr[7] = "\0";
 
         // Add all tokens to a string array
         int lenIndex = 0;
         while (token != NULL) {
             // Assign to string array
-            strArr[lenIndex] = token;
+            strcpy(strArr[lenIndex], token);
             lenIndex++;
-            printf("Token: %s\n", token);
             token = strtok(NULL, progDelimiter);
         }
 
         // Remove "\n" character from the last string
-        lenIndex--;
-        strArr[lenIndex][strlen(strArr[lenIndex])-1] = '\0';
+        // lenIndex--;
+        // strArr[lenIndex][strlen(strArr[lenIndex])-1] = '\0';
 
         // Get the current print file for the loop iteration
         printFile = inMain ? MAINcode : LOCALcode;
@@ -1249,6 +1247,9 @@ void generateText(char * IRcode) {
         else if (strncmp(strArr[3], "+", 1) == 0 || strncmp(strArr[3], "-", 1) == 0 || strncmp(strArr[3], "*", 1) == 0 || strncmp(strArr[3], "/", 1) == 0) {
             generateOperationWAT(printFile, strArr[0], strArr[2], strArr[3], strArr[4]);
         }
+
+        // Move to next line
+        line = strtok(NULL, "\n");
     }
 }
 
