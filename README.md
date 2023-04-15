@@ -29,10 +29,13 @@ composer update
 ```
 
 ## Permissions
-Ensure that PHP has full read, write, and execute permissions for the /src directory. This can be done using the following command:
+Ensure that PHP has full read, write, and execute permissions for the /src directory. One method is to transfer ownership to the user that PHP runs as, and setting permissions accordingly using the following commands:
 ```
-sudo chmod -R 777 /path/to/artsy/src
+sudo chown -R www-data:www-data /path/to/artsy/src
+sudo chmod -R 755 /path/to/artsy/src
 ```
+
+However, this example may need to be modified if you want to specify different group or user permissions.
 
 ## Using the Artsy Programming Language
 For detailed instructions on how to use the Artsy programming language, please refer to our [documentation website](https://drewesch.notion.site/Artsy-Coding-7b9021e7eb11475ca68ca2d7a60bdd1e).
