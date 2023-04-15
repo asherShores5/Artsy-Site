@@ -1,7 +1,4 @@
 <?php
-// Start the session if it hasn't been started already
-session_start();
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Decode the POST request
   $data = json_decode(file_get_contents("php://input"), true);
@@ -15,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Set the code variable
   $code = $data['code'];
+
+  // Set the uuid variable
+  $uuid = $data['uuid'];
 
   // Validate the input
   if (!$code) {
@@ -39,11 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  // Get the session ID
-  $sessionId = session_id();
-
   // Save the code to a file
-  $filename = $dir_in . $sessionId . '.txt';
+  $filename = $dir_in . $uuid . '.txt';
 
   if (!file_put_contents($filename, $code)) {
     $response = array(
@@ -68,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Execute the set of commands in a new working directory
   $dir = '../src/';
   chdir($dir);
-  $command = "make artsy ARGS=\"" . $sessionId . "\"";
+  $command = "make artsy ARGS=\"" . $uuid . "\"";
 
   $output = shell_exec(escapeshellcmd($command));
 
@@ -83,10 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Check if the wasm file was created
-  $wasmFile = $dir_in . $sessionId . '.wasm';
+  $wasmFile = $dir_in . $uuid . '.wasm';
   if (!file_exists($wasmFile)) {
     // Return back error file name
-    $errorFile = $dir_in . $sessionId . '_error.txt';
+    $errorFile = $dir_in . $uuid . '_error.txt';
     echo $errorFile;
     exit;
   }
