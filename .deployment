@@ -1,2 +1,2 @@
-[deployment]
-postDeploymentScriptPath = ./scripts/postdeploy.sh
+[config]
+command = bash ./scripts/postdeploy.sh
