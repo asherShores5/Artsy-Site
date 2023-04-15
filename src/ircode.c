@@ -71,14 +71,14 @@ struct Var {
 struct Var uvTable[100];
 
 // Function to open unoptimized IRcode
-void initIRcodeFile() {
-    IRcode = fopen("IRcode.ir", "w");
+void initIRcodeFile(char * newPath) {
+    IRcode = fopen(newPath, "w");
     fprintf(IRcode, "#### IR Code ####\n");
 }
 
 // Function to open optimized IRcode file
-void initIRcodeFileOptimized() {
-    IRcodeOptimized = fopen("IRcodeOptimized.ir", "w");
+void initIRcodeFileOptimized(char * newPath) {
+    IRcodeOptimized = fopen(newPath, "w");
     fprintf(IRcodeOptimized, "#### Optimized IR Code ####\n");
 }
 
@@ -1611,7 +1611,7 @@ char* ASTTraversalOptimized(struct AST* root) {
 }
 
 // Main functions for IRcode generation
-void generateIRCode() {
+void generateIRCode(char * newPath) {
     // Set Scope Memory
     currScope = calloc(1000, sizeof(char));
     strcpy(currScope, "global");
@@ -1621,13 +1621,13 @@ void generateIRCode() {
 
     // Start AST Traversal
     printf("\n\n----Generate IRCode----\n\n");
-    initIRcodeFile();
+    initIRcodeFile(newPath);
     ASTTraversal(ast);
     fclose(IRcode);
 }
 
 // Main function for optimized IRcode generation
-void generateIRCodeOptimized() {
+void generateIRCodeOptimized(char * newPath) {
     // Reset temp variable number
     lastIndex = 0;
 
@@ -1636,7 +1636,7 @@ void generateIRCodeOptimized() {
 
     // Start Optimized AST Traversal
     printf("\n\n----Perform Code Optimizations----\n\n");
-    initIRcodeFileOptimized();
+    initIRcodeFileOptimized(newPath);
     ASTTraversalOptimized(ast);
     fclose(IRcodeOptimized);
     fflush(stdout);

@@ -15,6 +15,8 @@ extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
 
+extern int lines;
+
 void yyerror(const char* s);
 char scopeStack[50][50];
 char currentFunctionScope[50];
@@ -134,7 +136,8 @@ VarDecl:
 		if (inSymTab == 0) 
 			addItem($2, "Var", $4, 0, scopeStack[stackPointer], stackPointer, blockNumber);
 		else {
-			printf("SEMANTIC ERROR: Variable %s has already been declared.\n", $2);
+			// New semantic system test
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s has already been declared.\n", lines, $2);
 			exit(1);
 		}
 		// If the variable has not been declared 
@@ -157,7 +160,7 @@ VarDecl:
 		if (inSymTab == 0) 
 			addItem($2, "Array", $4, atoi($6), scopeStack[stackPointer], stackPointer, blockNumber);
 		else {
-			printf("SEMANTIC ERROR: Variable %s has already been declared.\n", $2);
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s has already been declared.\n", lines, $2);
 			exit(1);
 		}
 		// If the variable has not been declared 
@@ -189,7 +192,7 @@ ActionHeader: ACTION TYPE ID LEFTPAREN ParamDeclList RIGHTPAREN {
 			addAction($2, $3, $5, scopeStack, stackPointer, blockNumber); //id
 		}
 		else {
-			printf("SEMANTIC ERROR: Action %s has already been declared.\n", $3);
+			fprintf(errorFile, "Semantic Error, line %d: Action %s has already been declared.\n", lines, $3);
 			exit(1);
 		}
 
@@ -214,7 +217,7 @@ ActionHeader: ACTION TYPE ID LEFTPAREN ParamDeclList RIGHTPAREN {
 			addAction("void", $2, $4, scopeStack, stackPointer, blockNumber); //id
 		}
 		else {
-			printf("SEMANTIC ERROR: Action %s has already been declared.\n", $2);
+			fprintf(errorFile, "Semantic Error, line %d: Action %s has already been declared.\n", lines, $2);
 			exit(1);
 		}
 
@@ -282,7 +285,7 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 
 		// If the primary type is a variable, check if the variable is in the symbol table
 		if (!strcmp($2->nodeType, "int") && !strcmp($2->nodeType, "float") && !strcmp($2->nodeType, "string") && strncmp(getPrimaryType($2), "var", 3) == 0 && !found($2, scopeStack, stackPointer)) {
-			printf("SEMANTIC ERROR: Variable %s does not exist.\n", $2);
+			fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, $2);
 			exit(1);
 		}
 
@@ -296,9 +299,9 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 		$$ = AST_SingleChildNode("finish", "finish", 0);
 
 		// Semantic check
-		// If the finish statement is not within a loop, throw a semantic error
+		// If the finish statement is not within a loop, throw a Semantic Error
 		if (!inLoop) {
-			printf("SEMANTIC ERROR: The \"finish\" keyword was specified outside of a loop.\n");
+			fprintf(errorFile, "Semantic Error, line %d: The \"finish\" keyword was specified outside of a loop.\n", lines);
 			exit(1);
 		}
 	}
@@ -307,9 +310,9 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 		$$ = AST_SingleChildNode("report", $2, $2); 
 
 		// Semantic check for void functions
-		// If the function is a void function and states a return, throw a semantic error
+		// If the function is a void function and states a return, throw a Semantic Error
 		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) == 0) {
-			printf("SEMANTIC ERROR: Cannot specify \"report\" with a report type for void actions.\n");
+			fprintf(errorFile, "Semantic Error, line %d: Cannot specify \"report\" with a report type for void actions.\n", lines);
 			exit(1);
 		}
 
@@ -321,9 +324,9 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 		$$ = AST_SingleChildNode("voidreport", "voidreport", 0); 
 
 		// Semantic check for non-void functions
-		// If the function is a non-void function and states a blank return, throw a semantic error
+		// If the function is a non-void function and states a blank return, throw a Semantic Error
 		if (strncmp(getItemType(currentFunctionScope, scopeStack, 1), "void", 4) != 0) {
-			printf("SEMANTIC ERROR: Cannot specify a \"report\" without a report type for non-void actions.\n");
+			fprintf(errorFile, "Semantic Error, line %d: Cannot specify a \"report\" without a report type for non-void actions.\n", lines);
 			exit(1);
 		}
 	}
@@ -694,9 +697,9 @@ ActionCall: ID LEFTPAREN ExprList RIGHTPAREN {
 			char * callParamType = getCallListItemType(funcCallParamList, i, 0, scopeStack[stackPointer]);
 
             // Check to see if the two types do not match
-            // If they don't, return a semantic error
+            // If they don't, return a Semantic Error
             if (strncmp(funcParamType, callParamType, strlen(callParamType)) != 0) {
-                printf("\nSEMANTIC ERROR: The call for parameter #%d (%s) does not match the type for parameter #%d (%s) in the function declaration for \"%s\".\n", i, callParamType, i, funcParamType, $1);
+                fprintf(errorFile, "Semantic Error, line %d: The call for parameter #%d (%s) does not match the type for parameter #%d (%s) in the function declaration for \"%s\".\n", lines, i, callParamType, i, funcParamType, $1);
                 exit(1);
             }
         }

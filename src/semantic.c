@@ -16,7 +16,7 @@ int found(char itemName[50], char scopeStack[50][50], int stackPointer);
 void CheckGlobal(char* variableName, char* currentScope) {
     int nonGlobal = strcmp(currentScope, "global");
     if (nonGlobal != 0 && found(variableName, "global", 0) == 1) {
-        printf("SEMANTIC ERROR: Variable %s has already been declared globally.\n", variableName);
+        fprintf(errorFile, "Semantic Error, line %d: Variable %s has already been declared globally.\n", lines, variableName);
         exit(1);
     }
 }
@@ -40,13 +40,13 @@ char* CheckPrimaryType(char * variableName, char scopeStack[50][50], int stackPo
     printf("variableName: %s\n", variableName);
     fflush(stdout);
 
-    // If this item is not in the symbol table, return a semantic error. Else, return the primary type
+    // If this item is not in the symbol table, return a Semantic Error. Else, return the primary type
     return getItemType(variableName, scopeStack, stackPointer);
 }
 
 void checkID(char* identifier, char scopeStack[50][50], int stackPointer) {
     if (found(identifier, scopeStack, stackPointer) == 0) {
-        printf("SEMANTIC ERROR: Variable %s does not exist.\n", identifier);
+        fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, identifier);
         exit(1);
     }
 }
@@ -67,9 +67,7 @@ void CheckComparisonType(struct AST * leftExprTreeNode, struct AST * rightExprTr
     }
 
     if(strcmp(leftType, rightType) != 0) {
-        printf("SEMANTIC ERROR: the type of leftExprTreeNode: %s does not match the type of the rightExprTreeNode: %s. \n", leftExprTreeNode->nodeType, rightExprTreeNode->nodeType);
-        printf("\nleftType: %s\n", leftType);
-        printf("\nrightType: %s\n", rightType);
+        fprintf(errorFile, "Semantic Error, line %d: the type of leftExprTreeNode: %s does not match the type of the rightExprTreeNode: %s. \n", lines, leftExprTreeNode->nodeType, rightExprTreeNode->nodeType);
         exit(1);
     }
 }
@@ -79,7 +77,7 @@ void CheckAssignmentType(char * identifier, char * exprType, char scopeStack[50]
     char * idType = getItemType(identifier, scopeStack, stackPointer);
     
     if (strncmp(idType, exprType, strlen(exprType)) != 0) {
-        printf("SEMANTIC ERROR: The type of \"%s\" does not match the type of \"%s\".\n", identifier, exprType);
+        fprintf(errorFile, "Semantic Error, line %d: The type of \"%s\" does not match the type of \"%s\".\n", lines, identifier, exprType);
 		exit(1);
     }
 }
@@ -87,7 +85,7 @@ void CheckAssignmentType(char * identifier, char * exprType, char scopeStack[50]
 // Checks to see if the LHS matches the RHS for a given operation
 void CheckOperationType(char * leftExpr, char * rightExpr) {
     if (strncmp(leftExpr, rightExpr, strlen(rightExpr)) != 0) {
-        printf("SEMANTIC ERROR: The type of \"%s\" does not match the type of \"%s\".\n", leftExpr, rightExpr);
+        fprintf(errorFile, "Semantic Error, line %d: The type of \"%s\" does not match the type of \"%s\".\n", lines, leftExpr, rightExpr);
 		exit(1);
     }
 }
@@ -97,7 +95,7 @@ void CheckParamLength(char funcName[50], struct AST * funcCallParamList) {
     int callParams = getNumExprs(funcCallParamList);
 
     if (funcParams != callParams) {
-        printf("\nSEMANTIC ERROR: The total number of call parameters for \"%s\" (%d) does not match function declaration (%d).\n", funcName, callParams, funcParams);
+        fprintf(errorFile, "Semantic Error, line %d: The total number of call parameters for \"%s\" (%d) does not match function declaration (%d).", lines, funcName, callParams, funcParams);
         exit(1);
     }
 }
@@ -105,25 +103,25 @@ void CheckParamLength(char funcName[50], struct AST * funcCallParamList) {
 void CheckIndexOutOfBound(char * identifier, char * integer, char scopeStack[50][50], int stackPointer) {
     struct Entry * itemObj = getItem(identifier, scopeStack, stackPointer);
     if (itemObj == NULL) {
-        printf("\nSEMANTIC ERROR: The total number of call parameters for \"%s\" (%s) does not match function declaration (%d).\n", identifier, integer, scopeStack[stackPointer]);
+        fprintf(errorFile, "Semantic Error, line %d: The total number of call parameters for \"%s\" (%s) does not match function declaration (%d).", lines, identifier, integer, scopeStack[stackPointer]);
         exit(1);
     }
     if (itemObj->arrayLength < atoi(integer) || atoi(integer) < 0) {
-        printf("\nSEMANTIC ERROR: Index out of bound for array %s with size %d\n", identifier, itemObj->arrayLength);
+        fprintf(errorFile, "Semantic Error, line %d: Index out of bound for array %s with size %d\n", lines, identifier, itemObj->arrayLength);
         exit(1);
     }
 }
 
 void checkIntDivisionError(int numerator, int denominator) {
     if (denominator == 0) {
-        printf("\nDivision Error: Cannot divide %d by 0.\n", numerator);
+        fprintf(errorFile, "Division Error, line %d: Cannot divide %d by 0.\n", lines, numerator);
         exit(1);
     }
 }
 
 void checkFloatDivisionError(float numerator, float denominator) {
     if (denominator == 0.0) {
-        printf("\nDivision Error: Cannot divide %f by 0.0.\n", numerator);
+        fprintf(errorFile, "Division Error, line %d: Cannot divide %f by 0.0.\n", lines, numerator);
         exit(1);
     }
 }
@@ -135,16 +133,16 @@ void checkEscapeChars(char * phrase) {
     for (int i = 0; i < len; i++) {
         // Detect if the escape character is referenced
         if (phrase[i] == '\\') {
-            // If the next character is the null character, throw a semantic error
+            // If the next character is the null character, throw a Semantic Error
             // Incomplete escape character
             if (phrase[i+1] == '\0') {
-                printf("\nSemantic Error: Incomplete escape character reference.\n");
+                fprintf(errorFile, "Semantic Error, line %d: Incomplete escape character reference.\n", lines);
                 exit(1);
             }
 
-            // Throw a semantic error if the next char does not make this a valid escape char combination
+            // Throw a Semantic Error if the next char does not make this a valid escape char combination
             if (phrase[i+1] != '\"' && phrase[i+1] != '\'' && phrase[i+1] != '\\' && phrase[i+1] != 'n' && phrase[i+1] != 't') {
-                printf("\nSemantic Error: Invalid escape character combination (\\%c).\n", phrase[i+1]);
+                fprintf(errorFile, "Semantic Error, line %d: Invalid escape character combination (\\%c).\n", lines, phrase[i+1]);
                 exit(1);
             }
 
@@ -162,20 +160,20 @@ int countEscapeChars(char * phrase) {
     for (int i = 0; i < len; i++) {
         // Detect if the escape character is referenced
         if (phrase[i] == '\\') {
-            // If the next character is the null character, throw a semantic error
+            // If the next character is the null character, throw a Semantic Error
             // Incomplete escape character
             if (phrase[i+1] == '\0') {
-                printf("\nSemantic Error: Incomplete escape character reference.\n");
+                fprintf(errorFile, "Semantic Error, line %d: Incomplete escape character reference.\n", lines);
                 exit(1);
             }
 
-            // Throw a semantic error if the next char does not make this a valid escape char combination
+            // Throw a Semantic Error if the next char does not make this a valid escape char combination
             if (phrase[i+1] != '\"' && phrase[i+1] != '\'' && phrase[i+1] != '\\' && phrase[i+1] != 'n' && phrase[i+1] != 't') {
-                printf("\nSemantic Error: Invalid escape character combination (\\%c).\n", phrase[i+1]);
+                fprintf(errorFile, "Semantic Error, line %d: Invalid escape character combination (\\%c).\n", lines, phrase[i+1]);
                 exit(1);
             }
 
-            // If no semantic error occurs, add to the count
+            // If no Semantic Error occurs, add to the count
             numEscapeChars++;
 
             // Skip over index for loop
@@ -194,8 +192,8 @@ char * findVarScope(char * varName, char ** scopeList, int scopeListLength) {
             return getItemScope(varName, scopeList[i], 1);
         }
     }
-    // Else, it's not in this list; throw a semantic error
-    printf("\nSemantic Error: Variable %s is not nested in any scope.\n", varName);
+    // Else, it's not in this list; throw a Semantic Error
+    fprintf(errorFile, "Semantic Error, line %d: Variable %s is not nested in any scope.\n", lines, varName);
     exit(1);
 }
 

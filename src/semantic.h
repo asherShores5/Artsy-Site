@@ -2,6 +2,10 @@
 #define SEMANTIC_H
 #include "AST.h"
 
+// Error log file
+extern FILE* errorFile;
+extern int lines;
+
 // Header file for all semantic check functions
 
 void CheckGlobal(char* variableName, char* currentScope);

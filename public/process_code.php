@@ -1,7 +1,20 @@
 <?php
+// Start the session if it hasn't been started already
+session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Decode the POST request
+  $data = json_decode(file_get_contents("php://input"), true);
+
+  // Validate that data isn't empty
+  if ($data === null) {
+    http_response_code(400);
+    echo 'Invalid input';
+    exit;
+  }
+
   // Set the code variable
-  $code = $_COOKIE['codeInput'];
+  $code = $data['code'];
 
   // Validate the input
   if (!$code) {
@@ -26,16 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  // Generate a random string
-  $length = 10;
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $randomString = '';
-  for ($i = 0; $i < $length; $i++) {
-      $randomString .= $characters[rand(0, strlen($characters) - 1)];
-  }
+  // Get the session ID
+  $sessionId = session_id();
 
   // Save the code to a file
-  $filename = $dir_in . $randomString . '.txt';
+  $filename = $dir_in . $sessionId . '.txt';
 
   if (!file_put_contents($filename, $code)) {
     $response = array(
@@ -60,8 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Execute the set of commands in a new working directory
   $dir = '../src/';
   chdir($dir);
-  $filename = './in/' . $randomString . '.txt';
-  $command = 'make artsy ' . escapeshellarg($filename);
+  $command = "make artsy ARGS=\"" . $sessionId . "\"";
 
   $output = shell_exec(escapeshellcmd($command));
 
@@ -76,14 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Check if the wasm file was created
-  $wasmFile = $dir_in . $randomString . '.txt.wasm';
+  $wasmFile = $dir_in . $sessionId . '.wasm';
   if (!file_exists($wasmFile)) {
-    $error = 'Make command failed to create the file: ' . $wasmFile;
-    $response = array(
-      "status" => "error",
-      "message" => $error, 
-    );
-    echo json_encode($response);
+    // Return back error file name
+    $errorFile = $dir_in . $sessionId . '_error.txt';
+    echo $errorFile;
     exit;
   }
 

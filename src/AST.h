@@ -3,8 +3,16 @@
 #define AST_H
 
 #include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h> 
+#include <time.h>
 
 // Header file to list the AST structure and all functions to generate an AST
+
+// Error log file
+extern FILE* errorFile;
+extern int lines;
 
 // An AST node contains a LHS, a RHS, and pointers to new AST nodes on the LHS & RHS
 struct AST{

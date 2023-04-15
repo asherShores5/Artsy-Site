@@ -31,9 +31,9 @@ struct Entry* getParamList(char * id, struct AST* paramlist, char scopeStack[50]
 	struct Entry * list = malloc(sizeof(struct Entry));	
 	if(strcmp(paramlist->nodeType, "variable parm") == 0) {
 		// Semantic check
-		// If the parameter variable name has already been declared before this, throw a semantic error
+		// If the parameter variable name has already been declared before this, throw a Semantic Error
 		if (found(paramlist->RHS, scopeStack, stackPointer) == 1) {
-			printf("SEMANTIC ERROR: Parameter %s already declared as a variable.\n", paramlist->RHS);
+			fprintf(errorFile, "Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
 			exit(1);
 		}
 
@@ -65,9 +65,9 @@ void addAction(char *type, char *id, struct AST* paramlist, char scopeStack[50][
 		struct Entry* list = malloc(sizeof(struct Entry));
 
 		// Semantic check
-		// If the parameter variable name has already been declared before this, throw a semantic error
+		// If the parameter variable name has already been declared before this, throw a Semantic Error
 		if (found(paramlist->RHS, scopeStack, stackPointer) == 1) {
-			printf("SEMANTIC ERROR: Parameter %s already declared as a variable.\n", paramlist->RHS);
+			fprintf(errorFile, "Semantic Error, line %d: Parameter %s already declared as a variable.\n", lines, paramlist->RHS);
 			exit(1);
 		}
 		
@@ -209,7 +209,7 @@ void updateItemArrayLength(char itemName[50], char scopeStack[50][50], int stack
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d1 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -288,7 +288,7 @@ int getItemID(char itemName[50], char scopeStack[50][50], int stackPointer) {
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d2 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -329,7 +329,7 @@ char* getItemKind(char itemName[50], char scopeStack[50][50], int stackPointer) 
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d3 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -370,7 +370,7 @@ char* getItemType(char itemName[50], char scopeStack[50][50], int stackPointer) 
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d4 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -411,7 +411,7 @@ int getArrayLength(char itemName[50], char scopeStack[50][50], int stackPointer)
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d5 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -452,7 +452,7 @@ char* getItemScope(char itemName[50], char scopeStack[50][50], int stackPointer)
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d4 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -493,7 +493,7 @@ int getItemStackPointer(char itemName[50], char scopeStack[50][50], int stackPoi
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d4 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 
@@ -534,7 +534,7 @@ int getItemBlockNumber(char itemName[50], char scopeStack[50][50], int stackPoin
 		}
 	}
 	// Else, return false
-	printf("SEMANTIC ERROR: Variable %s d4 does not exist.\n", itemName);
+	fprintf(errorFile, "Semantic Error, line %d: Variable %s does not exist.\n", lines, itemName);
 	exit(1);
 }
 

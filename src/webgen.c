@@ -24,7 +24,14 @@ FILE * WATcode; // Generates WATcode.wat
 FILE * MAINcode; // File used to place code within the main function
 FILE * VARScode; // File used to place variables at the top of the main function
 FILE * LOCALcode; // File used to place code within a local scope
-FILE * IRcode; // Optimized IRcode file
+FILE * IRfile; // Optimized IRfile file
+
+// Path name variables
+char * IRfilePath;
+char * WATcodePath;
+char * MAINcodePath;
+char * VARScodePath;
+char * LOCALcodePath;
 
 // Standard program variables
 #define MAX_LINE_LENGTH 10000
@@ -34,8 +41,8 @@ char * returnType;
 char * currOp;
 
 // Scope Variables
-char * currScope;
-char ** prevScopes;
+char * currScopeWAT;
+extern char ** prevScopes;
 int totalWebScopes = 1;
 
 // Variables to detect if declared types and params are within a function
@@ -51,13 +58,41 @@ int stackNumber = 0;
 
 // Function to open the files for the WebAssembly Generator
 // Required before generating any WAT code
-void initAssemblyFile() {
-    printf("\n----Generating WebAssembly Text File----\n\n"); // Creates a WAT file with a generic header that needs to be in every file
-    IRcode = fopen("IRcodeOptimized.ir", "r");
-    WATcode = fopen("WATcode.wat", "w"); 
-    MAINcode = fopen("MAINcode.wat", "w"); 
-    VARScode = fopen("VARScode.wat", "w"); 
-    LOCALcode = fopen("LOCALcode.wat", "w"); 
+void initAssemblyFile(char * sessionID) {
+    // Create all the path names
+    IRfilePath = malloc(1000 * sizeof(char));
+    WATcodePath = malloc(1000 * sizeof(char));
+    MAINcodePath = malloc(1000 * sizeof(char));
+    VARScodePath = malloc(1000 * sizeof(char));
+    LOCALcodePath = malloc(1000 * sizeof(char));
+
+    strcpy(IRfilePath, "./in/");
+    strcat(IRfilePath, sessionID);
+    strcat(IRfilePath, "_IRcodeOptimized.ir");
+
+    strcpy(WATcodePath, "./in/");
+    strcat(WATcodePath, sessionID);
+    strcat(WATcodePath, "_WATcode.wat");
+
+    strcpy(MAINcodePath, "./in/");
+    strcat(MAINcodePath, sessionID);
+    strcat(MAINcodePath, "_MAINcode.wat");
+
+    strcpy(VARScodePath, "./in/");
+    strcat(VARScodePath, sessionID);
+    strcat(VARScodePath, "_VARScode.wat");
+
+    strcpy(LOCALcodePath, "./in/");
+    strcat(LOCALcodePath, sessionID);
+    strcat(LOCALcodePath, "_LOCALcode.wat");
+
+    // Open all files
+    printf("\n----Generating WebAssembly Text File----\n\n");
+    IRfile = fopen(IRfilePath, "r");
+    WATcode = fopen(WATcodePath, "w"); 
+    MAINcode = fopen(MAINcodePath, "w"); 
+    VARScode = fopen(VARScodePath, "w"); 
+    LOCALcode = fopen(LOCALcodePath, "w"); 
 }
 
 // Function to get file type from string
@@ -281,7 +316,7 @@ void generateVarDeclareStatementWAT(FILE * printFile, char * varType, char * var
     // Step 1: Get the WAT Type, current scope, and files
     char * scopeType = getScopeType(varName);
     char * varScope = findVarScope(varName, prevScopes, totalWebScopes);
-    char * WATType = strncmp(getItemKind(varName, varScope, 1), "Array", 5) == 0 ? getWATType("int") : getWATType(getItemType(varName, currScope, 1));
+    char * WATType = strncmp(getItemKind(varName, varScope, 1), "Array", 5) == 0 ? getWATType("int") : getWATType(getItemType(varName, currScopeWAT, 1));
     char * printFileStr = inMain ? "MAINcode" : "LOCALcode";
     char * helperFile = getHelperFileType(printFileStr);
 
@@ -543,8 +578,8 @@ void generateSoloStringWAT(FILE * printFile, char * strVal) {
     // Step 3: Add the string to the string hash table
     int indexEntry = currMaxStringIndex;
     int strSize = printStrArrSize;
-    set(&stringAddresses, printVar, currScope, indexEntry);
-    set(&stringSizes, printVar, currScope, strSize);
+    set(&stringAddresses, printVar, currScopeWAT, indexEntry);
+    set(&stringSizes, printVar, currScopeWAT, strSize);
     currMaxStringIndex += strSize; // Update max string index for the next array entry
 
     // Step 4: Print the whole string in one area
@@ -798,18 +833,18 @@ void generateText() {
     FILE * printFile = MAINcode;
 
     // Current scope and previous scope variables
-    currScope = calloc(1000, sizeof(char));
-    strcpy(currScope, "global");
+    currScopeWAT = calloc(1000, sizeof(char));
+    strcpy(currScopeWAT, "global");
     prevScopes = malloc(MAX_ARRAY_LENGTH * sizeof(char*));
     for (int i = 0; i < MAX_ARRAY_LENGTH; i++) { prevScopes[i] = malloc(100 * sizeof(char)); }
     strcpy(prevScopes[0], "global");
 
     // Loop through each line in the code and generate WAT for each valid statement
-    while (fgets(line, MAX_LINE_LENGTH, IRcode) != NULL) {
+    while (fgets(line, MAX_LINE_LENGTH, IRfile) != NULL) {
         // Ensure the line from fgets isn't beyond the max
         // Avoids buffer overflow attacks
         if (strlen(line) == MAX_LINE_LENGTH - 1 && line[MAX_LINE_LENGTH - 2] != '\n') 	  {
-            printf("SEMANTIC ERROR: Line %d is too long.\n", lineNumber);
+            fprintf(errorFile, "Semantic Error: Line %d is too long.\n", lines);
             exit(1);
         }
         printf("%s", line);
@@ -857,9 +892,9 @@ void generateText() {
             returnType = newType;
 
             // Set new scope and retain history using previous scope
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, strArr[2]);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, strArr[2]);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Start function declaration
@@ -906,10 +941,10 @@ void generateText() {
         else if (strncmp(strArr[0], "exit", 4) == 0) { 
             inMain = 1; // Set flag back to global
             generateLocalOperations(); // Load in everything from the local file
-            generateActionEndWAT(currScope); // Generate WAT function ending code
+            generateActionEndWAT(currScopeWAT); // Generate WAT function ending code
             
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
         }
 
@@ -979,10 +1014,10 @@ void generateText() {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000 * sizeof(char));
-            snprintf(newScope, 1000, "while %s %d", currScope, getItemBlockNumber("while", findVarScope("while", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "while %s %d", currScopeWAT, getItemBlockNumber("while", findVarScope("while", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1007,10 +1042,10 @@ void generateText() {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000 * sizeof(char));
-            snprintf(newScope, 1000, "if %s %d", currScope, getItemBlockNumber("if", findVarScope("if", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "if %s %d", currScopeWAT, getItemBlockNumber("if", findVarScope("if", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1035,10 +1070,10 @@ void generateText() {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
-            snprintf(newScope, 1000, "elif %s %d", currScope, getItemBlockNumber("elif", findVarScope("elif", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "elif %s %d", currScopeWAT, getItemBlockNumber("elif", findVarScope("elif", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1062,10 +1097,10 @@ void generateText() {
 
             // Set new scope and retain history using previous scope
             char * newScope = malloc(1000*sizeof(char));
-            snprintf(newScope, 1000, "else %s %d", currScope, getItemBlockNumber("else", findVarScope("else", prevScopes, totalWebScopes), 1));
-            currScope = malloc(1000 * sizeof(char));
-            strcpy(currScope, newScope);
-            strcpy(prevScopes[totalWebScopes], currScope);
+            snprintf(newScope, 1000, "else %s %d", currScopeWAT, getItemBlockNumber("else", findVarScope("else", prevScopes, totalWebScopes), 1));
+            currScopeWAT = malloc(1000 * sizeof(char));
+            strcpy(currScopeWAT, newScope);
+            strcpy(prevScopes[totalWebScopes], currScopeWAT);
             totalWebScopes++;
 
             // Set finish index
@@ -1080,7 +1115,7 @@ void generateText() {
             generateWhileExitWAT(printFile);
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // Reduce stack number
@@ -1088,7 +1123,7 @@ void generateText() {
             stackNumber--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1098,11 +1133,11 @@ void generateText() {
             generateIfExitWAT(printFile, "then");
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1112,11 +1147,11 @@ void generateText() {
             generateIfExitWAT(printFile, "then");
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1133,11 +1168,11 @@ void generateText() {
             }
 
             // Set current scope as previous scope
-            strcpy(currScope, prevScopes[totalWebScopes-2]);
+            strcpy(currScopeWAT, prevScopes[totalWebScopes-2]);
             totalWebScopes--;
 
             // If the previous scope is not another logic statement, change logical scope boolean
-            if (strncmp(currScope, "while", 5) != 0 && strncmp(currScope, "if", 2) != 0 && strncmp(currScope, "elif", 4) != 0 && strncmp(currScope, "else", 4) != 0) {
+            if (strncmp(currScopeWAT, "while", 5) != 0 && strncmp(currScopeWAT, "if", 2) != 0 && strncmp(currScopeWAT, "elif", 4) != 0 && strncmp(currScopeWAT, "else", 4) != 0) {
                 inLogic = 0;
             }
         }
@@ -1226,7 +1261,7 @@ void generateLocalOperations() {
 
     // Open LOCALcode file in read mode
     fclose(LOCALcode);
-    LOCALcode = fopen("LOCALcode.wat", "r");
+    LOCALcode = fopen(LOCALcodePath, "r");
 
     // Read all WAT code that was inserted into the local file
     while (ch != EOF) {
@@ -1242,7 +1277,7 @@ void generateLocalOperations() {
 
     // Close file and reopen in write mode
     fclose(LOCALcode);
-    LOCALcode = fopen("LOCALcode.wat", "w");
+    LOCALcode = fopen(LOCALcodePath, "w");
 }
 
 void generateMainVars() {
@@ -1254,7 +1289,7 @@ void generateMainVars() {
 
     // Open LOCALcode file in read mode
     fclose(VARScode);
-    VARScode = fopen("VARScode.wat", "r");
+    VARScode = fopen(VARScodePath, "r");
 
     // Read all WAT code that was inserted into the vars file
     while (ch != EOF) {
@@ -1277,7 +1312,7 @@ void generateMain() {
 
     // Open MAINcode file in read mode
     fclose(MAINcode);
-    MAINcode = fopen("MAINcode.wat", "r");
+    MAINcode = fopen(MAINcodePath, "r");
 
     // Generate the starting code for the main function
     fprintf(WATcode, "\t;; Start Main Function\n");
@@ -1306,7 +1341,7 @@ void completeFile() {
     fprintf(WATcode, ")\n");
 
     // Closes all files once complete
-    fclose(IRcode);
+    fclose(IRfile);
     fclose(WATcode);
     fclose(MAINcode);
     fclose(LOCALcode);
@@ -1314,12 +1349,12 @@ void completeFile() {
 
 
 // Main driver function to generate all WAT code
-void generateWATcode() {
+void generateWATcode(char * sessionID) {
     // Initialize String Hash Tables
     init(&stringAddresses);
     init(&stringSizes);
 
-    initAssemblyFile();
+    initAssemblyFile(sessionID);
     generateStartModule();
     generateText();
     generateMain();
