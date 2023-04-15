@@ -1,0 +1,2 @@
+[deployment]
+postDeploymentScriptPath = ./scripts/postdeploy.sh
