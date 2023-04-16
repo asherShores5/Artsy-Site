@@ -93,3 +93,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 vendor
+
+# Other deploy files
+deploy.txt
