@@ -84,7 +84,7 @@
           editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1); // include hello world program by default
           saveCode();
         } else {
-          console.log("Restoring your progress");
+          console.log("Your progress was restored!");
           editor.setValue(localStorage.getItem('codeInput'));
         }
       }
@@ -126,6 +126,9 @@
               console.log("Artsy output is displayed!");
             }).catch(console.error);
 
+          // Display an error message if output is empty
+          setSaveText("Code processed!", "color:green;");
+
         } else if (response.endsWith('_error.txt')) {
           // Display the compiler error to the output terminal
           fetch(response)
@@ -134,9 +137,16 @@
               output.innerHTML = data;
             })
             .catch(error => console.error(error));
+          
+          setSaveText("Processing failed.", "color:red;");
+          // Display an error message if output is empty
+          if (output.innerHTML === "" || output.innerHTML === null) {
+            output.innerHTML = "This program did not display anything. Please try inputting something else with Artsy.";
+          }
 
         } else {
           // Display a default error message to the output terminal
+          setSaveText("Processing failed.", "color:red;");
           output.innerHTML = "Error running Artsy compiler. Try again later.";
         }
       }
@@ -173,7 +183,7 @@
         var jsonData = JSON.stringify(data);
 
         // Display saveCode
-        setSaveText("Processing your code...", "style:black");
+        setSaveText("Processing your code...", "color:black;");
 
         // Send an AJAX request to process_code.php and execute compiler
         $.ajax({

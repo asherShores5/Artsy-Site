@@ -50,32 +50,6 @@ struct AST * AST_DoublyChildNodes(char nodeType[50], char LHS[50], char RHS[50],
 	
 }
 
-
-
-//This action is to show the abstract symbol tree
-//Will allow for an easier ability to debug future projects!
-void showSingleAST(struct AST * ASTNode) {
-	// Use recursion to traverse the AST
-	// Base case
-	if (ASTNode == NULL)
-        return;
-
-    showSingleAST(ASTNode->left); // Start by using recursion to traverse the LHS of the tree
-    printf("%s\t%s\t%s", ASTNode->nodeType, ASTNode->LHS, ASTNode->RHS); // Print field in tree position
-    showSingleAST(ASTNode->right); // Traverse RHS of tree
-}
-
-void showAST(struct AST * ASTNode) {
-	// Use recursion to traverse the AST
-	// Base case
-	if (ASTNode == NULL)
-        return;
-
-    showSingleAST(ASTNode->left); // Start by using recursion to traverse the LHS of the tree
-    printf("\nAST Node: %s----------------\n", ASTNode->nodeType); // Print field in tree position
-    showSingleAST(ASTNode->right); // Traverse RHS of tree
-}
-
 char * getExprOp(struct AST * root) {
 	if (root == NULL) {
 		return "none";
@@ -89,7 +63,6 @@ char * getExprOp(struct AST * root) {
 		// Assign number/variable type to operation type variable
 		op = malloc(strlen(root->nodeType)*sizeof(char));
 		strcpy(op, root->nodeType);
-		// printf("%s\n", op);
 		fflush(stdout);
 
 		// Return operation type
@@ -163,7 +136,6 @@ int getNumExprs(struct AST * root) {
 		return 0;
 	}
 	int count = 0;
-	// printf("Node: %s, LHS: %s, RHS: %s\n", root->nodeType, root->LHS, root->RHS);
 	if (strncmp(root->nodeType, "action call param list", 24) != 0 && strncmp(root->nodeType, "exprlist exprtail", 17) != 0 && strncmp(root->nodeType, "exprlist end", 12) != 0 && strncmp(root->nodeType, "exprlist exprtail", 17) != 0 && strncmp(root->nodeType, ")", 1) != 0 && strncmp(root->nodeType, ",", 1) != 0) {
 		return 1;
 	}
@@ -182,8 +154,6 @@ char * getCallListItemType(struct AST * root, int searchIndex, int currIndex, ch
 	if (root == NULL) {
 		return "none";
 	}
-
-	// printf("Node: %s, LHS: %s, RHS: %s\n", root->nodeType, root->LHS, root->RHS);
 
 	// Logic
 	// 1. If func call param list is encountered, traverse to the right
@@ -248,7 +218,6 @@ char * getCallListItemType(struct AST * root, int searchIndex, int currIndex, ch
 		}
 	} else if (strncmp(root->nodeType, "exprlist end", 12) == 0) {
 		if (searchIndex != currIndex) {
-			fprintf(errorFile, "Semantic Error, line %d: Search index (%d) does not match the total number of call parameters (%d).\n", lines, searchIndex, currIndex);
 			exit(1);
 		} else {
 			char * nodeType = root->RHS;

@@ -37,7 +37,6 @@ char* CheckPrimaryType(char * variableName, char scopeStack[50][50], int stackPo
         return substr + 1;
     }
 
-    printf("variableName: %s\n", variableName);
     fflush(stdout);
 
     // If this item is not in the symbol table, return a Semantic Error. Else, return the primary type

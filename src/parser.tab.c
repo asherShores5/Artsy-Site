@@ -1287,7 +1287,7 @@ yyreduce:
   case 4: /* Program: DeclList StmtList Program  */
 #line 98 "parser.y"
                                   {
-		printf("\nProgram Version: DeclList StmtList Program\n");
+		// printf("\nProgram Version: DeclList StmtList Program\n");
 		struct AST * funcChildNode = AST_DoublyChildNodes("program", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_DoublyChildNodes("program",(yyvsp[-2].ast), funcChildNode, (yyvsp[-2].ast), funcChildNode);
 	}
@@ -1326,12 +1326,12 @@ yyreduce:
   case 9: /* VarDecl: DECLARE ID AS TYPE SEMICOLON  */
 #line 126 "parser.y"
                                         {
-		printf("\n RECOGNIZED RULE: Variable declaration %s\n", (yyvsp[-3].string));
+		// printf("\n RECOGNIZED RULE: Variable declaration %s\n", $2);
 		// Variable declaration rule
 		// Symbol Table
-		symTabAccess();
+		
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
-		//printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
+		//// printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
 		
 		// Check if the variable has been declared
 		// If it has, throw an error
@@ -1343,7 +1343,7 @@ yyreduce:
 			exit(1);
 		}
 		// If the variable has not been declared 
-		showSymTable();
+		
 		
 
 		// Generate AST node as a doubly node
@@ -1356,10 +1356,10 @@ yyreduce:
   case 10: /* VarDecl: DECLARE ID AS TYPE LEFTSQUARE INTEGER RIGHTSQUARE SEMICOLON  */
 #line 152 "parser.y"
                                                                       {
-		printf("RECOGNIZED RULE: Array declaration"); 
-		symTabAccess(); 
+		// printf("RECOGNIZED RULE: Array declaration"); 
+		 
 		int inSymTab = found((yyvsp[-6].string), scopeStack, stackPointer);
-		//printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
+		//// printf("looking for %s in symtab - found: %d \n", $2, inSymTab);
 							
 		// Check if the variable has been declared
 		// If it has, throw an error
@@ -1370,7 +1370,7 @@ yyreduce:
 			exit(1);
 		}
 		// If the variable has not been declared 
-		showSymTable();
+		
 
 		struct AST* arraySize = AST_SingleChildNode("size", (yyvsp[-2].string), (yyvsp[-2].string)); 
 		struct AST* array = AST_DoublyChildNodes((yyvsp[-6].string), "array", arraySize, "array", arraySize);
@@ -1412,11 +1412,11 @@ yyreduce:
   case 16: /* ActionHeader: ACTION TYPE ID LEFTPAREN ParamDeclList RIGHTPAREN  */
 #line 184 "parser.y"
                                                                 {
-		printf("RECOGNIZED RULE: Standard Action\n");
+		// printf("RECOGNIZED RULE: Standard Action\n");
 
 		// Check if the function variable has already been declared
 		// If it has, throw an error
-		symTabAccess();
+		
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
 		if (inSymTab == 0){
 			addAction((yyvsp[-4].string), (yyvsp[-3].string), (yyvsp[-1].ast), scopeStack, stackPointer, blockNumber); //id
@@ -1426,7 +1426,7 @@ yyreduce:
 			exit(1);
 		}
 
-		showSymTable();
+		
 		(yyval.ast) = AST_DoublyChildNodes("action context", (yyvsp[-3].string), (yyvsp[-1].ast), (yyvsp[-3].string), (yyvsp[-1].ast));
 
 		stackPointer++;
@@ -1441,9 +1441,9 @@ yyreduce:
   case 17: /* ActionHeader: ACTION ID LEFTPAREN ParamDeclList RIGHTPAREN  */
 #line 208 "parser.y"
                                                        {
-		printf("RECOGNIZED RULE: Void Action\n");
+		// printf("RECOGNIZED RULE: Void Action\n");
 		
-		symTabAccess();
+		
 		int inSymTab = found((yyvsp[-3].string), scopeStack, stackPointer);
 
 		// Check if the function variable has already been declared
@@ -1456,7 +1456,7 @@ yyreduce:
 			exit(1);
 		}
 
-		showSymTable();
+		
 		(yyval.ast) = AST_DoublyChildNodes("action context", (yyvsp[-3].string), (yyvsp[-1].ast), (yyvsp[-3].string), (yyvsp[-1].ast));
 
 		stackPointer++;
@@ -1508,7 +1508,7 @@ yyreduce:
 
   case 23: /* ParamDecl: TYPE ID  */
 #line 254 "parser.y"
-                   { printf("RECOGNIZED RULE: Variable Parameter\n");
+                   { // printf("RECOGNIZED RULE: Variable Parameter\n");
 		(yyval.ast) = AST_DoublyChildNodes("variable parm", (yyvsp[-1].string), (yyvsp[0].string), (yyvsp[-1].string), (yyvsp[0].string));
 	}
 #line 1515 "parser.tab.c"
@@ -1516,7 +1516,7 @@ yyreduce:
 
   case 24: /* ParamDecl: TYPE ID LEFTSQUARE RIGHTSQUARE  */
 #line 257 "parser.y"
-                                         { printf("RECOGNIZED RULE: Array Parameter\n");
+                                         { // printf("RECOGNIZED RULE: Array Parameter\n");
 		(yyval.ast) = AST_DoublyChildNodes("array parm", (yyvsp[-3].string), (yyvsp[-2].string), (yyvsp[-3].string), (yyvsp[-2].string));
 	}
 #line 1523 "parser.tab.c"
@@ -1533,7 +1533,7 @@ yyreduce:
   case 26: /* StmtList: Stmt StmtList  */
 #line 265 "parser.y"
                         {
-		printf("\n RECOGNIZED RULE: StmtList statement\n");
+		// printf("\n RECOGNIZED RULE: StmtList statement\n");
 		// Generate a list of all statement declarations below vardecl
 		(yyval.ast) = AST_DoublyChildNodes("statements", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		}
@@ -1565,11 +1565,11 @@ yyreduce:
 
   case 30: /* Stmt: PRINT Expr SEMICOLON  */
 #line 280 "parser.y"
-                                { printf("\n RECOGNIZED RULE: PRINT statement\n");
+                                { // printf("\n RECOGNIZED RULE: PRINT statement\n");
 		// Generate write declarations as a statement in the parser
 		(yyval.ast) = AST_SingleChildNode("write", (yyvsp[-1].ast), (yyvsp[-1].ast));
 
-		printf("Write: %s\n", (yyvsp[-1].ast)->nodeType);
+		// printf("Write: %s\n", $2->nodeType);
 
 		// If the primary type is a variable, check if the variable is in the symbol table
 		if (!strcmp((yyvsp[-1].ast)->nodeType, "int") && !strcmp((yyvsp[-1].ast)->nodeType, "float") && !strcmp((yyvsp[-1].ast)->nodeType, "string") && strncmp(getPrimaryType((yyvsp[-1].ast)), "var", 3) == 0 && !found((yyvsp[-1].ast), scopeStack, stackPointer)) {
@@ -1584,7 +1584,7 @@ yyreduce:
   case 31: /* Stmt: ADDLINE SEMICOLON  */
 #line 293 "parser.y"
                             {
-		printf("\n RECOGNIZED RULE: ADDLINE statement\n");
+		// printf("\n RECOGNIZED RULE: ADDLINE statement\n");
 		(yyval.ast) = AST_SingleChildNode("addline", "\n", 0);
 	}
 #line 1591 "parser.tab.c"
@@ -1593,7 +1593,7 @@ yyreduce:
   case 32: /* Stmt: FINISH SEMICOLON  */
 #line 297 "parser.y"
                            {
-		printf("\n RECOGNIZED RULE: FINISH statement\n");
+		// printf("\n RECOGNIZED RULE: FINISH statement\n");
 		(yyval.ast) = AST_SingleChildNode("finish", "finish", 0);
 
 		// Semantic check
@@ -1609,7 +1609,7 @@ yyreduce:
   case 33: /* Stmt: REPORT Expr SEMICOLON  */
 #line 308 "parser.y"
                                 {
-		printf("\n RECOGNIZED RULE: REPORT statement\n");
+		// printf("\n RECOGNIZED RULE: REPORT statement\n");
 		(yyval.ast) = AST_SingleChildNode("report", (yyvsp[-1].ast), (yyvsp[-1].ast)); 
 
 		// Semantic check for void functions
@@ -1628,7 +1628,7 @@ yyreduce:
   case 34: /* Stmt: REPORT SEMICOLON  */
 #line 322 "parser.y"
                            {
-		printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
+		// printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
 		(yyval.ast) = AST_SingleChildNode("voidreport", "voidreport", 0); 
 
 		// Semantic check for non-void functions
@@ -1662,7 +1662,7 @@ yyreduce:
   case 38: /* IfStmt: If IfStmtTail  */
 #line 338 "parser.y"
                       {
-	printf("\n RECOGNIZED RULE: if statement block\n");
+	// printf("\n RECOGNIZED RULE: if statement block\n");
 	(yyval.ast) = AST_DoublyChildNodes("IfStmt", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 }
 #line 1669 "parser.tab.c"
@@ -1712,9 +1712,9 @@ yyreduce:
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the while loop to the symbol table
-	symTabAccess();
+	
 	addLogic("while", "While", scopeStack[stackPointer], stackPointer, blockNumber);
-	showSymTable();
+	
 
 	// Indicate that it's within a loop
 	inLoop = 1;
@@ -1739,9 +1739,9 @@ yyreduce:
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the if-statement to the symbol table
-	symTabAccess();
+	
 	addLogic("if", "If", scopeStack[stackPointer], stackPointer, blockNumber);
-	showSymTable();
+	
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1759,7 +1759,7 @@ yyreduce:
   case 46: /* If: IfHead Block  */
 #line 405 "parser.y"
                  {
-	printf("\n RECOGNIZED RULE: if statement\n");
+	// printf("\n RECOGNIZED RULE: if statement\n");
 
 	(yyval.ast) = AST_DoublyChildNodes("If", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1775,9 +1775,9 @@ yyreduce:
 	(yyval.ast) = AST_SingleChildNode((yyvsp[-1].ast), (yyvsp[-1].ast), (yyvsp[-1].ast));
 
 	// Add the elif-statement to the symbol table
-	symTabAccess();
+	
 	addLogic("elif", "Elif", scopeStack[stackPointer], stackPointer, blockNumber);
-	showSymTable();
+	
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1795,7 +1795,7 @@ yyreduce:
   case 48: /* Elif: ElifHead Block  */
 #line 435 "parser.y"
                       {
-	printf("\n RECOGNIZED RULE: elif statement\n");
+	// printf("\n RECOGNIZED RULE: elif statement\n");
 
 	(yyval.ast) = AST_DoublyChildNodes("Elif", (yyvsp[-1].ast), (yyvsp[0].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1809,9 +1809,9 @@ yyreduce:
 #line 445 "parser.y"
                {
 	// Add the else-statement to the symbol table
-	symTabAccess();
+	
 	addLogic("else", "Else", scopeStack[stackPointer], stackPointer, blockNumber);
-	showSymTable();
+	
 
 	// Create tempScopeName
 	char tempScopeName[50];
@@ -1829,7 +1829,7 @@ yyreduce:
   case 50: /* Else: ElseHead Block  */
 #line 463 "parser.y"
                       {
-	printf("\n RECOGNIZED RULE: else statement\n");
+	// printf("\n RECOGNIZED RULE: else statement\n");
 
 	(yyval.ast) = AST_SingleChildNode("Else", (yyvsp[0].ast), (yyvsp[0].ast));
 	stackPointer--;
@@ -1880,7 +1880,7 @@ yyreduce:
 		char * arrayPrefix = malloc(100*sizeof(char));
 		strcat(arrayPrefix, "inarray_");
 		strcat(arrayPrefix, getItemType((yyvsp[-3].string), scopeStack, stackPointer));
-		printf("Prefix: %s\n", arrayPrefix);
+		// printf("Prefix: %s\n", arrayPrefix);
 		(yyval.ast) = AST_DoublyChildNodes(arrayPrefix, (yyvsp[-3].string), (yyvsp[-1].string), (yyvsp[-3].string), (yyvsp[-1].string));
 	}
 #line 1887 "parser.tab.c"
@@ -1924,7 +1924,7 @@ yyreduce:
 
   case 62: /* Block: LEFTBRACKET Program RIGHTBRACKET  */
 #line 514 "parser.y"
-                                         { printf("\n RECOGNIZED RULE: Block statement\n");
+                                         { // printf("\n RECOGNIZED RULE: Block statement\n");
 		(yyval.ast) = AST_SingleChildNode("block",(yyvsp[-1].ast), (yyvsp[-1].ast));
 		}
 #line 1931 "parser.tab.c"
@@ -1932,7 +1932,7 @@ yyreduce:
 
   case 63: /* Expr: Primary  */
 #line 519 "parser.y"
-                { printf("\n RECOGNIZED RULE: Simplest expression\n");
+                { // printf("\n RECOGNIZED RULE: Simplest expression\n");
 		(yyval.ast) = (yyvsp[0].ast);
 		
 		char tempNodeType[50];
@@ -1945,7 +1945,7 @@ yyreduce:
 
   case 64: /* Expr: LET ID EQ Expr  */
 #line 527 "parser.y"
-                                { printf("\n RECOGNIZED RULE: Let Assignment statement \n");
+                                { // printf("\n RECOGNIZED RULE: Let Assignment statement \n");
 		// --- SEMANTIC CHECKS --- //
 		/*
 			int semanticCorrectness = FALSE;
@@ -1965,7 +1965,7 @@ yyreduce:
 		CheckAssignmentType((yyvsp[-2].string), getExprOp((yyvsp[0].ast)), scopeStack, stackPointer);
 
 		// Generate AST tree nodes
-		printf("DEBUG -- GENERATE AST\n");
+		// printf("DEBUG -- GENERATE AST\n");
 		(yyval.ast) = AST_DoublyChildNodes("=",(yyvsp[-2].string), (yyvsp[0].ast), (yyvsp[-2].string), (yyvsp[0].ast));
 
 	}
@@ -1974,7 +1974,7 @@ yyreduce:
 
   case 65: /* Expr: LET ID LEFTSQUARE INTEGER RIGHTSQUARE EQ Expr  */
 #line 551 "parser.y"
-                                                                { printf("\n RECOGNIZED RULE: Let Assignment element statement\n");
+                                                                { // printf("\n RECOGNIZED RULE: Let Assignment element statement\n");
 		// --- SEMANTIC CHECKS --- //
 		/*
 			int semanticCorrectness = FALSE;
@@ -1994,7 +1994,7 @@ yyreduce:
 		CheckAssignmentType((yyvsp[-5].string), (yyvsp[0].ast), scopeStack, stackPointer);
 
 		// Generate AST tree nodes
-		printf("DEBUG -- GENERATE AST\n");
+		// printf("DEBUG -- GENERATE AST\n");
 		struct AST* arrayElement = AST_DoublyChildNodes("element assignment", (yyvsp[-3].string), (yyvsp[0].ast), (yyvsp[-3].string), (yyvsp[0].ast)); 
 
 		(yyval.ast) = AST_DoublyChildNodes("=", (yyvsp[-5].string), arrayElement, (yyvsp[-5].string), arrayElement);
@@ -2005,7 +2005,7 @@ yyreduce:
 
   case 66: /* Expr: Expr PLUS Expr  */
 #line 577 "parser.y"
-                         { printf("\n RECOGNIZED RULE: PLUS statement\n");
+                         { // printf("\n RECOGNIZED RULE: PLUS statement\n");
 		// Semantic checks
 
 		// Check to see if the LHS matches the RHS
@@ -2013,14 +2013,14 @@ yyreduce:
 		
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("+", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
-		printf("EXPR PLUS EXPR: %s \n------------------------------------------------------------------\n", (yyvsp[0].ast)->nodeType);
+		// printf("EXPR PLUS EXPR: %s \n------------------------------------------------------------------\n", $3->nodeType);
 	}
 #line 2019 "parser.tab.c"
     break;
 
   case 67: /* Expr: Expr MINUS Expr  */
 #line 587 "parser.y"
-                          { printf("\n RECOGNIZED RULE: MINUS statement\n");
+                          { // printf("\n RECOGNIZED RULE: MINUS statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2034,13 +2034,13 @@ yyreduce:
 
   case 68: /* Expr: Expr MULTIPLY Expr  */
 #line 596 "parser.y"
-                             { printf("\n RECOGNIZED RULE: MULTIPLY statement\n");
+                             { // printf("\n RECOGNIZED RULE: MULTIPLY statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
 		CheckOperationType(getExprOp((yyvsp[-2].ast)), getExprOp((yyvsp[0].ast)));
 
-		printf("Node: *, Term 1: %s, Term 2: %s\n", (yyvsp[-2].ast)->RHS, (yyvsp[0].ast)->RHS);
+		// printf("Node: *, Term 1: %s, Term 2: %s\n", $1->RHS, $3->RHS);
 		
 		// Generate AST Nodes (doubly linked)
 		(yyval.ast) = AST_DoublyChildNodes("*", (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
@@ -2050,7 +2050,7 @@ yyreduce:
 
   case 69: /* Expr: Expr DIVIDE Expr  */
 #line 607 "parser.y"
-                           { printf("\n RECOGNIZED RULE: DIVIDE statement\n");
+                           { // printf("\n RECOGNIZED RULE: DIVIDE statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2092,7 +2092,7 @@ yyreduce:
 
   case 70: /* Expr: Expr EXPONENT Expr  */
 #line 644 "parser.y"
-                             { printf("\n RECOGNIZED RULE: BinOp statement\n");
+                             { // printf("\n RECOGNIZED RULE: BinOp statement\n");
 		// Semantic checks
 		
 		// Check to see if the LHS matches the RHS
@@ -2106,7 +2106,7 @@ yyreduce:
 
   case 71: /* Expr: Expr COMMA Expr  */
 #line 653 "parser.y"
-                          { printf("\n RECOGNIZED RULE: BinOp statement\n");
+                          { // printf("\n RECOGNIZED RULE: BinOp statement\n");
 		// Semantic checks
 		
 		// Check if both exprs exist
@@ -2120,7 +2120,7 @@ yyreduce:
   case 72: /* Expr: Expr COMPARISONOPERATOR Expr  */
 #line 661 "parser.y"
                                        {
-		printf("\n RECOGNIZED RULE: Comparison statement\n");
+		// printf("\n RECOGNIZED RULE: Comparison statement\n");
 		struct AST * tempNode = AST_DoublyChildNodes((yyvsp[-1].string), (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_SingleChildNode("Comparison", tempNode, tempNode);
 	}
@@ -2130,7 +2130,7 @@ yyreduce:
   case 73: /* Expr: Expr LOGICALOPERATOR Expr  */
 #line 666 "parser.y"
                                     {
-		printf("\n RECOGNIZED RULE: Logical statement\n");
+		// printf("\n RECOGNIZED RULE: Logical statement\n");
 		struct AST * tempNode = AST_DoublyChildNodes((yyvsp[-1].string), (yyvsp[-2].ast), (yyvsp[0].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = AST_SingleChildNode("Logical", tempNode, tempNode);
 	}
@@ -2164,7 +2164,7 @@ yyreduce:
   case 78: /* ActionCall: ID LEFTPAREN ExprList RIGHTPAREN  */
 #line 678 "parser.y"
                                              {
-	printf("\nRECOGNIZED RULE: ActionCall\n");
+	// printf("\nRECOGNIZED RULE: ActionCall\n");
 	struct AST* funcCallParamList = AST_SingleChildNode("action call param list", (yyvsp[-1].ast), (yyvsp[-1].ast));
 	(yyval.ast) = AST_DoublyChildNodes("action call", (yyvsp[-3].string), funcCallParamList, (yyvsp[-3].string), funcCallParamList);
 
@@ -2395,7 +2395,7 @@ yyreturnlab:
 
 int parser_main(FILE * inputfile)
 {
-	printf("\n----Starting Lexer and Parser----\n\n");
+	// printf("\n----Starting Lexer and Parser----\n\n");
 	stackPointer = 0;
 	blockNumber = 0;
 	inLoop = 0;

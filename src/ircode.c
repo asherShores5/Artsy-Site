@@ -213,7 +213,6 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
 
 // Optimized version of binary operations for IRcodeOptimized.ir
 char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2){
-    // printf("ID1: %s, ID2: %s\n", id1, id2);
     memset(outputId, 0, 50);
 
     // Assign temporary variables for tracking base array variables
@@ -756,11 +755,11 @@ char * emitFunctionCallOptimized(char *id) {
 // This initializes creating all of the IRcode for unoptimized IRcode
 char* ASTTraversal(struct AST* root) {
     if(root != NULL) {
-        printf("root->nodeType: %s\n", root->nodeType);
+        // printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
-        // printf("root->LHS: %s\n", root->LHS);
+        // // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
-        // printf("root->RHS: %s\n", root->RHS);
+        // // printf("root->RHS: %s\n", root->RHS);
         fflush(stdout);
         char rightVar[50];
         char leftVar[50];
@@ -852,7 +851,6 @@ char* ASTTraversal(struct AST* root) {
             snprintf(newScope, 1000, "while %s %d", currScope, getItemBlockNumber("while", findVarScope("while", prevScopes, totalIRScopes), 1));
             strcpy(prevScopes[totalIRScopes], currScope);
             strcpy(currScope, newScope);
-            printf("newScope: %s\n", currScope);
             totalIRScopes++;
 
             fprintf(IRcode, "\n");
@@ -1174,11 +1172,11 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        printf("root->nodeType: %s\n", root->nodeType);
+        // printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
-        // printf("root->LHS: %s\n", root->LHS);
+        // // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
-        // printf("root->RHS: %s\n", root->RHS);
+        // // printf("root->RHS: %s\n", root->RHS);
         fflush(stdout);
 
         char rightVar[50];
@@ -1389,7 +1387,6 @@ char* ASTTraversalOptimized(struct AST* root) {
             // Set current scope as previous scope
             strcpy(currScope, prevScopes[totalIRScopes-2]);
             totalIRScopes--;
-            printf("currScope: %s\n", currScope);
         }
         if(strcmp(root->nodeType, "and") == 0
             || strcmp(root->nodeType, "or") == 0) {
@@ -1471,7 +1468,7 @@ char* ASTTraversalOptimized(struct AST* root) {
         }
         if(strncmp(root->nodeType, "action call", 14) == 0) {
             ASTTraversalOptimized(root->right);
-            printf("made it\n");
+            // printf("made it\n");
 
             memset(buffer, 0, 50);
             strcpy(buffer, emitFunctionCallOptimized(root->LHS));
@@ -1620,7 +1617,6 @@ void generateIRCode(char * newPath) {
     strcpy(prevScopes[0], "global");
 
     // Start AST Traversal
-    printf("\n\n----Generate IRCode----\n\n");
     initIRcodeFile(newPath);
     ASTTraversal(ast);
     fclose(IRcode);
@@ -1635,7 +1631,7 @@ void generateIRCodeOptimized(char * newPath) {
     strcpy(currScope, "global");
 
     // Start Optimized AST Traversal
-    printf("\n\n----Perform Code Optimizations----\n\n");
+    // printf("\n\n----Perform Code Optimizations----\n\n");
     initIRcodeFileOptimized(newPath);
     ASTTraversalOptimized(ast);
     fclose(IRcodeOptimized);
