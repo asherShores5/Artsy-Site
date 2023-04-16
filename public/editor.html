@@ -90,45 +90,40 @@
       }
 
       // Function to run code and display output in output box
-      function displayCode(response) {
+      async function displayCode(response) {
         // Display Artsy within the output terminal
         var memory;
-        let artsyOutput = "";
 
         // Check if the file name ends with a ".wasm" extension
         if (response.endsWith('.wasm')) {
-          // Display the result to the output terminal
-          fetch(response)
-            .then(response => response.arrayBuffer())
-            .then(bytes => WebAssembly.instantiate(bytes, 
-            {
-            env: {
+          try {
+            const module = await fetch(response);
+            const { instance } = await WebAssembly.instantiateStreaming(module, {
+              env: {
                 print_int: function printInt(wVar) {
-                    output.innerHTML += wVar;
+                  output.innerHTML += wVar;
                 },
 
                 print_float: function printFloat(wVar) {
-                    output.innerHTML += wVar;
+                  output.innerHTML += wVar;
                 },
 
                 print_string: function printString(wVar) {
-                    output.innerHTML += String.fromCharCode(wVar);
+                  output.innerHTML += String.fromCharCode(wVar);
                 },
 
                 newline: function newline() {
-                    output.innerHTML += "\n";
+                  output.innerHTML += "\n";
                 }
               }
-            }
-            )).then(results => {
-              instance = results.instance;
-              memory = instance.exports.pagememory;
-              console.log("Artsy output is displayed!");
-            }).catch(console.error);
-
-          // Display an error message if output is empty
-          setSaveText("Code processed!", "color:green;");
-
+            });
+            memory = instance.exports.pagememory;
+            setSaveText("Code processed!", "color:green;");
+          } catch (error) {
+            console.error(error);
+            setSaveText("Processing failed.", "color:red;");
+            output.innerHTML = "Error running Artsy compiler. Try again later.";
+          }
         } else if (response.endsWith('_error.txt')) {
           // Display the compiler error to the output terminal
           fetch(response)
@@ -139,10 +134,6 @@
             .catch(error => console.error(error));
           
           setSaveText("Processing failed.", "color:red;");
-          // Display an error message if output is empty
-          if (output.innerHTML === "" || output.innerHTML === null) {
-            output.innerHTML = "This program did not display anything. Please try inputting something else with Artsy.";
-          }
 
         } else {
           // Display a default error message to the output terminal

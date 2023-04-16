@@ -724,6 +724,6 @@ int parser_main(FILE * inputfile)
 }
 
 void yyerror(const char* s) {
-	fprintf(stderr, "Parse error: %s\n", s);
+	fprintf(errorFile, "Syntax error, line %d", lines);
 	exit(1);
 }
