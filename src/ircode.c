@@ -1016,7 +1016,7 @@ char* ASTTraversal(struct AST* root) {
             emitExit(IRcode);
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
-            if (root->RHS != NULL && root->RHS[0] != '\0' && root->RHS[0] != '\n') {
+            if (root->right != NULL && (root->RHS != NULL || root->RHS[0] != '\0' || root->RHS[0] != '\n') && (root->right->RHS == NULL || root->right->RHS[0] != '\0' || strncmp(root->right->RHS, "ction call", 11) == 0)) {
                 strcpy(params[paramIndex], root->right->RHS);
                 paramIndex += 1;
             }
@@ -1172,7 +1172,7 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        // printf("root->nodeType: %s\n", root->nodeType);
+        printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
@@ -1438,7 +1438,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             }
         }
         if(strcmp(root->nodeType, "exprlist end") == 0) {
-            if (root->RHS != NULL && root->RHS[0] != '\0' && root->RHS[0] != '\n') {
+            if (root->right != NULL && (root->RHS != NULL || root->RHS[0] != '\0' || root->RHS[0] != '\n') && (root->right->RHS == NULL || root->right->RHS[0] != '\0' || strncmp(root->right->RHS, "ction call", 11) == 0)) {
                 strcpy(params[paramIndex], root->right->RHS);
                 paramIndex += 1;
             }

@@ -178,7 +178,9 @@ ActionDeclList: { 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 ;
 
 ActionDeclListTail: ActionDecl {$$ = $1;}
-	| ActionDecl ActionDeclListTail {$$ = AST_DoublyChildNodes("ActionDecl ActionDeclListTail",$1,$2,$1, $2);}
+	| ActionDecl ActionDeclListTail {
+		$$ = AST_DoublyChildNodes("ActionDecl ActionDeclListTail", $1, $2, $1, $2);
+	}
 ;
 
 ActionHeader: ACTION TYPE ID LEFTPAREN ParamDeclList RIGHTPAREN {
@@ -292,11 +294,11 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 	}
 	| ADDLINE SEMICOLON {
 		// printf("\n RECOGNIZED RULE: ADDLINE statement\n");
-		$$ = AST_SingleChildNode("addline", "\n", 0);
+		$$ = AST_SingleChildNode("addline", "addline", "addline");
 	}
 	| FINISH SEMICOLON {
 		// printf("\n RECOGNIZED RULE: FINISH statement\n");
-		$$ = AST_SingleChildNode("finish", "finish", 0);
+		$$ = AST_SingleChildNode("finish", "finish", "finish");
 
 		// Semantic check
 		// If the finish statement is not within a loop, throw a Semantic Error
@@ -321,7 +323,7 @@ Stmt:	SEMICOLON	{ 	$$ = AST_SingleChildNode("empty", "empty", "empty");}
 	}
 	| REPORT SEMICOLON {
 		// printf("\n RECOGNIZED RULE: VOID REPORT statement\n");
-		$$ = AST_SingleChildNode("voidreport", "voidreport", 0); 
+		$$ = AST_SingleChildNode("voidreport", "voidreport", "voidreport"); 
 
 		// Semantic check for non-void functions
 		// If the function is a non-void function and states a blank return, throw a Semantic Error
@@ -490,7 +492,7 @@ Primary :	 INTEGER	{$$ = AST_SingleChildNode("int", $1, $1); }
 	}
 ;
 
-ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\n", 0);}	
+ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\0", "\0");}	
 	| Primary	{ 
 			$$ = AST_SingleChildNode("exprlist end", $1, $1); 
 	}
@@ -512,7 +514,7 @@ ExprList: {}
 ;
 
 Block:  LEFTBRACKET Program RIGHTBRACKET { // printf("\n RECOGNIZED RULE: Block statement\n");
-		$$ = AST_SingleChildNode("block",$2, $2);
+		$$ = AST_SingleChildNode("block", $2, $2);
 		}
 ;
 
@@ -545,7 +547,7 @@ Expr  :	Primary { // printf("\n RECOGNIZED RULE: Simplest expression\n");
 
 		// Generate AST tree nodes
 		// printf("DEBUG -- GENERATE AST\n");
-		$$ = AST_DoublyChildNodes("=",$2, $4, $2, $4);
+		$$ = AST_DoublyChildNodes("=", $2, $4, $2, $4);
 
 	}
 	| LET ID LEFTSQUARE INTEGER RIGHTSQUARE EQ Expr 	{ // printf("\n RECOGNIZED RULE: Let Assignment element statement\n");
