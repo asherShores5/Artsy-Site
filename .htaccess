@@ -1,0 +1,16 @@
+# Turn on ReWrite Engine
+# RewriteEngine On
+
+# Redirect requests to /public/ if not already there
+# RewriteCond %{REQUEST_URI} !^/public/
+# RewriteRule ^(.*)$ /public/$1 [L]
+
+# Redirect requests for / to index.html
+# RewriteCond %{REQUEST_URI} ^/$
+# RewriteRule ^(.*)$ /public/index.html [L]
+
+# Remove .html extension from URLs
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-l
+# RewriteRule ^([^\.]+)$ $1.html [NC,L]
