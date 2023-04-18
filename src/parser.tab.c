@@ -1890,7 +1890,7 @@ yyreduce:
 
   case 57: /* ExprListTail: %empty  */
 #line 495 "parser.y"
-              {(yyval.ast) = AST_SingleChildNode("exprlist end", "\0", "\0");}
+              {(yyval.ast) = AST_SingleChildNode("exprlist end", "\n", 0);}
 #line 1895 "parser.tab.c"
     break;
 

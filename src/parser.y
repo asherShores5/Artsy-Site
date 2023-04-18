@@ -492,7 +492,7 @@ Primary :	 INTEGER	{$$ = AST_SingleChildNode("int", $1, $1); }
 	}
 ;
 
-ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\0", "\0");}	
+ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\n", 0);}	
 	| Primary	{ 
 			$$ = AST_SingleChildNode("exprlist end", $1, $1); 
 	}
