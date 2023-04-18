@@ -6,11 +6,6 @@
 struct Entry symTabItems[100];
 int symTabIndex;
 
-// Simple action to notify user that the table has been accessed successfully
-void symTabAccess(void){
-	printf("::::> Symbol table accessed.\n");
-}
-
 // Add a single entry struct to the symbol table for the appropriate scope
 void addItem(char itemName[50], char itemKind[8], char itemType[8], int arrayLength, char scope[50], int stackPointer, int blockNumber){
 	// Set entry struct item data for each parameter in the action
@@ -114,23 +109,6 @@ void addLogic(char * itemName, char * itemKind, char * scopeStack, int stackPoin
 	symTabIndex++;
 }
 
-void showSymTable(){
-	// Show the format of the symboltable using the scope's current entries
-	printf("itemID    itemName    itemKind    itemType    ArrayLength    itemScope    stackPointer    blockNumber\n");
-	printf("-----------------------------------------------------------------------------------------------------\n");
-	for (int i=0; i<symTabIndex; i++){
-		printf("%7d %7s %12s %12s %12d %22s %5d %12d\n", symTabItems[i].itemID, symTabItems[i].itemName, symTabItems[i].itemKind, symTabItems[i].itemType, symTabItems[i].arrayLength, symTabItems[i].scope, symTabItems[i].stackPointer, symTabItems[i].blockNumber);
-		if(symTabItems[i].paramlist) {
-			struct Entry* tempList = symTabItems[i].paramlist;
-			while(tempList) {
-				printf("%5d %15s %7s %7s %6d %15s\n",tempList->itemID, tempList->itemName, tempList->itemKind, tempList->itemType, tempList->arrayLength, tempList->scope);
-				tempList = tempList->paramlist;
-			}
-		}
-	}
-	printf("-----------------------------------------------------------------------------------------------------\n");
-}
-
 int found(char itemName[50], char scopeStack[50][50], int stackPointer){
 	// Lookup an identifier in the symbol table
 	// return TRUE or FALSE
@@ -145,7 +123,7 @@ int found(char itemName[50], char scopeStack[50][50], int stackPointer){
 					for(int j = stackPointer; j >= 0; j--) {
 						int str2 = strcmp(tempList->scope, scopeStack[j]);
 						if(str2 == 0) {
-							//printf("Found: %s\n-----------------------", itemName);
+							//// printf("Found: %s\n-----------------------", itemName);
 							return 1; // found the ID in the table
 						}
 					}
@@ -161,7 +139,7 @@ int found(char itemName[50], char scopeStack[50][50], int stackPointer){
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				
 				if(str2 == 0) {
-				//printf("Found: %s\n-----------------------", itemName);
+				//// printf("Found: %s\n-----------------------", itemName);
 				return 1; // found the ID in the table
 				}
 			}
@@ -241,7 +219,7 @@ struct Entry* getItem(char itemName[50], char scopeStack[50][50], int stackPoint
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return &symTabItems[i]; // found the ID in the table
 				}
 			}
@@ -281,7 +259,7 @@ int getItemID(char itemName[50], char scopeStack[50][50], int stackPointer) {
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].itemID;
 				}
 			}
@@ -322,7 +300,7 @@ char* getItemKind(char itemName[50], char scopeStack[50][50], int stackPointer) 
 			for(int j = stackPointer; j >= 0; j --) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].itemKind;
 				}
 			}
@@ -363,7 +341,7 @@ char* getItemType(char itemName[50], char scopeStack[50][50], int stackPointer) 
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].itemType;
 				}
 			}
@@ -404,7 +382,7 @@ int getArrayLength(char itemName[50], char scopeStack[50][50], int stackPointer)
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].arrayLength;
 				}
 			}
@@ -445,7 +423,7 @@ char* getItemScope(char itemName[50], char scopeStack[50][50], int stackPointer)
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].scope;
 				}
 			}
@@ -486,7 +464,7 @@ int getItemStackPointer(char itemName[50], char scopeStack[50][50], int stackPoi
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].stackPointer;
 				}
 			}
@@ -527,7 +505,7 @@ int getItemBlockNumber(char itemName[50], char scopeStack[50][50], int stackPoin
 			for(int j = stackPointer; j >= 0; j--) {
 				int str2 = strcmp(symTabItems[i].scope, scopeStack[j]);
 				if(str2 == 0) {
-					//printf("Found: %s\n-----------------------", itemName);
+					//// printf("Found: %s\n-----------------------", itemName);
 					return symTabItems[i].blockNumber;
 				}
 			}
@@ -541,10 +519,7 @@ int getItemBlockNumber(char itemName[50], char scopeStack[50][50], int stackPoin
 int compareTypes(char item1[50], char item2[50], char scope[50]) {
 	// Compare two item types for any symbol table entry
 	const char* idType1 = item1;
-
 	const char* idType2 = item2;
-
-	printf("%s = %s\n", idType1, idType2);
 
 	// Return true or false to state if these items are the same
 	return strcmp(idType1, idType2);

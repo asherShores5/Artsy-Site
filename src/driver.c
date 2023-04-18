@@ -12,13 +12,6 @@ FILE* errorFile;
 
 // Starts the whole program
 int main(int argc, char ** argv) {
-  // Track the total compilation time
-  double total_time;
-  clock_t start, end;
-
-  // Start the clock
-	start = clock();
-
   // If the program initialization is valid, allow the program to run
   if (argc > 1) {
     // Create an input path
@@ -32,8 +25,7 @@ int main(int argc, char ** argv) {
 
     // Check if the input file actually exists
     if (inputFile == NULL) {
-        printf("Error: Failed to open input file. Try running again.");
-        return 1;
+        exit(1);
     }
 
     // Next, create an error log file
@@ -48,7 +40,6 @@ int main(int argc, char ** argv) {
     // Run the parser
     // If it returns an error, exit the program with a warning number
     if (parser_main(inputFile) != 0) {
-      printf("Parser Failed, Exiting Program.\n\n");
       exit(1);
     }
 
@@ -78,16 +69,6 @@ int main(int argc, char ** argv) {
     // After the .wasm file is generated, the changes will be immediately live
     // on testProg.html using the LiveServer extension or on artsy-project.com
     generateWATcode(argv[1]);
-
-    // Print compilation confirmation message
-    printf("\nArtsy Compilation complete! Displaying to website...\n");
-
-    // Stop the time clock
-    end = clock();
-
-    // Calculate and print out the total time
-    total_time = ((double) (end - start)) / CLOCKS_PER_SEC;
-	  printf("\nArtsy Compilation Time: %f seonds\n\n", total_time);
 
     // End the program
     return 0;

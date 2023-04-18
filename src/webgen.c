@@ -87,7 +87,7 @@ void initAssemblyFile(char * sessionID) {
     strcat(LOCALcodePath, "_LOCALcode.wat");
 
     // Open all files
-    printf("\n----Generating WebAssembly Text File----\n\n");
+    // printf("\n----Generating WebAssembly Text File----\n\n");
     IRfile = fopen(IRfilePath, "r");
     WATcode = fopen(WATcodePath, "w"); 
     MAINcode = fopen(MAINcodePath, "w"); 
@@ -274,10 +274,8 @@ void checkParamContext() {
 int getFinishIndex() {
     int newIndex = 0;
     for (int i = 0; i < stackNumber + 1; i++) {
-        printf("Stack num #%d: %d\n", i, finishIndexes[i]);
         newIndex += finishIndexes[i];
     }
-    printf("New index: %d\n", newIndex);
     return newIndex;
 }
 
@@ -847,7 +845,7 @@ void generateText() {
             fprintf(errorFile, "Semantic Error: Line %d is too long.\n", lines);
             exit(1);
         }
-        printf("%s", line);
+        // printf("%s", line);
 
         // Break apart the line into an iterable array of strings
         // Set the program delimiter for separating terms by word

@@ -32,12 +32,6 @@ struct AST * AST_SingleChildNode(char nodeType[50], char RHS[50], struct AST * c
 // Generates an AST Node with both a LHS and RHS
 struct AST * AST_DoublyChildNodes(char nodeType[50], char LHS[50], char RHS[50], struct AST * leftChildNode, struct AST * rightChildNode);
 
-//This function is to show the abstract symbol tree
-//Will allow for an easier ability to debug future projects!
-void showSingleAST(struct AST * ASTNode);
-
-void showAST(struct AST * ASTNode);
-
 char * getExprOp(struct AST * root); 
 
 int evaluateIntExpr(struct AST * root);

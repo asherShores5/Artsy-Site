@@ -32,7 +32,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "TRUE"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : TRUE\n", yytext);
+	// printf("%s : TRUE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return TRUE;
 }
@@ -40,7 +40,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "FALSE"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : FALSE\n", yytext);
+	// printf("%s : FALSE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return FALSE;
 }
@@ -48,7 +48,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "int"	{
 			// Recognize integers as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : INT\n", yytext);
+			// printf("%s : INT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -56,7 +56,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "string" {
 			// Recognize chars as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : STRING\n", yytext);
+			// printf("%s : STRING\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -65,7 +65,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "float"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : FLOAT\n", yytext);
+			// printf("%s : FLOAT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -73,7 +73,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "flag"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : FLAG\n", yytext);
+			// printf("%s : FLAG\n", yytext);
 			yylval.string = strdup(yytext); 
 			return TYPE;
 		}
@@ -82,7 +82,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "let"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : LET\n", yytext);
+			// printf("%s : LET\n", yytext);
 			yylval.string = strdup(yytext); 
 			return LET;
 		}
@@ -90,7 +90,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "declare"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : DECLARE\n", yytext);
+			// printf("%s : DECLARE\n", yytext);
 			yylval.string = strdup(yytext); 
 			return DECLARE;
 		}
@@ -98,7 +98,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "as"	{
 			// Recognize strings as a TYPE, return as a token
 			words++; chars += strlen(yytext);
-			printf("%s : AS\n", yytext);
+			// printf("%s : AS\n", yytext);
 			yylval.string = strdup(yytext); 
 			return AS;
 		}
@@ -106,7 +106,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "print"	{
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : PRINT\n", yytext);
+			// printf("%s : PRINT\n", yytext);
 			yylval.string = strdup(yytext); 
 			return PRINT;
 		}
@@ -114,7 +114,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "addline"	{
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : ADDLINE\n", yytext);
+			// printf("%s : ADDLINE\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ADDLINE;
 		}
@@ -122,7 +122,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "report"	{
 			// The report operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return REPORT;
 		}
@@ -130,7 +130,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "action"	{
 			// The function operation is special, return as a ACTION token
 			words++; chars += strlen(yytext);
-			printf("%s : ACTION\n", yytext);
+			// printf("%s : ACTION\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ACTION;
 		}
@@ -138,7 +138,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "while"	{
 			// The write operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return WHILE;
 		}
@@ -147,7 +147,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 			// The write operation is special, return as a KEYWORD token
 			// TO-DO: Implement in parser
 			words++; chars += strlen(yytext);
-			printf("%s : FINISH\n", yytext);
+			// printf("%s : FINISH\n", yytext);
 			yylval.string = strdup(yytext); 
 			return FINISH;
 		}
@@ -155,7 +155,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "if"	{
 			// The "IF" operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return IF;
 		}
@@ -163,7 +163,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "elif"	{
 			// The "IF" operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-			printf("%s : KEYWORD\n", yytext);
+			// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ELIF;
 		}
@@ -171,7 +171,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "else"	{
 			// The else operation is special, return as a KEYWORD token
 			words++; chars += strlen(yytext);
-		 	printf("%s : KEYWORD\n", yytext);
+		 	// printf("%s : KEYWORD\n", yytext);
 			yylval.string = strdup(yytext); 
 			return ELSE;
 		}
@@ -180,7 +180,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 ","		{
 		  // Comma Recognition
 		  chars++;
-		  printf("%s : COMMA\n", yytext);
+		  // printf("%s : COMMA\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return COMMA;
 		}
@@ -188,7 +188,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 ";"		{
 		  // End of statement recognition
 		  chars++;
-		  printf("%s : SEMICOLON\n", yytext);
+		  // printf("%s : SEMICOLON\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return SEMICOLON;
 		}
@@ -196,7 +196,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "="		{
 		  // Assignment recognition token
 		  chars++;
-		  printf("%s : EQ\n", yytext);
+		  // printf("%s : EQ\n", yytext);
 		  yylval.string = strdup(yytext); 
 		  return EQ;
 		}
@@ -204,7 +204,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "+"		{
 	// Addition operator recognition, return as "PLUS" token
 	chars++;
-	printf("%s : PLUS\n", yytext);
+	// printf("%s : PLUS\n", yytext);
 	yylval.string = strdup(yytext); 
 	return PLUS;
 }
@@ -212,7 +212,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "-"		{
 	// Minus operator recognition, return as "MINUS" token
 	chars++;
-	printf("%s : MINUS\n", yytext);
+	// printf("%s : MINUS\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MINUS;
 }
@@ -220,7 +220,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "*"		{
 	// Multiplication operator recognition, return as "PLUS" token
 	chars++;
-	printf("%s : MULTIPLY\n", yytext);
+	// printf("%s : MULTIPLY\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MULTIPLY;
 }
@@ -228,7 +228,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "/"		{
 	// Division operator recognition, return as "DIVIDE" token
 	chars++;
-	printf("%s : DIVIDE\n", yytext);
+	// printf("%s : DIVIDE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return DIVIDE;
 }
@@ -236,7 +236,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "^" 	{
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
-	printf("%s : EXPONENT\n", yytext);
+	// printf("%s : EXPONENT\n", yytext);
 	yylval.string = strdup(yytext); 
 	return EXPONENT;
 }
@@ -244,7 +244,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "%" 	{
 	// EXPONENT operator recognition, return as "EXP" token
 	chars++;
-	printf("%s : MODULO\n", yytext);
+	// printf("%s : MODULO\n", yytext);
 	yylval.string = strdup(yytext); 
 	return MODULO;
 }
@@ -252,7 +252,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "{"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTBRACKET\n", yytext);
+	// printf("%s : LEFTBRACKET\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTBRACKET;
 }
@@ -260,7 +260,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "}"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTBRACKET\n", yytext);
+	// printf("%s : RIGHTBRACKET\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTBRACKET;
 }
@@ -269,7 +269,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "("		{
 	// Paren recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTPAREN\n", yytext);
+	// printf("%s : LEFTPAREN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTPAREN;
 }
@@ -277,7 +277,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 ")"		{
 	// Paren recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTPAREN\n", yytext);
+	// printf("%s : RIGHTPAREN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTPAREN;
 }
@@ -285,7 +285,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "["		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LEFTSQUARE\n", yytext);
+	// printf("%s : LEFTSQUARE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LEFTSQUARE;
 }
@@ -293,7 +293,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "]"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : RIGHTSQUARE\n", yytext);
+	// printf("%s : RIGHTSQUARE\n", yytext);
 	yylval.string = strdup(yytext); 
 	return RIGHTSQUARE;
 }
@@ -301,7 +301,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "<"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LESSTHAN\n", yytext);
+	// printf("%s : LESSTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -309,7 +309,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 ">"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : GREATERTHAN\n", yytext);
+	// printf("%s : GREATERTHAN\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -317,7 +317,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "=="		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : DOUBLEEQUAL\n", yytext);
+	// printf("%s : DOUBLEEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -325,7 +325,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "!="		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : NOTEQUAL\n", yytext);
+	// printf("%s : NOTEQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -333,7 +333,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 ">="		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : GREATERTHAN OR EQUAL\n", yytext);
+	// printf("%s : GREATERTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
@@ -342,14 +342,14 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "<="		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : LESSTHAN OR EQUAL\n", yytext);
+	// printf("%s : LESSTHAN OR EQUAL\n", yytext);
 	yylval.string = strdup(yytext); 
 	return COMPARISONOPERATOR;
 }
 "and"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : AND\n", yytext);
+	// printf("%s : AND\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LOGICALOPERATOR;
 }
@@ -357,7 +357,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 "or"		{
 	// Bracket recognition, will be used later as a token for scopes
 	chars++;
-	printf("%s : OR\n", yytext);
+	// printf("%s : OR\n", yytext);
 	yylval.string = strdup(yytext); 
 	return LOGICALOPERATOR;
 }
@@ -365,21 +365,21 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 {ID}	{
 			  // IDs such as "x" or "y" are utilized with a TYPE or KEYWORD, return as an identifier token
 			  words++; chars += strlen(yytext);
-			  printf("%s : IDENTIFIER\n",yytext);
+			  // printf("%s : IDENTIFIER\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return ID;
 			}
 
 {INTEGER}	{
 			  words++; chars += strlen(yytext);
-			  printf("%s : INTEGER\n",yytext);
+			  // printf("%s : INTEGER\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return INTEGER;
 			}
 
 {FLOAT}		{
 			  words++; chars += strlen(yytext);
-			  printf("%s : FLOAT\n",yytext);
+			  // printf("%s : FLOAT\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return FLOAT;
 			}
@@ -387,7 +387,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 {NUMBER}	{
 		      // Any integer needs to be assigned to a digit or number, so return any digit as a number token
 			  words++; chars += strlen(yytext);
-			  printf("%s : NUMBER\n",yytext);
+			  // printf("%s : NUMBER\n",yytext);
 			  yylval.number = strdup(yytext); 
 			  //yylval.number = atoi(yytext); 
 			  return NUMBER;
@@ -395,7 +395,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 
 {STRING}	{
   			  words++; chars += strlen(yytext);
-			  printf("%s : STRING\n",yytext);
+			  // printf("%s : STRING\n",yytext);
 			  yylval.string = strdup(yytext); 
 			  return STRING;
 			}
@@ -406,7 +406,7 @@ MULTI_LINE_COMMENT 	\/\#([^\#]|\#+[^\#\/])*\#\/
 [ \t]	{chars++;}
 .		{chars++;
 		 // Line break and tab recognition for processing files in Windows
-         printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
+         // printf("%s : Unrecognized symbol at line %d char %d\n", yytext, lines, chars);
 		}
 		
 

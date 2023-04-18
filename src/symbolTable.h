@@ -32,11 +32,7 @@ extern struct Entry symTabItems[100];
 extern int symTabIndex;
 
 // Symbol table functions for adding items and accessing specific data types
-void symTabAccess(void);
-
 void addItem(char itemName[50], char itemKind[8], char itemType[8], int arrayLength, char scope[50], int stackPointer, int blockNumber);
-
-void showSymTable();
 
 void addFunction(char *type, char *id, struct AST* paramlist, char scopeStack[50][50], int stackPointer, int blockNumber);
 

@@ -56,55 +56,74 @@
       // Start code editor
       startEditor();
 
+      function generateUUID() {
+        let uuid = '', i, random;
+
+        for (i = 0; i < 32; i++) {
+          random = Math.random() * 16 | 0;
+
+          if (i === 8 || i === 12 || i === 16 || i === 20) {
+            uuid += '-';
+          }
+
+          uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+        }
+
+        return uuid;
+      }
+
       // Function to start up code interface
       function startEditor() {
+        // Set the UUID if it does not exist yet
+        if (localStorage.getItem('uuid') === "" || localStorage.getItem('uuid') === null) {
+          localStorage.setItem('uuid', generateUUID());
+        }
+
         // Startup using the localStorage variable "codeInput", otherwise generate default starter code    
-        if (localStorage.getItem('codeInput') === null || localStorage.getItem('codeInput') === '') {
+        if (localStorage.getItem('codeInput') === "" || localStorage.getItem('codeInput') === null) {
           editor.setValue("# Artsy Starter Program\nprint \"Hello Artsy\";", -1); // include hello world program by default
           saveCode();
         } else {
-          console.log("Restoring your progress");
+          console.log("Your progress was restored!");
           editor.setValue(localStorage.getItem('codeInput'));
         }
       }
 
       // Function to run code and display output in output box
-      function displayCode(response) {
+      async function displayCode(response) {
         // Display Artsy within the output terminal
         var memory;
-        let artsyOutput = "";
 
         // Check if the file name ends with a ".wasm" extension
         if (response.endsWith('.wasm')) {
-          // Display the result to the output terminal
-          fetch(response)
-            .then(response => response.arrayBuffer())
-            .then(bytes => WebAssembly.instantiate(bytes, 
-            {
-            env: {
+          try {
+            const module = await fetch(response);
+            const { instance } = await WebAssembly.instantiateStreaming(module, {
+              env: {
                 print_int: function printInt(wVar) {
-                    output.innerHTML += wVar;
+                  output.innerHTML += wVar;
                 },
 
                 print_float: function printFloat(wVar) {
-                    output.innerHTML += wVar;
+                  output.innerHTML += wVar;
                 },
 
                 print_string: function printString(wVar) {
-                    output.innerHTML += String.fromCharCode(wVar);
+                  output.innerHTML += String.fromCharCode(wVar);
                 },
 
                 newline: function newline() {
-                    output.innerHTML += "\n";
+                  output.innerHTML += "\n";
                 }
               }
-            }
-            )).then(results => {
-              instance = results.instance;
-              memory = instance.exports.pagememory;
-              console.log("Artsy output is displayed!");
-            }).catch(console.error);
-
+            });
+            memory = instance.exports.pagememory;
+            setSaveText("Code processed!", "color:green;");
+          } catch (error) {
+            console.error(error);
+            setSaveText("Processing failed.", "color:red;");
+            output.innerHTML = "Error running Artsy compiler. Try again later.";
+          }
         } else if (response.endsWith('_error.txt')) {
           // Display the compiler error to the output terminal
           fetch(response)
@@ -113,9 +132,12 @@
               output.innerHTML = data;
             })
             .catch(error => console.error(error));
+          
+          setSaveText("Processing failed.", "color:red;");
 
         } else {
           // Display a default error message to the output terminal
+          setSaveText("Processing failed.", "color:red;");
           output.innerHTML = "Error running Artsy compiler. Try again later.";
         }
       }
@@ -146,12 +168,13 @@
 
         // Convert the data into JSON
         var data = {
-          code: localStorage.getItem('codeInput')
+          code: localStorage.getItem('codeInput'),
+          uuid: localStorage.getItem('uuid')
         };
         var jsonData = JSON.stringify(data);
 
         // Display saveCode
-        setSaveText("Processing your code...", "style:black");
+        setSaveText("Processing your code...", "color:black;");
 
         // Send an AJAX request to process_code.php and execute compiler
         $.ajax({

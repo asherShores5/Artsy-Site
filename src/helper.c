@@ -172,38 +172,51 @@ char * getCompareWATType(char * symbol, char * WATType, char * logicType) {
     char * compareType = calloc(10, sizeof(char));
 
     // Get initial WAT Type
-    if (strncmp(symbol, "<", 1) == 0 && strncmp(WATType, "i32", 3) == 0) {
+    if (strncmp(symbol, "<=", 2) == 0 && strncmp(WATType, "i32", 3) == 0) {
+        strcpy(compareType, "le_s");
+    } else if (strncmp(symbol, "<=", 2) == 0 && strncmp(WATType, "f32", 3) == 0) {
+        strcpy(compareType, "le");
+    } else if (strncmp(symbol, ">=", 2) == 0 && strncmp(WATType, "i32", 3) == 0) {
+        strcpy(compareType, "ge_s");
+    } else if (strncmp(symbol, ">=", 2) == 0 && strncmp(WATType, "f32", 3) == 0) {
+        strcpy(compareType, "ge");
+    } else if (strncmp(symbol, "<", 1) == 0 && strncmp(WATType, "i32", 3) == 0) {
         strcpy(compareType, "lt_s");
     } else if (strncmp(symbol, "<", 1) == 0 && strncmp(WATType, "f32", 3) == 0) {
         strcpy(compareType, "lt");
-    } else if (strncmp(symbol, "<=", 1) == 0 && strncmp(WATType, "i32", 3) == 0) {
-        strcpy(compareType, "le_s");
-    } else if (strncmp(symbol, "<=", 1) == 0 && strncmp(WATType, "f32", 3) == 0) {
-        strcpy(compareType, "le");
     } else if (strncmp(symbol, ">", 1) == 0 && strncmp(WATType, "i32", 3) == 0) {
         strcpy(compareType, "gt_s");
     } else if (strncmp(symbol, ">", 1) == 0 && strncmp(WATType, "f32", 3) == 0) {
         strcpy(compareType, "gt");
-    } else if (strncmp(symbol, ">=", 1) == 0 && strncmp(WATType, "i32", 3) == 0) {
-        strcpy(compareType, "ge_s");
-    } else if (strncmp(symbol, ">=", 1) == 0 && strncmp(WATType, "f32", 3) == 0) {
-        strcpy(compareType, "ge");
-    } else if (strncmp(symbol, "==", 1) == 0) {
+    } else if (strncmp(symbol, "==", 2) == 0) {
         strcpy(compareType, "eq");
-    } else if (strncmp(symbol, "!=", 1) == 0) {
+    } else if (strncmp(symbol, "!=", 2) == 0) {
         strcpy(compareType, "ne");
     } else {
         // Uses a void or undefined keyword
         strcpy(compareType, "void");
     }
 
-    // Switch sign direction if it's the condition for a while loop (only applies to ">" and "<")
-    if (strncmp(logicType, "while", 5) == 0 && compareType[0] == 'l') {
+    // Switch sign direction if it's the condition for a while loop
+    if (strncmp(logicType, "while", 5) == 0 && strncmp(compareType, "le", 2) == 0) {
         compareType[0] = 'g';
-    } else if (strncmp(logicType, "while", 5) == 0 && compareType[0] == 'g') {
+        compareType[1] = 't';
+    } else if (strncmp(logicType, "while", 5) == 0 && strncmp(compareType, "lt", 2) == 0) {
+        compareType[0] = 'g';
+        compareType[1] = 'e';
+    } else if (strncmp(logicType, "while", 5) == 0 && strncmp(compareType, "ge", 2) == 0) {
         compareType[0] = 'l';
+        compareType[1] = 't';
+    } else if (strncmp(logicType, "while", 5) == 0 && strncmp(compareType, "gt", 2) == 0) {
+        compareType[0] = 'l';
+        compareType[1] = 'e';
+    } else if (strncmp(logicType, "while", 5) == 0 && compareType[0] == 'e') {
+        strcpy(compareType, "ne");
+    } else if (strncmp(logicType, "while", 5) == 0 && compareType[0] == 'n') {
+        strcpy(compareType, "eq");
     }
 
+    // Return final compare type symbol
     return compareType;
 }
 
