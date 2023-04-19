@@ -82,14 +82,32 @@ void initIRcodeFileOptimized(char * newPath) {
     fprintf(IRcodeOptimized, "#### Optimized IR Code ####\n");
 }
 
-char * updateArrayId(char id[50]) {
-    // Split apart the phrase into a set of tokens by the "[" keyword
-    char delimiter[] = "[], ";
-    return strtok(id, delimiter);
+char* updateArrayId(char* id) {
+    // Check if the input string starts with a negative sign
+    int isNegative = 0;
+    // if (id[1] == '-') {
+    //     isNegative = 1;
+    // }
+    
+    // Split the string based on "[" and "]" delimiters
+    char delimiter[] = "[]";
+    char* token = strtok(id, delimiter);
+    
+    // Add the negative sign back to the result if necessary
+    char* result;
+    if (isNegative) {
+        result = (char*) malloc(strlen(token) + 2); // allocate space for "-" and null terminator
+        strcpy(result, "-");
+        strcat(result, token);
+    } else {
+        result = (char*) malloc(strlen(token) + 1); // allocate space for null terminator
+        strcpy(result, token);
+    }
+    
+    return result;
 }
-
 // Use the cvTable to find the temporary variable for a given variable declaration
-char* getVarConstant(char var[50]){
+char* getVarConstant(char * var[50]){
 	for(int i=0; i<cvIndex; i++){
         if (strcmp(cvTable[i].var, var) == 0){
             memset(buffer, 0, 50);
@@ -108,7 +126,7 @@ void addUnusedVar(char var[50]) {
 }
 
 // Function to update variable declarations if the variable is unused - part of the optimization process
-void updateUnusedVar(char var[50]) {
+void updateUnusedVar(char * var) {
 	for(int i=0; i<uvIndex; i++){
         if (strcmp(uvTable[i].var, var) == 0) {
             uvTable[i].boolVal = 1;
@@ -119,7 +137,7 @@ void updateUnusedVar(char var[50]) {
 
 // Checks the symbol table
 // Returns true or false depending if the variable is used or not (for code optimization)
-int isUsedVar(char var[50]) {
+int isUsedVar(char * var) {
     for (int i = 0; i < uvIndex; i++){
         if (strcmp(uvTable[i].var, var) == 0) {
             return uvTable[i].boolVal;
@@ -151,6 +169,8 @@ char* emitBinaryOperation(char op[2], const char* id1, const char* id2){
     if (strncmp(getPrimaryType(token2), "var", 3) == 0) {
         updateUnusedVar(updateArrayId(token2));
     }
+    strcpy(token1, updateArrayId(token1));
+    strcpy(token2, updateArrayId(token2));
 
     // Output suboperation type (for webgen parsing)
     if (!startSubOp) {
@@ -167,6 +187,22 @@ char* emitBinaryOperation(char op[2], const char* id1, const char* id2){
         startSubOp = 1;
     }
 
+    // Check if there's a second index
+    char arrDelim[] = "[]";
+    char * newToken1 = strtok(id1, arrDelim);
+    newToken1 = strtok(NULL, arrDelim);
+
+    char * newToken2 = strtok(id2, arrDelim);
+    newToken2 = strtok(NULL, arrDelim);
+
+    // Change final variables if there's a second index
+    if (newToken1 != NULL) {
+        sprintf(token1, "%s[%s]", token1, newToken1);
+    }
+    if (newToken2 != NULL) {
+        sprintf(token2, "%s[%s]", token2, newToken2);
+    }
+
     // Print the unoptimized iRcode using outputIDs, the operator, and the other ids
     fprintf(IRcode, "%s = %s %s %s\n", outputId, token1, op, token2);
     lastIndex += 1;
@@ -179,7 +215,9 @@ char* emitBinaryOperation(char op[2], const char* id1, const char* id2){
 char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id2){
     // Assign temporary variables for tracking base array variables
     char * token1 = malloc(strlen(id1)*sizeof(char));
+    char * token2 = malloc(strlen(id2)*sizeof(char));
     strcpy(token1, id1);
+    strcpy(token2, id2);
 
     // Create a temporary variable assignment using "T"
     memset(outputId, 0, 50);
@@ -187,6 +225,10 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
     sprintf(currLabelIndexBuffer, "%d", lastIndex);
     strcat(outputId, "T");
     strcat(outputId, currLabelIndexBuffer);
+    strcpy(token1, updateArrayId(token1));
+    strcpy(token2, updateArrayId(token2));
+    strcpy(id1, updateArrayId(id1));
+    strcpy(id2, updateArrayId(id2));
 
     // Output suboperation type (for webgen parsing)
     if (!startSubOpOptimized) {
@@ -203,8 +245,24 @@ char* emitBinaryOperationUnoptimized(char op[2], const char* id1, const char* id
         startSubOpOptimized = 1;
     }
 
+    // Check if there's a second index
+    char arrDelim[] = "[]";
+    char * newToken1 = strtok(id1, arrDelim);
+    newToken1 = strtok(NULL, arrDelim);
+
+    char * newToken2 = strtok(id2, arrDelim);
+    newToken2 = strtok(NULL, arrDelim);
+
+    // Change final variables if there's a second index
+    if (newToken1 != NULL) {
+        sprintf(token1, "%s[%s]", token1, newToken1);
+    }
+    if (newToken2 != NULL) {
+        sprintf(token2, "%s[%s]", token2, newToken2);
+    }
+
     // Print the unoptimized iRcode using outputIDs, the operator, and the other ids
-    fprintf(IRcode, "%s = %s %s %s\n", outputId, id1, op, id2);
+    fprintf(IRcode, "%s = %s %s %s\n", outputId, token1, op, token2);
     lastIndex += 1;
 
     // Returns output
@@ -217,14 +275,16 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
 
     // Assign temporary variables for tracking base array variables
     char * token1 = malloc(strlen(id1)*sizeof(char));
+    char * token2 = malloc(strlen(id2)*sizeof(char));
     strcpy(token1, id1);
+    strcpy(token2, id2);
 
     // If it's an array, get the optype based on the token
     char * opType = getPrimaryType(updateArrayId(token1));
 
     if (strncmp(opType, "int", 3) == 0) {
-        int num1 = (int) strtol(id1, (char **)NULL, 10);
-        int num2 = (int) strtol(id2, (char **)NULL, 10);
+        int num1 = (int) strtol(updateArrayId(token1), (char **)NULL, 10);
+        int num2 = (int) strtol(updateArrayId(token2), (char **)NULL, 10);
 
         // Get optimized result
         int result;
@@ -241,8 +301,8 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
         sprintf(outputId, "%d", result);
         return outputId;
     } else if (strncmp(opType, "float", 5) == 0) {
-        float num1 = atof(id1);
-        float num2 = atof(id2);
+        float num1 = atof(updateArrayId(token1));
+        float num2 = atof(updateArrayId(token2));
 
         // Get optimized result
         float result;
@@ -264,13 +324,15 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
     sprintf(currLabelIndexBuffer, "%d", lastIndex);
     strcat(outputId, "T");
     strcat(outputId, currLabelIndexBuffer);
+    strcpy(token1, updateArrayId(token1));
+    strcpy(token2, updateArrayId(token2));
     
     // Output suboperation type (for webgen parsing)
     if (!startSubOpOptimized) {
         char * opType = calloc(100, sizeof(char));
 
         if (strncmp(getPrimaryType(token1), "var", 3) == 0) {
-            char * tempScope = findVarScope(token1, prevScopes, totalIRScopes);
+            char * tempScope = findVarScope(updateArrayId(token1), prevScopes, totalIRScopes);
             opType = getItemType(token1, tempScope, 1);
         } else {
             opType = getPrimaryType(token1);
@@ -280,8 +342,24 @@ char* emitBinaryOperationOptimized(char op[1], const char* id1, const char* id2)
         startSubOpOptimized = 1;
     }
 
+    // Check if there's a second index
+    char arrDelim[] = "[]";
+    char * newToken1 = strtok(id1, arrDelim);
+    newToken1 = strtok(NULL, arrDelim);
+
+    char * newToken2 = strtok(id2, arrDelim);
+    newToken2 = strtok(NULL, arrDelim);
+
+    // Change final variables if there's a second index
+    if (newToken1 != NULL) {
+        sprintf(token1, "%s[%s]", token1, newToken1);
+    }
+    if (newToken2 != NULL) {
+        sprintf(token2, "%s[%s]", token2, newToken2);
+    }
+
     // Output optimized suboperation line
-    fprintf(IRcodeOptimized, "%s = %s %s %s\n", outputId, id1, op, id2);
+    fprintf(IRcodeOptimized, "%s = %s %s %s\n", outputId, token1, op, token2);
     lastIndex += 1;
 
     return outputId;
@@ -340,7 +418,7 @@ void emitAssignmentOptimized(char * id1, char * id2){
         if(flag) {
             strcpy(cvTable[cvIndex].var, id1);
             cvTable[cvIndex].val = (int) strtol(id2, (char **)NULL, 10);
-            cvIndex ++;
+            cvIndex++;
         }
     }
 
@@ -385,7 +463,7 @@ void emitAssignmentForElement(char * id1, char * elementNum, char * id2) {
     fprintf(IRcode, "%s[%s] = %s\n", id1, elementNum, id2);
 }
 
-void emitAssignmentForElementOptimized(char *id1, char * elementNum, char * id2) {
+void emitAssignmentForElementOptimized(char * id1, char * elementNum, char * id2) {
     int flag = 1;
 
     if(isNumeric(id2)) {
@@ -674,7 +752,7 @@ char * emitFunctionCall(char *id) {
     }
 
     // Output suboperation type (for webgen parsing)
-    char * opType = calloc(100, sizeof(char));
+    char * opType = malloc(100 * sizeof(char));
     if (!startSubOp) {        
         if (strncmp(getPrimaryType(id), "var", 3) == 0) {
             strcpy(opType, getItemType(id, "global", 1));
@@ -719,12 +797,12 @@ char * emitFunctionCallOptimized(char *id) {
     strcat(outputId, currLabelIndexBuffer);
 
     // Output suboperation type (for webgen parsing)
-    char * opType;
+    char * opType = malloc(100 * sizeof(char));
     if (!startSubOpOptimized) {
         if (strncmp(getPrimaryType(id), "var", 3) == 0) {
-            opType = getItemType(id, "global", 1);
+            strcpy(opType, getItemType(id, "global", 1));
         } else {
-            opType = getPrimaryType(id);
+            strcpy(opType, getPrimaryType(id));
         }
 
         // Do not generate a subop if its a void function call
@@ -755,11 +833,11 @@ char * emitFunctionCallOptimized(char *id) {
 // This initializes creating all of the IRcode for unoptimized IRcode
 char* ASTTraversal(struct AST* root) {
     if(root != NULL) {
-        // printf("root->nodeType: %s\n", root->nodeType);
+        printf("IR root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
-        // // printf("root->LHS: %s\n", root->LHS);
+        // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
-        // // printf("root->RHS: %s\n", root->RHS);
+        // printf("root->RHS: %s\n", root->RHS);
         fflush(stdout);
         char rightVar[50];
         char leftVar[50];
@@ -985,7 +1063,7 @@ char* ASTTraversal(struct AST* root) {
             ASTTraversal(root->right);
         }
         if(strcmp(root->nodeType, "write") == 0) {
-            if (root->right->LHS != NULL && strncmp(getPrimaryType(root->right->LHS), "var", 3) == 0 && strncmp(root->right->LHS, "int", 3) != 0 && strncmp(root->right->LHS, "float", 5) != 0) {
+            if (root->right->LHS != NULL && strncmp(root->right->LHS, "\0", 1) != 0 && strncmp(getPrimaryType(root->right->LHS), "var", 3) == 0 && strncmp(root->right->LHS, "int", 3) != 0 && strncmp(root->right->LHS, "float", 5) != 0) {
                 // Write id in array callout format
                 emitWriteArrayId(root->right->LHS, root->right->RHS);
             } else if (strcmp(root->RHS, "int") == 0
@@ -1072,6 +1150,7 @@ char* ASTTraversal(struct AST* root) {
                         } else {
                             strcpy(rightVar, root->right->right->right->RHS);
                         }
+                        updateUnusedVar(rightVar);
                         return emitBinaryOperation(root->right->RHS, leftVar, rightVar);
                     } else {
                         if (strncmp(getPrimaryType(root->right->right->LHS), "var", 3) == 0) {
@@ -1079,9 +1158,11 @@ char* ASTTraversal(struct AST* root) {
                         } else {
                             strcpy(rightVar, root->right->right->RHS);
                         }
-                        emitAssignmentForElement(root->LHS, root->right->LHS, rightVar);
+                        updateUnusedVar(updateArrayId(rightVar));
+                        emitAssignmentForElement(root->LHS, root->right->LHS, updateArrayId(rightVar));
                     }
             } else {
+                updateUnusedVar(rightVar);
                 emitAssignment(root->LHS, rightVar);
             }
         }
@@ -1134,6 +1215,19 @@ char* ASTTraversal(struct AST* root) {
                     // New changes here
                     if (strncmp(root->right->LHS, "action call", 14) == 0) {
                         strcpy(rightVar, ASTTraversal(root->right));
+                    } 
+                    // Avoids second missing expression problem
+                    else if (strcmp(root->RHS, "+") == 0
+                        || strcmp(root->RHS, "-") == 0
+                        || strcmp(root->RHS, "*") == 0
+                        || strcmp(root->RHS, "/") == 0
+                        || strcmp(root->RHS, ">") == 0
+                        || strcmp(root->RHS, ">=") == 0
+                        || strcmp(root->RHS, "<") == 0
+                        || strcmp(root->RHS, "<=") == 0
+                        || strcmp(root->RHS, "==") == 0
+                        || strcmp(root->RHS, "!=") == 0) {
+                            strcpy(rightVar, ASTTraversal(root->right));
                     } else if (strncmp(root->right->LHS, "int", 3) == 0 || strncmp(root->right->LHS, "float", 5) == 0) {
                         strcpy(rightVar, root->right->left->RHS);
                     } else if (strncmp(root->right->RHS, "action call param list", 24) == 0) {
@@ -1172,7 +1266,7 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        // printf("root->nodeType: %s\n", root->nodeType);
+        printf("IROPT root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
@@ -1402,7 +1496,7 @@ char* ASTTraversalOptimized(struct AST* root) {
             emitTypeArrayDeclarationOptimized(root->LHS, root->RHS, "-1");
         }
         if(strcmp(root->nodeType, "write") == 0) {
-            if (root->right->LHS != NULL && strncmp(getPrimaryType(root->right->LHS), "var", 3) == 0 && strncmp(root->right->LHS, "int", 3) != 0 && strncmp(root->right->LHS, "float", 5) != 0) {
+            if (root->right->LHS != NULL && strncmp(root->right->LHS, "\0", 1) != 0 && strncmp(getPrimaryType(root->right->LHS), "var", 3) == 0 && strncmp(root->right->LHS, "int", 3) != 0 && strncmp(root->right->LHS, "float", 5) != 0) {
                 // Write id in array callout format
                 if (isUsedVar(root->right->LHS)) {
                     emitWriteArrayIdOptimized(root->right->LHS, root->right->RHS);
@@ -1510,7 +1604,6 @@ char* ASTTraversalOptimized(struct AST* root) {
                             } else {
                                 strcpy(rightVar, root->right->right->right->RHS);
                             }
-
                             return inWhileLoop ? emitBinaryOperationUnoptimized(root->right->RHS, leftVar, rightVar) : emitBinaryOperationOptimized(root->right->RHS, leftVar, rightVar);
                         } else {
                             if (strncmp(getPrimaryType(root->right->right->LHS), "var", 3) == 0) {
@@ -1518,11 +1611,11 @@ char* ASTTraversalOptimized(struct AST* root) {
                             } else {
                                 strcpy(rightVar, root->right->right->RHS);
                             }
-                            emitAssignmentForElementOptimized(root->LHS, root->right->LHS, rightVar);
+                            emitAssignmentForElementOptimized(root->LHS, root->right->LHS, updateArrayId(rightVar));
                         }
                 } else {
                     char rightVarOptimized[50];
-                    strcpy(rightVarOptimized, getVarConstant(rightVar));
+                    strcpy(rightVarOptimized, getVarConstant(updateArrayId(rightVar)));
                     emitAssignmentOptimized(root->LHS, rightVarOptimized);
                 }
             }
@@ -1577,6 +1670,19 @@ char* ASTTraversalOptimized(struct AST* root) {
                     // New changes here
                     if (strncmp(root->right->LHS, "action call", 14) == 0) {
                         strcpy(rightVar, ASTTraversalOptimized(root->right));
+                    }
+                    // Avoids second missing expression problem 
+                    else if (strcmp(root->RHS, "+") == 0
+                        || strcmp(root->RHS, "-") == 0
+                        || strcmp(root->RHS, "*") == 0
+                        || strcmp(root->RHS, "/") == 0
+                        || strcmp(root->RHS, ">") == 0
+                        || strcmp(root->RHS, ">=") == 0
+                        || strcmp(root->RHS, "<") == 0
+                        || strcmp(root->RHS, "<=") == 0
+                        || strcmp(root->RHS, "==") == 0
+                        || strcmp(root->RHS, "!=") == 0) {
+                            strcpy(rightVar, ASTTraversalOptimized(root->right));
                     } else if (strncmp(root->right->LHS, "int", 3) == 0 || strncmp(root->right->LHS, "float", 5) == 0) {
                         strcpy(rightVar, root->right->left->RHS);
                     } else if (strncmp(root->right->RHS, "action call param list", 24) == 0) {
@@ -1587,9 +1693,20 @@ char* ASTTraversalOptimized(struct AST* root) {
                 } else {
                     strcpy(rightVar, ASTTraversalOptimized(root->right));
                 }
-
-                strcpy(rightVarOptimized, getVarConstant(leftVar));
-                strcpy(leftVarOptimized, getVarConstant(rightVar));
+                // Form optimized variables and retain variable history
+                strcpy(rightVarOptimized, leftVar);
+                strcpy(rightVarOptimized, getVarConstant(updateArrayId(rightVarOptimized)));
+                strcpy(leftVarOptimized, rightVar);
+                strcpy(leftVarOptimized, getVarConstant(updateArrayId(leftVarOptimized)));
+                
+                // Check if the optimized number used constant folding
+                // If not, reuse the previous variables from history
+                if (!isdigit(leftVarOptimized[0])) {
+                    strcpy(leftVarOptimized, rightVar);
+                }
+                if (!isdigit(rightVarOptimized[0])) {
+                    strcpy(rightVarOptimized, leftVar);
+                }
 
                 return inWhileLoop ? emitBinaryOperationUnoptimized(root->nodeType, leftVar, rightVar) : emitBinaryOperationOptimized(root->nodeType, rightVarOptimized, leftVarOptimized);
         }

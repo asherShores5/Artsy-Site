@@ -126,7 +126,7 @@ void CheckParamLength(char funcName[50], struct AST * funcCallParamList) {
     int callParams = getNumExprs(funcCallParamList);
 
     if (funcParams != callParams) {
-        fprintf(errorFile, "Semantic Error, line %d: The total number of call parameters for \"%s\" (%d) does not match function declaration (%d).", lines, funcName, callParams, funcParams);
+        fprintf(errorFile, "Semantic Error: The total number of call parameters does not match action declaration.");
         exit(1);
     }
 }

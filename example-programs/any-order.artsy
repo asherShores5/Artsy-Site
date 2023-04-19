@@ -24,5 +24,3 @@ addline;
 print testArr[0] + testArr[1] + testArr[1];
 addline;
 print x * y * z;
-
-

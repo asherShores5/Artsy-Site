@@ -509,13 +509,12 @@ Primary :	 INTEGER	{
 		char * arrayPrefix = malloc(100*sizeof(char));
 		strcat(arrayPrefix, "inarray_");
 		strcat(arrayPrefix, getItemType($1, scopeStack, stackPointer));
-		// printf("Prefix: %s\n", arrayPrefix);
 
 		$$ = AST_DoublyChildNodes(arrayPrefix, $1, $3, $1, $3);
 	}
 ;
 
-ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "\n", 0);}	
+ExprListTail: {$$ = AST_SingleChildNode("exprlist end", "", "");}	
 	| Primary	{ 
 			$$ = AST_SingleChildNode("exprlist end", $1, $1); 
 	}
@@ -727,7 +726,11 @@ ActionCall: ID LEFTPAREN ExprList RIGHTPAREN {
             char * funcParamType = getFuncParamItemType($1, numParams, i);
 
             // Get the expression parameter type at this index
-			char * callParamType = getCallListItemType(funcCallParamList, i, 0, scopeStack[stackPointer]);
+			char * callScope = malloc(100 * sizeof(char));
+			strcpy(callScope, scopeStack[stackPointer]);
+			char * callParamType = getCallListItemType(funcCallParamList, i, 0, callScope);
+
+			printf("types: %s %s\n", funcParamType, callParamType);
 
             // Check to see if the two types do not match
             // If they don't, return a Semantic Error
