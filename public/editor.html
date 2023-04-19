@@ -94,27 +94,27 @@
           editor.setValue(localStorage.getItem('codeInput'));
         }
 
-        // Convert UUID data into JSON
-        var data = {
-          uuid: localStorage.getItem('uuid')
-        };
-        var jsonData = JSON.stringify(data);
+        // // Convert UUID data into JSON
+        // var data = {
+        //   uuid: localStorage.getItem('uuid')
+        // };
+        // var jsonData = JSON.stringify(data);
 
-        // Try to display previously compiled code, if possible
-        $.ajax({
-          url: "load_editor.php",
-          type: "POST",
-          contentType: 'application/json',
-          data: jsonData,
-          success: function(response) {
-            if (response !== "File not found") {
-              displayCode(response);
-            }
-          },
-          error: function(xhr, status, error) {
-            console.log("Error: " + error);
-          }
-        });
+        // // Try to display previously compiled code, if possible
+        // $.ajax({
+        //   url: "load_editor.php",
+        //   type: "POST",
+        //   contentType: 'application/json',
+        //   data: jsonData,
+        //   success: function(response) {
+        //     if (response !== "File not found") {
+        //       displayCode(response);
+        //     }
+        //   },
+        //   error: function(xhr, status, error) {
+        //     console.log("Error: " + error);
+        //   }
+        // });
       }
 
       // Function to run code and display output in output box
