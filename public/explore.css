@@ -1,0 +1,172 @@
+/* Global styles */
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Container styles */
+  .container {
+    padding-top: 60px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Search bar styles */
+  .search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input[type="text"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 80%;
+  }
+  
+  .search-bar button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Categories styles */
+  .categories {
+    width: 20%;
+    margin-right: 20px;
+  }
+  
+  .categories h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .categories ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .categories li {
+    margin-bottom: 5px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #eee;
+  }
+  
+  .categories li:hover {
+    background-color: #ddd;
+  }
+  
+  /* User profiles styles */
+  .user-profiles {
+    width: 20%;
+  }
+  
+  .user-profiles h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .user-profiles ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .user-profiles li {
+    margin-bottom: 5px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #eee;
+  }
+  
+  .user-profiles li:hover {
+    background-color: #ddd;
+  }
+  
+  /* Content feed styles */
+  .content-feed {
+    width: 60%;
+  }
+  
+  .content-feed h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .scrollable {
+    max-height: 500px;
+    overflow-y: scroll;
+  }
+  
+  /* Project styles */
+  .project-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    color: #777;
+  }
+  
+  .project-info span {
+    font-size: 14px;
+  }
+  
+  .project-info .category {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  .project-info .author {
+    font-style: italic;
+  }
+  
+  .project-info .date {
+    font-weight: bold;
+    }
+    
+    /* Responsive styles */
+    @media screen and (max-width: 768px) {
+    .container {
+    padding: 10px;
+    }
+    
+    .search-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    }
+    
+    .search-bar input[type="text"] {
+    width: 100%;
+    margin-bottom: 10px;
+    }
+    
+    .categories, .user-profiles {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 20px;
+    }
+    
+    .content-feed {
+    width: 100%;
+    }
+    }
+  

@@ -31,4 +31,20 @@ transition: 1s ease;
 .videobox{
     transition: 1s ease;
 }
+
+/* CSS Styles */ 
+
+body { 
+font-family: Arial, sans-serif; 
+background-color: #f2f2f2; 
+} 
+.video-container { 
+width: 80%;  
+margin: 50px auto; 
+text-align: center; 
+} 
+.video-title { 
+font-size: 32px; 
+margin-bottom: 20px; 
+} 
     
