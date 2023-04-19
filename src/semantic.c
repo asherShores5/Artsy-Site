@@ -21,6 +21,38 @@ void CheckGlobal(char* variableName, char* currentScope) {
     }
 }
 
+void checkIntLength(char * varName) {
+    int intLen = strlen(varName);
+    if (intLen > 11 && varName[0] == '-' || intLen > 10 && varName[0] != '-') {
+        fprintf(errorFile, "Semantic Error, line %d: Int value is too long. (current: %d, max: 10)\n", lines, intLen);
+        exit(1);
+    }
+}
+
+void checkFloatLength(char * varName) {
+    int floatLen = strlen(varName);
+    if (floatLen > 41 && varName[0] == '-' || floatLen > 40 && varName[0] != '-') {
+        fprintf(errorFile, "Semantic Error, line %d: Float value is too long. (current: %d, max: 40)\n", lines, floatLen);
+        exit(1);
+    }
+}
+
+void checkStringLength(char * varName) {
+    int stringLen = strlen(varName);
+    if (stringLen > 50) {
+        fprintf(errorFile, "Semantic Error, line %d: String value is too long. (current: %d, max: 50)\n", lines, stringLen);
+        exit(1);
+    }
+}
+
+void checkVariableLength(char * varName) {
+    int varLen = strlen(varName);
+    if (varLen > 50) {
+        fprintf(errorFile, "Semantic Error, line %d: Variable definition \"%s\" is too long. (current: %d, max: 50)\n", lines, varName, varLen);
+        exit(1);
+    }
+}
+
 // Find an item's primary type using getItemType
 // Returns the actual primary token
 char* CheckPrimaryType(char * variableName, char scopeStack[50][50], int stackPointer){

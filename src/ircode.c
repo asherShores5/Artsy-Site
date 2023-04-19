@@ -1106,6 +1106,19 @@ char* ASTTraversal(struct AST* root) {
                     // New changes here
                     if (strncmp(root->left->LHS, "action call", 14) == 0) {
                         strcpy(leftVar, ASTTraversal(root->left));
+                    } 
+                    // Avoids second missing expression problem
+                    else if (strcmp(root->LHS, "+") == 0
+                        || strcmp(root->LHS, "-") == 0
+                        || strcmp(root->LHS, "*") == 0
+                        || strcmp(root->LHS, "/") == 0
+                        || strcmp(root->LHS, ">") == 0
+                        || strcmp(root->LHS, ">=") == 0
+                        || strcmp(root->LHS, "<") == 0
+                        || strcmp(root->LHS, "<=") == 0
+                        || strcmp(root->LHS, "==") == 0
+                        || strcmp(root->LHS, "!=") == 0) {
+                            strcpy(leftVar, ASTTraversal(root->left));
                     } else if (strncmp(root->left->LHS, "int", 3) == 0 || strncmp(root->left->LHS, "float", 5) == 0) {
                         strcpy(leftVar, root->left->left->RHS);
                     } else if (strncmp(root->left->RHS, "action call param list", 24) == 0) {
@@ -1132,19 +1145,6 @@ char* ASTTraversal(struct AST* root) {
                     strcpy(rightVar, ASTTraversal(root->right));
                 }
 
-                // Traverse to the left FIRST if there's an expression; avoids last missing expression problem
-                if (strcmp(root->LHS, "+") == 0
-                    || strcmp(root->LHS, "-") == 0
-                    || strcmp(root->LHS, "*") == 0
-                    || strcmp(root->LHS, "/") == 0
-                    || strcmp(root->LHS, ">") == 0
-                    || strcmp(root->LHS, ">=") == 0
-                    || strcmp(root->LHS, "<") == 0
-                    || strcmp(root->LHS, "<=") == 0
-                    || strcmp(root->LHS, "==") == 0
-                    || strcmp(root->LHS, "!=") == 0) {
-                        return emitBinaryOperation(root->nodeType, ASTTraversal(root->left), rightVar);;
-                }
                 return emitBinaryOperation(root->nodeType, leftVar, rightVar);
         }
 
@@ -1172,11 +1172,11 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        printf("root->nodeType: %s\n", root->nodeType);
+        // printf("root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
-        // // printf("root->LHS: %s\n", root->LHS);
+        // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
-        // // printf("root->RHS: %s\n", root->RHS);
+        // printf("root->RHS: %s\n", root->RHS);
         fflush(stdout);
 
         char rightVar[50];
@@ -1468,7 +1468,6 @@ char* ASTTraversalOptimized(struct AST* root) {
         }
         if(strncmp(root->nodeType, "action call", 14) == 0) {
             ASTTraversalOptimized(root->right);
-            // printf("made it\n");
 
             memset(buffer, 0, 50);
             strcpy(buffer, emitFunctionCallOptimized(root->LHS));
@@ -1548,11 +1547,25 @@ char* ASTTraversalOptimized(struct AST* root) {
                     // New changes here
                     if (strncmp(root->left->LHS, "action call", 14) == 0) {
                         strcpy(leftVar, ASTTraversalOptimized(root->left));
+                    }
+                    // Avoids second missing expression problem
+                    else if (strcmp(root->LHS, "+") == 0
+                        || strcmp(root->LHS, "-") == 0
+                        || strcmp(root->LHS, "*") == 0
+                        || strcmp(root->LHS, "/") == 0
+                        || strcmp(root->LHS, ">") == 0
+                        || strcmp(root->LHS, ">=") == 0
+                        || strcmp(root->LHS, "<") == 0
+                        || strcmp(root->LHS, "<=") == 0
+                        || strcmp(root->LHS, "==") == 0
+                        || strcmp(root->LHS, "!=") == 0) {
+                            strcpy(leftVar, ASTTraversalOptimized(root->left));
                     } else if (strncmp(root->left->LHS, "int", 3) == 0 || strncmp(root->left->LHS, "float", 5) == 0) {
                         strcpy(leftVar, root->left->left->RHS);
                     } else if (strncmp(root->left->RHS, "action call param list", 24) == 0) {
                         strcpy(leftVar, ASTTraversalOptimized(root->left));
-                    } else {
+                    }
+                    else {
                         sprintf(leftVar, "%s[%s]", root->left->LHS, root->left->RHS);
                     }
                 } else {
@@ -1573,23 +1586,6 @@ char* ASTTraversalOptimized(struct AST* root) {
                     }
                 } else {
                     strcpy(rightVar, ASTTraversalOptimized(root->right));
-                }
-
-                // Traverse to the left FIRST if there's an expression; avoids last missing expression problem
-                if (strcmp(root->LHS, "+") == 0
-                    || strcmp(root->LHS, "-") == 0
-                    || strcmp(root->LHS, "*") == 0
-                    || strcmp(root->LHS, "/") == 0
-                    || strcmp(root->LHS, ">") == 0
-                    || strcmp(root->LHS, ">=") == 0
-                    || strcmp(root->LHS, "<") == 0
-                    || strcmp(root->LHS, "<=") == 0
-                    || strcmp(root->LHS, "==") == 0
-                    || strcmp(root->LHS, "!=") == 0) {
-                        char * newVar = getVarConstant(ASTTraversalOptimized(root->left));
-                        strcpy(rightVarOptimized, getVarConstant(newVar));
-                        strcpy(leftVarOptimized, getVarConstant(rightVar));
-                        return inWhileLoop ? emitBinaryOperationUnoptimized(root->nodeType, leftVar, rightVar) : emitBinaryOperationOptimized(root->nodeType, rightVarOptimized, leftVarOptimized);
                 }
 
                 strcpy(rightVarOptimized, getVarConstant(leftVar));

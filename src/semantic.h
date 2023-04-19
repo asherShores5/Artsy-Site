@@ -9,8 +9,12 @@ extern int lines;
 // Header file for all semantic check functions
 
 void CheckGlobal(char* variableName, char* currentScope);
+void checkIntLength(char * varName);
+void checkFloatLength(char * varName);
+void checkStringLength(char * varName);
+void checkVariableLength(char * varName);
 char* CheckPrimaryType(char*arg1, char scopeStack[50][50], int stackPointer);
-void CheckID(char * identifier, char scopeStack[50][50], int stackPointer);
+void checkID(char * identifier, char scopeStack[50][50], int stackPointer);
 void CheckComparisonType(struct AST * leftExprTreeNode, struct AST * rightExprTreeNode, char scopeStack[50][50], int stackPointer);
 void CheckAssignmentType(char * identifier, char * exprType, char scopeStack[50][50], int stackPointer);
 void CheckOperationType(char * leftExpr, char * rightExpr);
