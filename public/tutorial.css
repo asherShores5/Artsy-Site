@@ -4,8 +4,7 @@
     margin-left: auto;
     margin-right: auto;
     width: 8em; 
-    overflow: scroll;   
-    
+    overflow: scroll;      
 }
 
 .videobox{
@@ -17,7 +16,6 @@
     text-align: justify;
     font-size: 4.3vw;
     resize: both;
-
 }
 
 
@@ -48,3 +46,8 @@ font-size: 32px;
 margin-bottom: 20px; 
 } 
     
+@media (max-width: 767px) {
+    .video-container {
+      width: 100%; /* set the width to 100% for screens smaller than 768px */
+    }
+}
