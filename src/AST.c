@@ -147,18 +147,15 @@ int getNumExprs(struct AST * root) {
 	if (root == NULL) {
 		return 0;
 	}
-	printf("root: %s\n", root->nodeType);
 	int count = 0;
 	if (strncmp(root->nodeType, "action call param list", 24) != 0 && strncmp(root->nodeType, "exprlist exprtail", 17) != 0 && strncmp(root->nodeType, "exprlist end", 13) != 0 && strncmp(root->nodeType, ")", 1) != 0 && strncmp(root->nodeType, ",", 1) != 0) {
 		return 1;
 	}
 	if (strncmp(root->LHS, "\0", 1) != 0) {
-		printf("left:%s\n", root->LHS);
 		count += getNumExprs(root->left);
 	}
 
 	if (strncmp(root->RHS, "\0", 1) != 0) {
-		printf("right:%s\n", root->RHS);
 		count += getNumExprs(root->right);
 	}
 
