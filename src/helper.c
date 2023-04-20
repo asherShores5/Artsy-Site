@@ -57,17 +57,21 @@ int isAlpha(char * phrase) {
 // Helper function to determine if the string is an integer
 int isInt(char * phrase) {
     // Get length of string
-    int len = strlen(phrase);
+    int len;
+    for (len = 0; phrase[len] != '\0'; ++len);
+
+    // If the length of the string is zero or contains only spaces, it cannot be an integer
+    int contains_only_spaces = strspn(phrase, " \t\n\r") == len;
+    if (len == 0 || contains_only_spaces) {
+        return 0;
+    }
 
     // Loop through each character
     // If there is a non-numerical character, return false
     for (int i = 0; i < len; i++) {
         if (i == 0 && phrase[i] == '-') {
-            // Ignore case for negative floats
-        } else if (phrase[i] == '\n' || phrase[i] == '\0' || phrase[i] == ' ') {
-            // Ignore case for new lines or end of statements
-        }
-        else if (!isdigit(phrase[i])) {
+            // Ignore case for negative integers
+        } else if (!isdigit(phrase[i])) {
             return 0;
         }
     }
@@ -79,7 +83,7 @@ int isInt(char * phrase) {
 // Helper function to determine if the string is a float
 int isFloat(char * phrase) {
     // Get length of string
-    int len;
+    int len = 0;
     for (len = 0; phrase[len] != '\0'; ++len);
 
     // Set a var for float condition (must require one and only one "." symbol)
@@ -112,7 +116,7 @@ int isFloat(char * phrase) {
 
 // Helper function that returns a boolean based on whether a phrase is a variable or not
 int isVar(char * phrase) {
-    if (phrase[0] == '\"' || phrase[0] == '\'' || isFloat(phrase) || isInt(phrase)) {
+    if (phrase[0] == '\"' || phrase[0] == '\'' || isFloat(phrase) == 1 || isInt(phrase) == 1) {
         return 0;
     }
     return 1;

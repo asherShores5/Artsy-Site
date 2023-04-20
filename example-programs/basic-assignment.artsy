@@ -1,0 +1,7 @@
+declare num1 as int;
+declare num2 as int;
+
+let num2 = 20;
+let num1 = num2;
+
+print num1;

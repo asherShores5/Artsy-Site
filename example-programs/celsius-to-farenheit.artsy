@@ -1,0 +1,5 @@
+declare celsius as int;
+declare fahrenheit as int;
+let celsius = 30;
+let fahrenheit = (celsius * 9 / 5) + 32;
+print fahrenheit;

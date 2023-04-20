@@ -543,8 +543,7 @@ int countParams(int itemID) {
 }
 
 int getNumFuncParams(char funcName[50]) {
-	char ** scopeStack = { "global" };
-	return countParams(getItemID(funcName, scopeStack, 0));
+	return countParams(getItemID(funcName, "global", 0));
 }
 
 char * getParamType(int itemID, int numParams, int searchIndex) {
@@ -555,16 +554,17 @@ char * getParamType(int itemID, int numParams, int searchIndex) {
 	struct Entry* tempList = symTabItems[itemID].paramlist;
 
 	// For each loop, add one parameter to the counter
+	char * paramType = malloc(100 * sizeof(char));
 	for (int i = 0; i < numParams; i++) {
 		if (i == searchIndex) {
-			char * paramType = malloc(100*sizeof(char));
 			strcpy(paramType, tempList->itemType);
 			return paramType;
 		}
 		tempList = tempList->paramlist;
 	}
 	// If it is not found, return none
-	return "none";
+	strcpy(paramType, "none");
+	return paramType;
 }
 
 char * getFuncParamItemType(char funcName[50], int numParams, int index) {
