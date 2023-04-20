@@ -1,0 +1,31 @@
+# Let's do something new!
+# Implement conditionals in Artsy
+
+/#
+Conditional Reference Guide:
+A statement that is either true or false.
+Example: If x is 10, is x < 9 true or false?
+
+Types of conditions:
+"==" means equals
+"!=" means doesnt equal
+"<" means less than
+">" means greater than
+"<=" means less than OR equals
+">=" means greater than OR equals
+
+You can use them in:
+    - If statements
+    - Loops
+#/
+
+declare x as int;
+let x = 10;
+
+if (x > 10) {
+    print "Too hot";
+} elif (x < 10) {
+    print "Too cold";
+} else {
+    print "Just right";
+}

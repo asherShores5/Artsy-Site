@@ -1,0 +1,15 @@
+# Let's do something new!
+# Factorial Recursive Function
+action int factorial(int num) {
+    if (num == 0) {
+        report 1;
+    }
+    declare new as int;
+    let new = num - 1;
+    report num * factorial(new);
+}
+
+declare result as int;
+let result = factorial(3);
+print "Factorial Result: ";
+print result;
