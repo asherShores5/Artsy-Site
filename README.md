@@ -1,4 +1,4 @@
-# Artsy Coding: Learn the art of programming
+# The Artsy Project: Learn the art of programming
 Website created by Andrew Esch, Asher Shores, Albert Gonzales, and Karan Sharma
 
 ## Operating System
