@@ -833,7 +833,7 @@ char * emitFunctionCallOptimized(char *id) {
 // This initializes creating all of the IRcode for unoptimized IRcode
 char* ASTTraversal(struct AST* root) {
     if(root != NULL) {
-        printf("IR root->nodeType: %s\n", root->nodeType);
+        // printf("IR root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
@@ -1266,7 +1266,7 @@ char* ASTTraversal(struct AST* root) {
  */
 char* ASTTraversalOptimized(struct AST* root) {
     if(root != NULL) {
-        printf("IROPT root->nodeType: %s\n", root->nodeType);
+        // printf("IROPT root->nodeType: %s\n", root->nodeType);
         // if(root->LHS != NULL)
         // printf("root->LHS: %s\n", root->LHS);
         // if(root->RHS != NULL)
