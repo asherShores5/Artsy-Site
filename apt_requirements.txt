@@ -1,0 +1,6 @@
+make
+flex
+bison
+wabt
+build-essential
+gcc
