@@ -33,4 +33,7 @@ IF DEFINED APP_POOL_ID (
     %windir%\System32\inetsrv\appcmd.exe start apppool /apppool.name:%APP_POOL_ID%
 )
 
+chown -R www-data:www-data /home/site/wwwroot/src
+chmod -R 755 /home/site/wwwroot/src
+
 echo Deployment complete.
