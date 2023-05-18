@@ -730,8 +730,6 @@ ActionCall: ID LEFTPAREN ExprList RIGHTPAREN {
 			strcpy(callScope, scopeStack[stackPointer]);
 			char * callParamType = getCallListItemType(funcCallParamList, i, 0, callScope);
 
-			printf("types: %s %s\n", funcParamType, callParamType);
-
             // Check to see if the two types do not match
             // If they don't, return a Semantic Error
             if (strncmp(funcParamType, callParamType, strlen(callParamType)) != 0) {
