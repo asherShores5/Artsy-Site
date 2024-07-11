@@ -66,23 +66,23 @@ void initAssemblyFile(char * sessionID) {
     VARScodePath = malloc(1000 * sizeof(char));
     LOCALcodePath = malloc(1000 * sizeof(char));
 
-    strcpy(IRfilePath, "./in/");
+    strcpy(IRfilePath, "/tmp/");
     strcat(IRfilePath, sessionID);
     strcat(IRfilePath, "_IRcodeOptimized.ir");
 
-    strcpy(WATcodePath, "./in/");
+    strcpy(WATcodePath, "/tmp/");
     strcat(WATcodePath, sessionID);
     strcat(WATcodePath, "_WATcode.wat");
 
-    strcpy(MAINcodePath, "./in/");
+    strcpy(MAINcodePath, "/tmp/");
     strcat(MAINcodePath, sessionID);
     strcat(MAINcodePath, "_MAINcode.wat");
 
-    strcpy(VARScodePath, "./in/");
+    strcpy(VARScodePath, "/tmp/");
     strcat(VARScodePath, sessionID);
     strcat(VARScodePath, "_VARScode.wat");
 
-    strcpy(LOCALcodePath, "./in/");
+    strcpy(LOCALcodePath, "/tmp/");
     strcat(LOCALcodePath, sessionID);
     strcat(LOCALcodePath, "_LOCALcode.wat");
 

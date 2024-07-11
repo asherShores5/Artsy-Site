@@ -16,7 +16,7 @@ int main(int argc, char ** argv) {
   if (argc > 1) {
     // Create an input path
     char * inputPath = malloc(1000 * sizeof(char));
-    strcpy(inputPath, "./in/");
+    strcpy(inputPath, "/tmp/");
     strcat(inputPath, argv[1]);
     strcat(inputPath, ".txt");
 
@@ -30,7 +30,7 @@ int main(int argc, char ** argv) {
 
     // Next, create an error log file
     char * errorPath = malloc(1000 * sizeof(char));
-    strcpy(errorPath, "./in/");
+    strcpy(errorPath, "/tmp/");
     strcat(errorPath, argv[1]);
     strcat(errorPath, "_error.txt");
 
@@ -45,7 +45,7 @@ int main(int argc, char ** argv) {
 
     // Next, create the unoptimized IRcode filename
     char * unoptIrCodePath = malloc(1000 * sizeof(char));
-    strcpy(unoptIrCodePath, "./in/");
+    strcpy(unoptIrCodePath, "/tmp/");
     strcat(unoptIrCodePath, argv[1]);
     strcat(unoptIrCodePath, "_IRcode.ir");
 
@@ -54,7 +54,7 @@ int main(int argc, char ** argv) {
 
     // Next, create the optimized IRcode filename
     char * optIrCodePath = malloc(1000 * sizeof(char));
-    strcpy(optIrCodePath, "./in/");
+    strcpy(optIrCodePath, "/tmp/");
     strcat(optIrCodePath, argv[1]);
     strcat(optIrCodePath, "_IRcodeOptimized.ir");
 
