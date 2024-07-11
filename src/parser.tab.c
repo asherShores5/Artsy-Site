@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.8.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -46,10 +46,10 @@
    USER NAME SPACE" below.  */
 
 /* Identify Bison output, and Bison version.  */
-#define YYBISON 30801
+#define YYBISON 30802
 
 /* Bison version string.  */
-#define YYBISON_VERSION "3.8.1"
+#define YYBISON_VERSION "3.8.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -2218,8 +2218,6 @@ yyreduce:
 			strcpy(callScope, scopeStack[stackPointer]);
 			char * callParamType = getCallListItemType(funcCallParamList, i, 0, callScope);
 
-			printf("types: %s %s\n", funcParamType, callParamType);
-
             // Check to see if the two types do not match
             // If they don't, return a Semantic Error
             if (strncmp(funcParamType, callParamType, strlen(callParamType)) != 0) {
@@ -2229,11 +2227,11 @@ yyreduce:
         }
     }
 }
-#line 2233 "parser.tab.c"
+#line 2231 "parser.tab.c"
     break;
 
 
-#line 2237 "parser.tab.c"
+#line 2235 "parser.tab.c"
 
       default: break;
     }
@@ -2426,7 +2424,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 746 "parser.y"
+#line 744 "parser.y"
 
 
 int parser_main(FILE * inputfile)

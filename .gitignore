@@ -96,3 +96,9 @@ vendor
 
 # Other deploy files
 deploy.txt
+
+# deployment stuff
+lambda-package
+
+# test file
+test.js

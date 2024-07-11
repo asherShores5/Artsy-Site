@@ -1,5 +1,0 @@
-{
-    "liveServer.settings.port": 5501,
-    "appService.defaultWebAppToDeploy": "/subscriptions/d9f01fe0-3324-45d8-9e78-b9fef81cc9f4/resourceGroups/drewesch-team/providers/Microsoft.Web/sites/artsy",
-    "appService.deploySubpath": "."
-}
