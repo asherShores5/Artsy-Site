@@ -9,6 +9,16 @@ var save_text = document.getElementById("save-text");
 // Start code editor
 startEditor();
 
+let wat2wasm;
+WebAssembly.instantiateStreaming(fetch("https://cdn.jsdelivr.net/npm/wabt@1.0.32/wabt.wasm")).then(wabt => {
+  wat2wasm = (watCode) => {
+    const module = wabt.instance.exports.wat2wasm(watCode);
+    const binary = new Uint8Array(wabt.instance.exports.memory.buffer, module.ptr, module.size);
+    wabt.instance.exports.free(module.ptr);
+    return binary.slice();
+  };
+});
+
 function generateUUID() {
   let uuid = '', i, random;
   for (i = 0; i < 32; i++) {
@@ -39,50 +49,39 @@ function startEditor() {
 }
 
 // Function to run code and display output in output box
-async function displayCode(response) {
-  // Display Artsy within the output terminal
-  var memory;
-
-  // Check if the file name ends with a ".wasm" extension
-  if (response.endsWith('.wasm')) {
-    try {
-      const module = await fetch(response);
-      const { instance } = await WebAssembly.instantiateStreaming(module, {
-        env: {
-          print_int: function printInt(wVar) {
-            output.innerHTML += wVar;
-          },
-          print_float: function printFloat(wVar) {
-            output.innerHTML += wVar;
-          },
-          print_string: function printString(wVar) {
-            output.innerHTML += String.fromCharCode(wVar);
-          },
-          newline: function newline() {
-            output.innerHTML += "\n";
-          }
-        }
-      });
-      memory = instance.exports.pagememory;
-      setSaveText("Code processed!", "color:green;");
-    } catch (error) {
-      setSaveText("Processing failed.", "color:red;");
-      output.innerHTML = error;
-    }
-  } else if (response.endsWith('_error.txt')) {
-    // Display the compiler error to the output terminal
-    fetch(response)
-      .then(response => response.text())
-      .then(data => {
-        output.innerHTML = data;
-      })
-      .catch(error => console.error(error));
+async function displayCode(watCode) {
+  try {
+    // Convert WAT to WASM
+    const wasmModule = await WebAssembly.compile(wat2wasm(watCode));
     
+    // Instantiate the WASM module
+    const instance = await WebAssembly.instantiate(wasmModule, {
+      env: {
+        print_int: function printInt(wVar) {
+          output.innerHTML += wVar;
+        },
+        print_float: function printFloat(wVar) {
+          output.innerHTML += wVar;
+        },
+        print_string: function printString(wVar) {
+          output.innerHTML += String.fromCharCode(wVar);
+        },
+        newline: function newline() {
+          output.innerHTML += "\n";
+        }
+      }
+    });
+
+    // Run the start function if it exists
+    if (instance.exports._start) {
+      instance.exports._start();
+    }
+
+    setSaveText("Code processed!", "color:green;");
+  } catch (error) {
+    console.error("Error:", error);
     setSaveText("Processing failed.", "color:red;");
-  } else {
-    // Display a default error message to the output terminal
-    setSaveText("Processing failed.", "color:red;");
-    output.innerHTML = "Error running Artsy compiler. Try again later.";
+    output.innerHTML = "Error running compiled code: " + error.message;
   }
 }
 
@@ -120,19 +119,26 @@ async function runCode() {
   // Display saveCode
   setSaveText("Processing your code...", "color:black;");
 
-  // Send an AJAX request to process_code.php and execute compiler
-  $.ajax({
-    url: "/process_code",
-    type: "POST",
-    contentType: 'application/json',
-    data: jsonData,
-    success: function(response) {
-      displayCode(response);
-    },
-    error: function(xhr, status, error) {
-      console.log("Error: " + error);
+  try {
+    const response = await fetch('https://5dpcfw46rj.execute-api.us-west-1.amazonaws.com/compile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  });
+
+    const watCode = await response.text();
+    displayCode(watCode);
+  } catch (error) {
+    console.error("Error:", error);
+    setSaveText("Processing failed.", "color:red;");
+    output.innerHTML = "Error running Artsy compiler. Try again later.";
+  }
 }
 
 // Register change event handler
