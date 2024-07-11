@@ -1,26 +1,21 @@
-<!DOCTYPE html> 
-<html> 
-  <head> 
-    <title>Artsy | Explore Coding Tutorials</title>
-    <link rel="stylesheet" href="tutorial.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    
-    <style>
-        body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
-        .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
-        .fa-anchor,.fa-coffee {font-size:200px}
-    </style>  
-  </head> 
-  <body>
-    <!-- Nav Bar -->
-<div class="w3-top">
-  <div class="w3-bar w3-green w3-card w3-left-align w3-large">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Artsy | Explore Coding Tutorials</title>
+  <link rel="stylesheet" href="css/tutorial.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+  <!-- Nav Bar -->
+  <div class="w3-top">
+    <div class="w3-bar w3-green w3-card w3-left-align w3-large">
       <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-green" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
       <a href="index.html" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Home</a>
       <a href="editor.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Create</a>
@@ -28,41 +23,43 @@
       <a href="explore.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Explore</a>
       <a href="https://www.notion.so/drewesch/Artsy-Coding-7b9021e7eb11475ca68ca2d7a60bdd1e" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" target="_blank">Documentation</a>
       <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" target="_blank">About Us</a>
+    </div>
+
+    <!-- Navbar on small screens -->
+    <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+      <a href="index.html" class="w3-bar-item w3-button w3-padding-large">Home</a>
+      <a href="editor.html" class="w3-bar-item w3-button w3-padding-large">Create</a>
+      <a href="tutorial.html" class="w3-bar-item w3-button w3-padding-large">Tutorial</a>
+      <a href="explore.html" class="w3-bar-item w3-button w3-padding-large">Explore</a>
+      <a href="https://www.notion.so/drewesch/Artsy-Coding-7b9021e7eb11475ca68ca2d7a60bdd1e" class="w3-bar-item w3-button w3-padding-large w3-hover-white" target="_blank">Documentation</a>
+      <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-padding-large w3-hover-white" target="_blank">About Us</a>
+    </div>
   </div>
 
-  <!-- Navbar on small screens -->
-  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
-    <a href="index.html" class="w3-bar-item w3-button w3-padding-large">Home</a>
-    <a href="editor.html" class="w3-bar-item w3-button w3-padding-large">Create</a>
-    <a href="tutorial.html" class="w3-bar-item w3-button w3-padding-large">Tutorial</a>
-    <a href="explore.html" class="w3-bar-item w3-button w3-padding-large">Explore</a>
-    <a href="https://www.notion.so/drewesch/Artsy-Coding-7b9021e7eb11475ca68ca2d7a60bdd1e" class="w3-bar-item w3-button w3-padding-large w3-hover-white" target="_blank">Documentation</a>
-    <a href="https://padlet.com/ashershores5/artsy-learn-the-art-of-programming-yryx1aj5o50u1jkw" class="w3-bar-item w3-button w3-padding-large w3-hover-white" target="_blank">About Us</a>
-</div>
+  <div class="video-container" style="width: auto; height: 1000;">
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/82zcbIeJdKA')">
+      <img class="img-1" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Welcome To Artsy!</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color:azure;" onclick="window.open('https://www.youtube.com/watch?v=cjzPI_YppZo')">
+      <img class="img-2" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Variables</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://www.youtube.com/watch?v=Uq8t7ZOc3pE')">
+      <img class="img-3" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Arrays</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/Ybpn5hzplV8')">
+      <img class="img-4" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Create a Simple Calculator</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/98GWOAPN6do')">
+      <img class="img-4" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Recursion</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/o6rdsT_rLbE')">
+      <img class="img-5" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Loops</h1>
+    </div>
+    <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/_1Ff8-Hj7FU')">
+      <img class="img-6" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Ifs</h1>
+    </div>
+  </div>
 
-</div>
-  <br><br><br>  
-  <h1 style="text-align:center;">Click on Any Video To Learn More</h1>
-    <div class="video-container" style="width: auto; height: 1000;">
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/82zcbIeJdKA')">                  <img class="img-1" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Welcome To Artsy!</h1></div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color:azure;" onclick="window.open('https://www.youtube.com/watch?v=cjzPI_YppZo')">    <img class="img-2" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Variables</h1> </div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://www.youtube.com/watch?v=Uq8t7ZOc3pE')">   <img class="img-3" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Arrays</h1></div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/Ybpn5hzplV8')">                  <img class="img-4" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Create a Simple Calculator</h1></div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/98GWOAPN6do')">                  <img class="img-4" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Recursion</h1></div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/o6rdsT_rLbE')">                  <img class="img-5" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Loops</h1></div>
-      <div class="videobox" style="width: auto; height: auto; border: solid; color: azure;" onclick="window.open('https://youtu.be/_1Ff8-Hj7FU')">                  <img class="img-6" src="favicon.ico" width="100px" height="100px"> <h1 style="margin-left: 40px;">Learn about Ifs</h1></div>
-    </div> 
-  </body> 
-
-  <script>
-    // Used to toggle the menu on small screens when clicking on the menu button
-    function myFunction() {
-        var x = document.getElementById("navDemo");
-        if (x.className.indexOf("w3-show") == -1) {
-            x.className += " w3-show";
-        } else {
-            x.className = x.className.replace(" w3-show", "");
-        }
-    }
-</script>
-</html> 
+  <script src="js/tutorial.js"></script>
+</body>
+</html>
