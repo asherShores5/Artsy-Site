@@ -9,21 +9,41 @@ var save_text = document.getElementById("save-text");
 // Start code editor
 startEditor();
 
-let wat2wasm;
-WabtModule().then(wabt => {
-  wat2wasm = (watCode) => {
-    try {
-      const module = wabt.parseWat('temp.wat', watCode);
-      const { buffer } = module.toBinary({});
-      return buffer;
-    } catch (error) {
-      console.error('Error in wat2wasm:', error);
-      throw error;
-    }
-  };
-}).catch(error => {
-  console.error('Error loading WABT:', error);
-});
+let wabtModule;
+
+async function initWabt() {
+  try {
+    wabtModule = await WabtModule();
+    console.log('WABT initialized successfully');
+  } catch (error) {
+    console.error('Error initializing WABT:', error);
+  }
+}
+
+initWabt();
+
+async function wat2wasm(watCode) {
+  if (!wabtModule) {
+    throw new Error('WABT not initialized');
+  }
+  try {
+    const module = wabtModule.parseWat('temp.wat', watCode);
+    const { buffer } = module.toBinary({});
+    return buffer;
+  } catch (error) {
+    console.error('Error in wat2wasm:', error);
+    throw error;
+  }
+}
+
+function updateWatSyntax(watCode) {
+  return watCode
+    .replace(/\(set_local /g, '(local.set ')
+    .replace(/\(get_local /g, '(local.get ')
+    .replace(/\(tee_local /g, '(local.tee ')
+    .replace(/\(set_global /g, '(global.set ')
+    .replace(/\(get_global /g, '(global.get ');
+}
 
 function generateUUID() {
   let uuid = '', i, random;
@@ -57,8 +77,12 @@ function startEditor() {
 // Function to run code and display output in output box
 async function displayCode(watCode) {
   try {
+    // Update WAT syntax
+    const updatedWatCode = updateWatSyntax(watCode);
+    
     // Convert WAT to WASM
-    const wasmModule = await WebAssembly.compile(wat2wasm(watCode));
+    const wasmBuffer = await wat2wasm(updatedWatCode);
+    const wasmModule = await WebAssembly.compile(wasmBuffer);
     
     // Instantiate the WASM module
     const instance = await WebAssembly.instantiate(wasmModule, {
@@ -112,6 +136,14 @@ async function saveCode() {
 }
 
 async function runCode() {
+  if (!wabtModule) {
+    console.log('WABT not initialized yet, waiting...');
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+    if (!wabtModule) {
+      setSaveText("WABT initialization failed. Please refresh the page.", "color:red;");
+      return;
+    }
+  }
   // Reset terminal output
   output.innerHTML = "";
 
@@ -139,7 +171,7 @@ async function runCode() {
     }
 
     const watCode = await response.text();
-    displayCode(watCode);
+    await displayCode(watCode);
   } catch (error) {
     console.error("Error:", error);
     setSaveText("Processing failed.", "color:red;");
