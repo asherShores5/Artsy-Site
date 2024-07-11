@@ -160,3 +160,53 @@ body {
 .tabcontent.active {
   display: block;
 }
+
+#example-selector {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border: 2px solid #4CAF50;
+  border-radius: 5px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#example-selector:hover {
+  border-color: #45a049; /* Darker green on hover */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+#example-selector:focus {
+  outline: none;
+  border-color: #45a049;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+}
+
+/* Style for dropdown options */
+#example-selector option {
+  padding: 10px;
+  background-color: white;
+  color: #333;
+}
+
+/* Custom arrow for the dropdown */
+#example-selector {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%234CAF50' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  padding-right: 30px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  #example-selector {
+      font-size: 14px;
+      padding: 8px;
+  }
+}

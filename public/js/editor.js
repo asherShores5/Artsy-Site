@@ -6,18 +6,82 @@ editor.getSession().setUseWorker(false);
 var output = document.getElementById("output");
 var save_text = document.getElementById("save-text");
 
+const exampleSelector = document.getElementById('example-selector');
+
+async function loadExamplePrograms() {
+  try {
+    const response = await fetch('/example-programs/index.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const examples = await response.json();
+    
+    examples.forEach(example => {
+      const option = document.createElement('option');
+      option.value = example.file;
+      option.textContent = example.name;
+      exampleSelector.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error loading example programs:", error);
+  }
+}
+
+async function loadSelectedExample() {
+  const selectedFile = exampleSelector.value;
+  if (selectedFile) {
+    try {
+      const response = await fetch(`/example-programs/${selectedFile}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const code = await response.text();
+      editor.setValue(code, -1);
+      saveCode();
+    } catch (error) {
+      console.error("Error loading example:", error);
+    }
+  }
+}
+
 // Start code editor
 startEditor();
 
-let wat2wasm;
-WebAssembly.instantiateStreaming(fetch("https://cdn.jsdelivr.net/npm/wabt@1.0.32/wabt.wasm")).then(wabt => {
-  wat2wasm = (watCode) => {
-    const module = wabt.instance.exports.wat2wasm(watCode);
-    const binary = new Uint8Array(wabt.instance.exports.memory.buffer, module.ptr, module.size);
-    wabt.instance.exports.free(module.ptr);
-    return binary.slice();
-  };
-});
+let wabtModule;
+
+async function initWabt() {
+  try {
+    wabtModule = await WabtModule();
+    console.log('WABT initialized successfully');
+  } catch (error) {
+    console.error('Error initializing WABT:', error);
+  }
+}
+
+initWabt();
+
+async function wat2wasm(watCode) {
+  if (!wabtModule) {
+    throw new Error('WABT not initialized');
+  }
+  try {
+    const module = wabtModule.parseWat('temp.wat', watCode);
+    const { buffer } = module.toBinary({});
+    return buffer;
+  } catch (error) {
+    console.error('Error in wat2wasm:', error);
+    throw error;
+  }
+}
+
+function updateWatSyntax(watCode) {
+  return watCode
+    .replace(/\(set_local /g, '(local.set ')
+    .replace(/\(get_local /g, '(local.get ')
+    .replace(/\(tee_local /g, '(local.tee ')
+    .replace(/\(set_global /g, '(global.set ')
+    .replace(/\(get_global /g, '(global.get ');
+}
 
 function generateUUID() {
   let uuid = '', i, random;
@@ -46,13 +110,22 @@ function startEditor() {
     console.log("Your progress was restored!");
     editor.setValue(localStorage.getItem('codeInput'));
   }
+    // Load example programs
+    loadExamplePrograms();
+
+    // Add event listener for example selection
+    exampleSelector.addEventListener('change', loadSelectedExample);
 }
 
 // Function to run code and display output in output box
 async function displayCode(watCode) {
   try {
+    // Update WAT syntax
+    const updatedWatCode = updateWatSyntax(watCode);
+    
     // Convert WAT to WASM
-    const wasmModule = await WebAssembly.compile(wat2wasm(watCode));
+    const wasmBuffer = await wat2wasm(updatedWatCode);
+    const wasmModule = await WebAssembly.compile(wasmBuffer);
     
     // Instantiate the WASM module
     const instance = await WebAssembly.instantiate(wasmModule, {
@@ -106,6 +179,14 @@ async function saveCode() {
 }
 
 async function runCode() {
+  if (!wabtModule) {
+    console.log('WABT not initialized yet, waiting...');
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+    if (!wabtModule) {
+      setSaveText("WABT initialization failed. Please refresh the page.", "color:red;");
+      return;
+    }
+  }
   // Reset terminal output
   output.innerHTML = "";
 
@@ -133,7 +214,7 @@ async function runCode() {
     }
 
     const watCode = await response.text();
-    displayCode(watCode);
+    await displayCode(watCode);
   } catch (error) {
     console.error("Error:", error);
     setSaveText("Processing failed.", "color:red;");

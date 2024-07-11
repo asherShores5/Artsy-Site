@@ -1,0 +1,62 @@
+[
+    {
+      "name": "Addition",
+      "file": "addition.artsy"
+    },
+    {
+      "name": "Any Order",
+      "file": "any-order.artsy"
+    },
+    {
+      "name": "Arrays (Non-Functional)",
+      "file": "arrays.artsy"
+    },
+    {
+      "name": "Basic Assignment",
+      "file": "basic-assignment.artsy"
+    },
+    {
+      "name": "Basic Conditionals",
+      "file": "basic-conditionals.artsy"
+    },
+    {
+      "name": "Basic",
+      "file": "basic.artsy"
+    },
+    {
+      "name": "Celsius to Fahrenheit",
+      "file": "celsius-to-farenheit.artsy"
+    },
+    {
+      "name": "Compute Action",
+      "file": "compute-action.artsy"
+    },
+    {
+      "name": "Escape Test",
+      "file": "escape-test.artsy"
+    },
+    {
+      "name": "Factorial",
+      "file": "factorial.artsy"
+    },
+    {
+      "name": "Fibonacci",
+      "file": "fibonacci.artsy"
+    },
+    {
+      "name": "Logical (Non-Functional)",
+      "file": "logical.artsy"
+    },
+    {
+      "name": "Simple While Loop (Non-Functional)",
+      "file": "simple-while-loop.artsy"
+    },
+    {
+      "name": "Starter Program",
+      "file": "starter-program.artsy"
+    },
+    {
+      "name": "Void Action (Non-Functional)",
+      "file": "void-action.artsy"
+    }
+  ]
