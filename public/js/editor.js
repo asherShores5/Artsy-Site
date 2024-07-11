@@ -6,6 +6,44 @@ editor.getSession().setUseWorker(false);
 var output = document.getElementById("output");
 var save_text = document.getElementById("save-text");
 
+const exampleSelector = document.getElementById('example-selector');
+
+async function loadExamplePrograms() {
+  try {
+    const response = await fetch('/example-programs/index.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const examples = await response.json();
+    
+    examples.forEach(example => {
+      const option = document.createElement('option');
+      option.value = example.file;
+      option.textContent = example.name;
+      exampleSelector.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error loading example programs:", error);
+  }
+}
+
+async function loadSelectedExample() {
+  const selectedFile = exampleSelector.value;
+  if (selectedFile) {
+    try {
+      const response = await fetch(`/example-programs/${selectedFile}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const code = await response.text();
+      editor.setValue(code, -1);
+      saveCode();
+    } catch (error) {
+      console.error("Error loading example:", error);
+    }
+  }
+}
+
 // Start code editor
 startEditor();
 
@@ -72,6 +110,11 @@ function startEditor() {
     console.log("Your progress was restored!");
     editor.setValue(localStorage.getItem('codeInput'));
   }
+    // Load example programs
+    loadExamplePrograms();
+
+    // Add event listener for example selection
+    exampleSelector.addEventListener('change', loadSelectedExample);
 }
 
 // Function to run code and display output in output box
