@@ -10,13 +10,19 @@ var save_text = document.getElementById("save-text");
 startEditor();
 
 let wat2wasm;
-WebAssembly.instantiateStreaming(fetch("https://cdn.jsdelivr.net/npm/wabt@1.0.32/wabt.wasm")).then(wabt => {
+WabtModule().then(wabt => {
   wat2wasm = (watCode) => {
-    const module = wabt.instance.exports.wat2wasm(watCode);
-    const binary = new Uint8Array(wabt.instance.exports.memory.buffer, module.ptr, module.size);
-    wabt.instance.exports.free(module.ptr);
-    return binary.slice();
+    try {
+      const module = wabt.parseWat('temp.wat', watCode);
+      const { buffer } = module.toBinary({});
+      return buffer;
+    } catch (error) {
+      console.error('Error in wat2wasm:', error);
+      throw error;
+    }
   };
+}).catch(error => {
+  console.error('Error loading WABT:', error);
 });
 
 function generateUUID() {
